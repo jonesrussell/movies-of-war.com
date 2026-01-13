@@ -30,7 +30,7 @@ const posterImage = props.movie.poster_url || '/images/placeholders/poster-place
 </script>
 
 <template>
-  <div class="relative min-h-[70vh] overflow-hidden bg-zinc-950">
+  <div class="relative min-h-[70vh] overflow-hidden bg-zinc-950 py-12">
     <div class="absolute inset-0">
       <img
         :src="posterImage"
@@ -51,7 +51,7 @@ const posterImage = props.movie.poster_url || '/images/placeholders/poster-place
           />
         </div>
 
-        <div class="flex flex-col justify-center lg:col-span-8">
+        <div class="flex flex-col justify-center lg:col-span-8 lg:pr-8">
           <div v-if="subtitle" class="mb-2 text-sm font-semibold uppercase tracking-wider text-red-500">
             {{ subtitle }}
           </div>
@@ -68,7 +68,7 @@ const posterImage = props.movie.poster_url || '/images/placeholders/poster-place
             </span>
           </div>
 
-          <p class="mb-8 max-w-2xl text-lg leading-relaxed text-zinc-300 line-clamp-none">
+          <p class="mb-8 max-w-2xl text-lg leading-relaxed text-zinc-300">
             {{ movie.synopsis }}
           </p>
 

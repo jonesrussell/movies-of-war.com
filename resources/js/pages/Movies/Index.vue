@@ -2,8 +2,8 @@
 import type { MovieFilters, PaginatedMovies, Tag } from '@/types';
 
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Filter, Search, X } from 'lucide-vue-next';
 import { useDebounceFn } from '@vueuse/core';
+import { Filter, Search, X } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';

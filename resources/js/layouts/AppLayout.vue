@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { BreadcrumbItemType } from '@/types';
+
 import { computed } from 'vue';
 
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';

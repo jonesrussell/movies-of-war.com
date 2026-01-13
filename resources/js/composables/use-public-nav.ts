@@ -1,7 +1,7 @@
+import type { User } from '@/types/models';
+
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-
-import type { User } from '@/types/models';
 
 export interface NavItem {
     href: string;

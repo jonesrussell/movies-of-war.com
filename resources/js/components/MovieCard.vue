@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Movie } from '@/types';
+import type { User } from '@/types/models';
 
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { Archive, CheckCircle, XCircle } from 'lucide-vue-next';
 
 import { Button } from '@/components/ui/button';
-import type { User } from '@/types/models';
 
 interface Props {
     movie: Movie;

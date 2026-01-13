@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Movie } from '@/types';
+import type { User } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
@@ -14,7 +15,6 @@ import {
 
 import MovieCard from '@/components/MovieCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { User } from '@/types/models';
 
 interface Props {
     movie: Movie;

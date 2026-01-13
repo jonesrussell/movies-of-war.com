@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { BreadcrumbItemType } from '@/types';
+import { computed } from 'vue';
 
 import AppContent from '@/components/AppContent.vue';
 import AppShell from '@/components/AppShell.vue';
@@ -10,8 +11,16 @@ interface Props {
     breadcrumbs?: BreadcrumbItemType[];
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
+});
+
+const headerProps = computed(() => {
+    const result: { breadcrumbs?: BreadcrumbItemType[] } = {};
+    if (props.breadcrumbs !== undefined) {
+        result.breadcrumbs = props.breadcrumbs;
+    }
+    return result;
 });
 </script>
 
@@ -19,7 +28,7 @@ withDefaults(defineProps<Props>(), {
     <AppShell variant="sidebar">
         <AppSidebar />
         <AppContent variant="sidebar" class="overflow-x-hidden">
-            <AppSidebarHeader :breadcrumbs="breadcrumbs" />
+            <AppSidebarHeader v-bind="headerProps" />
             <slot />
         </AppContent>
     </AppShell>

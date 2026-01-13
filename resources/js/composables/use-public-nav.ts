@@ -1,6 +1,8 @@
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
+import type { User } from '@/types/models';
+
 export interface NavItem {
     href: string;
     label: string;
@@ -9,7 +11,6 @@ export interface NavItem {
 
 export function usePublicNav(canRegister = false) {
     const page = usePage();
-    import type { User } from '@/types/models';
 
     const auth = computed(() => page.props.auth as { user?: User });
 

@@ -3,6 +3,7 @@ import type { MovieFilters, PaginatedMovies, Tag } from '@/types';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Filter, Search, X } from 'lucide-vue-next';
+import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';
@@ -29,25 +30,28 @@ const selectedConflict = ref(queryParams.value?.conflict || '');
 const selectedTag = ref(queryParams.value?.tag || '');
 const showFilters = ref(false);
 
+const debouncedFilter = useDebounceFn(() => {
+    router.get(
+        '/movies',
+        {
+            search: search.value || undefined,
+            year: selectedYear.value || undefined,
+            country: selectedCountry.value || undefined,
+            conflict: selectedConflict.value || undefined,
+            tag: selectedTag.value || undefined,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
+}, 300);
+
 watch(
     [search, selectedYear, selectedCountry, selectedConflict, selectedTag],
     () => {
-        router.get(
-            '/movies',
-            {
-                search: search.value || undefined,
-                year: selectedYear.value || undefined,
-                country: selectedCountry.value || undefined,
-                conflict: selectedConflict.value || undefined,
-                tag: selectedTag.value || undefined,
-            },
-            {
-                preserveState: true,
-                preserveScroll: true,
-            },
-        );
+        debouncedFilter();
     },
-    { debounce: 300 },
 );
 
 const clearFilters = () => {

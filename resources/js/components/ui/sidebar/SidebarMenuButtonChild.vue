@@ -24,12 +24,14 @@ const props = withDefaults(defineProps<SidebarMenuButtonProps>(), {
   <Primitive
     data-slot="sidebar-menu-button"
     data-sidebar="menu-button"
-    :data-size="size"
-    :data-active="isActive"
+    v-bind="{
+      ...(as !== undefined ? { as } : {}),
+      ...(asChild !== undefined ? { asChild } : {}),
+      ...(size !== undefined ? { 'data-size': size } : {}),
+      ...(isActive !== undefined ? { 'data-active': isActive } : {}),
+      ...$attrs,
+    }"
     :class="cn(sidebarMenuButtonVariants({ variant, size }), props.class)"
-    :as="as"
-    :as-child="asChild"
-    v-bind="$attrs"
   >
     <slot />
   </Primitive>

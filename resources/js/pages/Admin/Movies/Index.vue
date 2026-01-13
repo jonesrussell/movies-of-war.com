@@ -2,6 +2,7 @@
 import type { Movie, PaginatedMovies } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -19,22 +20,22 @@ usePage();
 const queryParams = computed(() => props.queryParams);
 const search = ref(queryParams.value?.search || '');
 
-watch(
-    search,
-    (value) => {
-        router.get(
-            '/dashboard/movies',
-            {
-                search: value || undefined,
-            },
-            {
-                preserveState: true,
-                preserveScroll: true,
-            },
-        );
-    },
-    { debounce: 300 },
-);
+const debouncedSearch = useDebounceFn((searchValue: string) => {
+    router.get(
+        '/dashboard/movies',
+        {
+            search: searchValue || undefined,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
+}, 300);
+
+watch(search, (value) => {
+    debouncedSearch(value);
+});
 
 function archiveMovie(movie: Movie) {
     if (confirm(`Are you sure you want to archive "${movie.title}"?`)) {
@@ -75,7 +76,7 @@ function unpublishMovie(movie: Movie) {
                 <div>
                     <h1 class="text-3xl font-bold text-white">Manage Movies</h1>
                     <p class="mt-2 text-zinc-400">
-                        {{ movies.total }} total movies
+                        {{ movies.meta.total }} total movies
                     </p>
                 </div>
                 <Link
@@ -238,11 +239,11 @@ function unpublishMovie(movie: Movie) {
 
             <!-- Pagination -->
             <div
-                v-if="movies.last_page > 1"
+                v-if="movies.meta.last_page > 1"
                 class="mt-6 flex justify-center gap-2"
             >
                 <Link
-                    v-for="page in movies.links"
+                    v-for="page in movies.meta.links"
                     :key="page.label"
                     :href="page.url || '#'"
                     :class="[

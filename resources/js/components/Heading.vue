@@ -9,7 +9,6 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     size: 'md',
-    description: undefined,
 });
 
 const headingClasses = {

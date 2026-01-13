@@ -33,7 +33,6 @@ export default defineConfig({
         host: '0.0.0.0',
         port: port,
         strictPort: true,
-        https: false,
         origin: isDdev ? `${ddevUrl}:${port}` : `http://localhost:${port}`,
         cors: {
             origin: isDdev ? [ddevUrl, `${ddevUrl}:${port}`] : true,

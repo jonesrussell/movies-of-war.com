@@ -121,9 +121,9 @@ Movies have three statuses managed through `App\Models\Movie` constants:
 - `getPosterUrl($path)` - Returns TMDB CDN URL
 
 **Import Command:** `app/Console/Commands/ImportTmdbMovies.php`
-- Uses `updateOrCreate` with `tmdb_id` to avoid duplicates
+- Uses `firstOrNew` with `tmdb_id` to avoid duplicates
 - New movies: status = `draft`
-- Existing movies: preserves current status
+- Existing movies: preserves current status on re-import
 - Auto-tags with genres and detected eras (WWI, WWII, Vietnam)
 - Rate limited to 4 requests/second
 

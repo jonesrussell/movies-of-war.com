@@ -15,12 +15,13 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid, Film, Bookmark, Star, Database } from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 
 const page = usePage();
 const auth = page.props.auth as { user: any };
 
-const mainNavItems: NavItem[] = [
+const mainNavItems = computed<NavItem[]>(() => [
     {
         title: 'Dashboard',
         href: dashboard().url,
@@ -40,7 +41,7 @@ const mainNavItems: NavItem[] = [
         ? [
               {
                   title: 'TMDB',
-                  href: '/dashboard',
+                  href: '/dashboard#tmdb-imports',
                   icon: Database,
               },
               {
@@ -50,7 +51,7 @@ const mainNavItems: NavItem[] = [
               },
           ]
         : []),
-];
+]);
 
 const footerNavItems: NavItem[] = [
     {

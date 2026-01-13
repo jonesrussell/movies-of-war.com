@@ -25,7 +25,7 @@ function handleSearchUpdate(value: string) {
 </script>
 
 <template>
-    <div class="mb-8">
+    <div id="tmdb-imports" class="mb-8">
         <div class="mb-6 flex items-center justify-between">
             <div>
                 <h2 class="text-2xl font-bold">TMDB Imports</h2>

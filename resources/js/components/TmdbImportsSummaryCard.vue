@@ -2,7 +2,13 @@
 import { Link } from '@inertiajs/vue3';
 import { ArrowRight, Database } from 'lucide-vue-next';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 
 interface Props {
     draftCount: number;
@@ -20,11 +26,14 @@ defineProps<Props>();
                     TMDB Imports
                 </CardTitle>
                 <CardDescription>
-                    {{ draftCount }} {{ draftCount === 1 ? 'movie' : 'movies' }} awaiting review
+                    {{ draftCount }}
+                    {{ draftCount === 1 ? 'movie' : 'movies' }} awaiting review
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div class="text-sm font-medium text-primary group-hover:underline flex items-center gap-1">
+                <div
+                    class="flex items-center gap-1 text-sm font-medium text-primary group-hover:underline"
+                >
                     Manage Imports
                     <ArrowRight class="size-4" />
                 </div>

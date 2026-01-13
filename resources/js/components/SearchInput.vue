@@ -29,11 +29,14 @@ watch(searchValue, (value) => {
     void debouncedEmit(value);
 });
 
-watch(() => props.modelValue, (value) => {
-    if (value !== searchValue.value) {
-        searchValue.value = value || '';
-    }
-});
+watch(
+    () => props.modelValue,
+    (value) => {
+        if (value !== searchValue.value) {
+            searchValue.value = value || '';
+        }
+    },
+);
 </script>
 
 <template>

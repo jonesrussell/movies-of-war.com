@@ -22,8 +22,6 @@ const props = withDefaults(defineProps<Props>(), {
     canRegister: false,
 });
 
-import { toRef } from 'vue';
-
 const { activeClass } = useActive();
 const canRegisterRef = toRef(props, 'canRegister');
 const { navItems } = usePublicNav(canRegisterRef.value);

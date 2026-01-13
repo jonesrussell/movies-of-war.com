@@ -2,7 +2,15 @@
 import type { User } from '@/types/models';
 
 import { Link, usePage } from '@inertiajs/vue3';
-import { Bookmark, BookOpen, Database, Film, Folder, LayoutGrid, Star } from 'lucide-vue-next';
+import {
+    Bookmark,
+    BookOpen,
+    Database,
+    Film,
+    Folder,
+    LayoutGrid,
+    Star,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import NavFooter from '@/components/NavFooter.vue';

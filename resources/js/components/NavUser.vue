@@ -17,21 +17,6 @@ import UserInfo from '@/components/UserInfo.vue';
 
 import UserMenuContent from './UserMenuContent.vue';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const page = usePage();
 const user = page.props.auth.user;
 const { isMobile, state } = useSidebar();

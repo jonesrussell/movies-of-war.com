@@ -1,18 +1,4 @@
 <script setup lang="ts">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import type { User } from '@/types';
 
 import { Link, router } from '@inertiajs/vue3';

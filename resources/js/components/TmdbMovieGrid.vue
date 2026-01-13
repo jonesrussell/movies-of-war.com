@@ -3,21 +3,6 @@ import type { Movie } from '@/types/models';
 
 import TmdbMovieCard from './TmdbMovieCard.vue';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 interface Props {
     movies: Movie[];
 }
@@ -31,7 +16,9 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div class="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+    <div
+        class="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
+    >
         <TmdbMovieCard
             v-for="movie in movies"
             :key="movie.id"

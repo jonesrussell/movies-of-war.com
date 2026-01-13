@@ -2,21 +2,6 @@ import type { LucideIcon } from 'lucide-vue-next';
 
 import { type InertiaLinkProps } from '@inertiajs/vue3';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export interface Auth {
     user: User;
 }
@@ -40,7 +25,7 @@ export type AppPageProps<
     auth: Auth;
     sidebarOpen: boolean;
     [key: string]: unknown;
-}
+};
 
 export interface User {
     id: number;

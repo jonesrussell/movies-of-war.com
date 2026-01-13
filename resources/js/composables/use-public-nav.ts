@@ -9,7 +9,7 @@ export interface NavItem {
 
 export function usePublicNav(canRegister = false) {
     const page = usePage();
-import type { User } from '@/types/models';
+    import type { User } from '@/types/models';
 
     const auth = computed(() => page.props.auth as { user?: User });
 

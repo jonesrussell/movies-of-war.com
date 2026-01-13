@@ -1,25 +1,11 @@
 <script setup lang="ts">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import type { Movie } from '@/types';
 
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { Archive, CheckCircle, XCircle } from 'lucide-vue-next';
 
 import { Button } from '@/components/ui/button';
+import type { User } from '@/types/models';
 
 interface Props {
     movie: Movie;
@@ -27,36 +13,48 @@ interface Props {
 
 const props = defineProps<Props>();
 const page = usePage();
-import type { User } from '@/types/models';
 
 const auth = page.props.auth as { user?: User };
 
-const posterImage = props.movie.poster_url || '/images/placeholders/poster-placeholder.png';
+const posterImage =
+    props.movie.poster_url || '/images/placeholders/poster-placeholder.png';
 const isAdmin = auth?.user?.is_admin;
 
 function handlePublish(e: Event) {
     e.preventDefault();
     e.stopPropagation();
-    router.post(`/movies/${props.movie.id}/publish`, {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        `/movies/${props.movie.id}/publish`,
+        {},
+        {
+            preserveScroll: true,
+        },
+    );
 }
 
 function handleUnpublish(e: Event) {
     e.preventDefault();
     e.stopPropagation();
-    router.post(`/movies/${props.movie.id}/unpublish`, {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        `/movies/${props.movie.id}/unpublish`,
+        {},
+        {
+            preserveScroll: true,
+        },
+    );
 }
 
 function handleArchive(e: Event) {
     e.preventDefault();
     e.stopPropagation();
     if (confirm(`Archive "${props.movie.title}"?`)) {
-        router.post(`/movies/${props.movie.id}/archive`, {}, {
-            preserveScroll: true,
-        });
+        router.post(
+            `/movies/${props.movie.id}/archive`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
     }
 }
 
@@ -64,11 +62,10 @@ const isPublished = props.movie.status === 'published';
 </script>
 
 <template>
-    <div class="group relative block overflow-hidden rounded-lg bg-zinc-900 transition-transform hover:scale-[1.02]">
-        <Link
-            :href="`/movies/${movie.slug}`"
-            class="block"
-        >
+    <div
+        class="group relative block overflow-hidden rounded-lg bg-zinc-900 transition-transform hover:scale-[1.02]"
+    >
+        <Link :href="`/movies/${movie.slug}`" class="block">
             <div class="aspect-[2/3] overflow-hidden">
                 <img
                     :src="posterImage"
@@ -78,23 +75,38 @@ const isPublished = props.movie.status === 'published';
                 />
             </div>
 
-            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
-                <div class="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 class="mb-2 text-lg font-bold text-white">{{ movie.title }}</h3>
+            <div
+                class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+            >
+                <div class="absolute right-0 bottom-0 left-0 p-4">
+                    <h3 class="mb-2 text-lg font-bold text-white">
+                        {{ movie.title }}
+                    </h3>
 
-                    <div class="mb-2 flex items-center gap-2 text-sm text-zinc-300">
+                    <div
+                        class="mb-2 flex items-center gap-2 text-sm text-zinc-300"
+                    >
                         <span>{{ movie.release_year }}</span>
-                        <span v-if="movie.runtime" class="flex items-center gap-1">
+                        <span
+                            v-if="movie.runtime"
+                            class="flex items-center gap-1"
+                        >
                             • {{ movie.runtime }} min
                         </span>
                         <span v-if="movie.country">• {{ movie.country }}</span>
                     </div>
 
-                    <p v-if="movie.synopsis" class="line-clamp-2 text-sm text-zinc-400">
+                    <p
+                        v-if="movie.synopsis"
+                        class="line-clamp-2 text-sm text-zinc-400"
+                    >
                         {{ movie.synopsis }}
                     </p>
 
-                    <div v-if="movie.tags && movie.tags.length > 0" class="mt-2 flex flex-wrap gap-1">
+                    <div
+                        v-if="movie.tags && movie.tags.length > 0"
+                        class="mt-2 flex flex-wrap gap-1"
+                    >
                         <span
                             v-for="tag in movie.tags.slice(0, 3)"
                             :key="tag.id"
@@ -106,7 +118,10 @@ const isPublished = props.movie.status === 'published';
                 </div>
             </div>
 
-            <div v-if="movie.is_upcoming" class="absolute right-2 top-2 rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white">
+            <div
+                v-if="movie.is_upcoming"
+                class="absolute top-2 right-2 rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white"
+            >
                 Coming Soon
             </div>
         </Link>

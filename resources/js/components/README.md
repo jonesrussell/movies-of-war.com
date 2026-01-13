@@ -12,7 +12,7 @@ import { Film, Bookmark, Search } from 'lucide-vue-next';
 </script>
 
 <template>
-  <Film class="h-4 w-4" />
+    <Film class="h-4 w-4" />
 </template>
 ```
 
@@ -25,23 +25,23 @@ import { Film, Bookmark, Search } from 'lucide-vue-next';
 ### App Layouts
 
 - **`AppSidebarLayout`**: Primary layout for authenticated dashboard pages
-  - Used by: Dashboard, Admin pages, Settings pages
-  - Features: Collapsible sidebar, breadcrumbs, user menu
+    - Used by: Dashboard, Admin pages, Settings pages
+    - Features: Collapsible sidebar, breadcrumbs, user menu
 
 - **`AppLayout`**: Wrapper that delegates to `AppSidebarLayout`
-  - Use this wrapper for consistency
+    - Use this wrapper for consistency
 
 ### Auth Layouts
 
 - **`AuthLayout`**: Wrapper that delegates to `AuthSimpleLayout`
-  - Used by: All authentication pages (Login, Register, etc.)
-  - Features: Centered card layout with logo
+    - Used by: All authentication pages (Login, Register, etc.)
+    - Features: Centered card layout with logo
 
 ### Public Layouts
 
 - **`PublicLayout`**: Layout for public-facing pages
-  - Used by: Welcome, Movies index/show, Watchlist
-  - Features: Public header with navigation
+    - Used by: Welcome, Movies index/show, Watchlist
+    - Features: Public header with navigation
 
 ## Heading Components
 
@@ -53,15 +53,16 @@ import Heading from '@/components/Heading.vue';
 </script>
 
 <template>
-  <!-- Small heading (default, h3, text-base) -->
-  <Heading title="Section Title" description="Optional description" />
-  
-  <!-- Large heading (h2, text-xl) -->
-  <Heading size="lg" title="Page Title" description="Page description" />
+    <!-- Small heading (default, h3, text-base) -->
+    <Heading title="Section Title" description="Optional description" />
+
+    <!-- Large heading (h2, text-xl) -->
+    <Heading size="lg" title="Page Title" description="Page description" />
 </template>
 ```
 
 **Sizes**:
+
 - `sm` / `md` (default): h3, text-base, for section headings
 - `lg`: h2, text-xl, for page-level headings
 

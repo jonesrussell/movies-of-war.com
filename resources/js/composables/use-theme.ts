@@ -1,6 +1,9 @@
 import { computed } from 'vue';
 
-import { type ResolvedAppearance, useAppearance } from '@/composables/use-appearance';
+import {
+    type ResolvedAppearance,
+    useAppearance,
+} from '@/composables/use-appearance';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type ResolvedTheme = ResolvedAppearance;
@@ -11,7 +14,8 @@ export type ResolvedTheme = ResolvedAppearance;
  * Can be extended for high-contrast mode, seasonal themes, etc.
  */
 export function useTheme() {
-    const { appearance, resolvedAppearance, updateAppearance } = useAppearance();
+    const { appearance, resolvedAppearance, updateAppearance } =
+        useAppearance();
 
     const isDark = computed(() => resolvedAppearance.value === 'dark');
     const isLight = computed(() => resolvedAppearance.value === 'light');

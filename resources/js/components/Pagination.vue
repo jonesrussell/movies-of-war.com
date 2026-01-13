@@ -3,21 +3,6 @@ import type { PaginationMeta } from '@/types/models';
 
 import { Link } from '@inertiajs/vue3';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 interface Props {
     meta: PaginationMeta;
 }
@@ -36,8 +21,8 @@ defineProps<Props>();
                 link.active
                     ? 'bg-primary text-primary-foreground'
                     : link.url
-                    ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                    : 'bg-muted text-muted-foreground cursor-not-allowed pointer-events-none',
+                      ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                      : 'pointer-events-none cursor-not-allowed bg-muted text-muted-foreground',
             ]"
         >
             <!-- eslint-disable-next-line vue/no-v-html -->

@@ -17,7 +17,9 @@ withDefaults(defineProps<Props>(), {
             <slot />
         </main>
         <footer class="border-t border-zinc-800 bg-zinc-900 py-8">
-            <div class="mx-auto max-w-7xl px-4 text-center text-zinc-500 sm:px-6 lg:px-8">
+            <div
+                class="mx-auto max-w-7xl px-4 text-center text-zinc-500 sm:px-6 lg:px-8"
+            >
                 <p>&copy; 2026 Movies of War. All rights reserved.</p>
             </div>
         </footer>

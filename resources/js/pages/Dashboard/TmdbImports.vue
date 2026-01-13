@@ -1,23 +1,7 @@
 <script setup lang="ts">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import type { Movie, PaginatedMovies } from '@/types/models';
 
-import { Head, router } from '@inertiajs/vue3';
-import { useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { Download } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
@@ -41,7 +25,9 @@ import { Label } from '@/components/ui/label';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
-    tmdbDrafts: PaginatedMovies | { data: Movie[]; meta?: PaginatedMovies['meta'] };
+    tmdbDrafts:
+        | PaginatedMovies
+        | { data: Movie[]; meta?: PaginatedMovies['meta'] };
     queryParams: {
         search?: string;
     };
@@ -52,7 +38,9 @@ const props = defineProps<Props>();
 const queryParams = computed(() => props.queryParams);
 const search = ref(queryParams.value?.search || '');
 const confirmDialogOpen = ref(false);
-const pendingAction = ref<{ type: 'publish' | 'archive'; movie: Movie } | null>(null);
+const pendingAction = ref<{ type: 'publish' | 'archive'; movie: Movie } | null>(
+    null,
+);
 const dialogOpen = ref(false);
 
 const form = useForm({
@@ -62,12 +50,16 @@ const form = useForm({
 
 function handleSearchUpdate(value: string) {
     search.value = value;
-    router.get('/dashboard/tmdb-imports', {
-        search: value || undefined,
-    }, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+    router.get(
+        '/dashboard/tmdb-imports',
+        {
+            search: value || undefined,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
 }
 
 function publishMovie(movie: Movie) {
@@ -88,9 +80,13 @@ function handleConfirm() {
     const { type, movie } = pendingAction.value;
     const action = type === 'publish' ? 'publish' : 'archive';
 
-    router.post(`/movies/${movie.id}/${action}`, {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        `/movies/${movie.id}/${action}`,
+        {},
+        {
+            preserveScroll: true,
+        },
+    );
 }
 
 function handleCancel() {
@@ -118,7 +114,8 @@ function handleImport() {
                     <div>
                         <h1 class="text-3xl font-bold">TMDB Imports</h1>
                         <p class="mt-1 text-sm text-muted-foreground">
-                            {{ props.tmdbDrafts?.meta?.total ?? 0 }} movies awaiting review
+                            {{ props.tmdbDrafts?.meta?.total ?? 0 }} movies
+                            awaiting review
                         </p>
                     </div>
 
@@ -133,12 +130,18 @@ function handleImport() {
                             <DialogHeader>
                                 <DialogTitle>Import TMDB Movies</DialogTitle>
                                 <DialogDescription>
-                                    Import war movies from The Movie Database. The import will run in the background.
+                                    Import war movies from The Movie Database.
+                                    The import will run in the background.
                                 </DialogDescription>
                             </DialogHeader>
-                            <form @submit.prevent="handleImport" class="space-y-4">
+                            <form
+                                @submit.prevent="handleImport"
+                                class="space-y-4"
+                            >
                                 <div class="space-y-2">
-                                    <Label for="limit">Number of movies to import</Label>
+                                    <Label for="limit"
+                                        >Number of movies to import</Label
+                                    >
                                     <Input
                                         id="limit"
                                         v-model.number="form.limit"
@@ -157,7 +160,10 @@ function handleImport() {
                                         v-model:checked="form.download_posters"
                                         :disabled="form.processing"
                                     />
-                                    <Label for="download_posters" class="cursor-pointer">
+                                    <Label
+                                        for="download_posters"
+                                        class="cursor-pointer"
+                                    >
                                         Download poster images
                                     </Label>
                                 </div>
@@ -170,8 +176,15 @@ function handleImport() {
                                     >
                                         Cancel
                                     </Button>
-                                    <Button type="submit" :disabled="form.processing">
-                                        {{ form.processing ? 'Importing...' : 'Start Import' }}
+                                    <Button
+                                        type="submit"
+                                        :disabled="form.processing"
+                                    >
+                                        {{
+                                            form.processing
+                                                ? 'Importing...'
+                                                : 'Start Import'
+                                        }}
                                     </Button>
                                 </DialogFooter>
                             </form>
@@ -189,7 +202,13 @@ function handleImport() {
                 </div>
 
                 <!-- TMDB Movies Grid -->
-                <div v-if="props.tmdbDrafts?.data && props.tmdbDrafts.data.length > 0" class="mb-6">
+                <div
+                    v-if="
+                        props.tmdbDrafts?.data &&
+                        props.tmdbDrafts.data.length > 0
+                    "
+                    class="mb-6"
+                >
                     <TmdbMovieGrid
                         :movies="props.tmdbDrafts.data"
                         @publish="publishMovie"
@@ -197,7 +216,13 @@ function handleImport() {
                     />
                 </div>
 
-                <div v-if="!props.tmdbDrafts?.data || props.tmdbDrafts.data.length === 0" class="mb-6 rounded-lg border border-border bg-card py-16 text-center">
+                <div
+                    v-if="
+                        !props.tmdbDrafts?.data ||
+                        props.tmdbDrafts.data.length === 0
+                    "
+                    class="mb-6 rounded-lg border border-border bg-card py-16 text-center"
+                >
                     <p class="text-muted-foreground">No TMDB imports found</p>
                     <p class="mt-2 text-sm text-muted-foreground">
                         Click "Import Movies" above to import movies from TMDB
@@ -205,7 +230,12 @@ function handleImport() {
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="props.tmdbDrafts?.meta && props.tmdbDrafts.meta.last_page > 1">
+                <div
+                    v-if="
+                        props.tmdbDrafts?.meta &&
+                        props.tmdbDrafts.meta.last_page > 1
+                    "
+                >
                     <Pagination :meta="props.tmdbDrafts.meta" />
                 </div>
             </div>
@@ -217,8 +247,12 @@ function handleImport() {
             v-model:open="confirmDialogOpen"
             :title="`${pendingAction.type === 'publish' ? 'Publish' : 'Archive'} Movie?`"
             :description="`Are you sure you want to ${pendingAction.type === 'publish' ? 'publish' : 'archive'} '${pendingAction.movie.title}'?`"
-            :confirm-text="pendingAction.type === 'publish' ? 'Publish' : 'Archive'"
-            :variant="pendingAction.type === 'archive' ? 'destructive' : 'default'"
+            :confirm-text="
+                pendingAction.type === 'publish' ? 'Publish' : 'Archive'
+            "
+            :variant="
+                pendingAction.type === 'archive' ? 'destructive' : 'default'
+            "
             @confirm="handleConfirm"
             @cancel="handleCancel"
         />

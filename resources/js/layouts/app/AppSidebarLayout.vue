@@ -1,19 +1,4 @@
 <script setup lang="ts">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import type { BreadcrumbItemType } from '@/types';
 
 import AppContent from '@/components/AppContent.vue';

@@ -3,21 +3,6 @@ import type { BreadcrumbItemType } from '@/types';
 
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];
 }

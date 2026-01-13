@@ -13,7 +13,10 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <Link href="/" class="flex items-center gap-3 transition-opacity hover:opacity-80">
+    <Link
+        href="/"
+        class="flex items-center gap-3 transition-opacity hover:opacity-80"
+    >
         <img
             src="/images/branding/logo.png"
             alt="Movies of War"

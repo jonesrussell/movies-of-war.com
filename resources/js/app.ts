@@ -1,20 +1,5 @@
 import '../css/app.css';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import type { DefineComponent } from 'vue';
 
 import { createInertiaApp } from '@inertiajs/vue3';

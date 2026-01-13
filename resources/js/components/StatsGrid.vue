@@ -15,6 +15,11 @@ defineProps<Props>();
 
 <template>
     <div class="grid gap-6 sm:grid-cols-3">
-        <StatsCard v-for="stat in stats" :key="stat.title" :title="stat.title" :value="stat.value" />
+        <StatsCard
+            v-for="stat in stats"
+            :key="stat.title"
+            :title="stat.title"
+            :value="stat.value"
+        />
     </div>
 </template>

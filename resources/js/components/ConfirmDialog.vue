@@ -36,9 +36,12 @@ const emit = defineEmits<{
 const openProp = toRef(props, 'open');
 const isOpen = ref(openProp.value);
 
-watch(() => props.open, (value) => {
-    isOpen.value = value;
-});
+watch(
+    () => props.open,
+    (value) => {
+        isOpen.value = value;
+    },
+);
 
 watch(isOpen, (value) => {
     emit('update:open', value);

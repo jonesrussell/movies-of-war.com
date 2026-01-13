@@ -50,7 +50,7 @@ const debouncedFilter = useDebounceFn(() => {
 watch(
     [search, selectedYear, selectedCountry, selectedConflict, selectedTag],
     () => {
-        debouncedFilter();
+        void debouncedFilter();
     },
 );
 

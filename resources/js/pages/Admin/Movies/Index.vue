@@ -34,7 +34,7 @@ const debouncedSearch = useDebounceFn((searchValue: string) => {
 }, 300);
 
 watch(search, (value) => {
-    debouncedSearch(value);
+    void debouncedSearch(value);
 });
 
 function archiveMovie(movie: Movie) {

@@ -37,8 +37,18 @@ task('deploy:build', function () {
     run('npm run build');
 });
 
+/**
+ * Restart queue workers gracefully.
+ * This tells all queue workers to finish their current job and then exit.
+ * Supervisor will automatically restart them with the new code.
+ */
+task('artisan:queue:restart', function () {
+    run('{{bin/php}} {{release_path}}/artisan queue:restart');
+});
+
 // Hooks
 
 after('deploy:update_code', 'deploy:npm');
 after('deploy:vendors', 'deploy:build');
+after('deploy:symlink', 'artisan:queue:restart');
 after('deploy:failed', 'deploy:unlock');

@@ -7,12 +7,9 @@ import { filterUndefinedProps } from "@/lib/utils"
 const props = defineProps<AvatarImageProps>()
 
 const filteredProps = computed(() => {
-  const filtered = filterUndefinedProps(props);
-  // Ensure src is always a string if provided (required by component)
-  if (props.src !== undefined && !('src' in filtered)) {
-    return { ...filtered, src: props.src };
-  }
-  return filtered;
+  // Remove src from props to pass separately
+  const { src, ...rest } = props;
+  return filterUndefinedProps(rest);
 })
 </script>
 
@@ -20,6 +17,7 @@ const filteredProps = computed(() => {
   <AvatarImage
     v-if="props.src"
     data-slot="avatar-image"
+    :src="(props.src as string)"
     v-bind="filteredProps"
     class="aspect-square size-full"
   >

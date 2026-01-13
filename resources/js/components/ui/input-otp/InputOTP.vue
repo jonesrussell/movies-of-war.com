@@ -15,7 +15,7 @@ const delegatedProps = reactiveOmit(props, "class")
 const filteredProps = computed(() => {
   const filtered = filterUndefinedProps(delegatedProps);
   // Ensure maxlength is always provided (required by component)
-  if (!('maxlength' in filtered) && props.maxlength !== undefined) {
+  if (props.maxlength !== undefined) {
     return { ...filtered, maxlength: props.maxlength };
   }
   return filtered;
@@ -26,7 +26,9 @@ const forwarded = useForwardPropsEmits(filteredProps, emits)
 
 <template>
   <OTPInput
+    v-if="props.maxlength !== undefined"
     v-slot="slotProps"
+    :maxlength="props.maxlength"
     v-bind="forwarded"
     :container-class="cn('flex items-center gap-2 has-disabled:opacity-50', props.class)"
     data-slot="input-otp"

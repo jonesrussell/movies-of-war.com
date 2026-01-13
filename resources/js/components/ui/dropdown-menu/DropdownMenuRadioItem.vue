@@ -19,7 +19,7 @@ const delegatedProps = reactiveOmit(props, "class")
 const filteredProps = computed(() => {
   const filtered = filterUndefinedProps(delegatedProps);
   // Ensure value is always provided (required by component)
-  if (!('value' in filtered) && props.value !== undefined) {
+  if (props.value !== undefined) {
     return { ...filtered, value: props.value };
   }
   return filtered;
@@ -30,7 +30,9 @@ const forwarded = useForwardPropsEmits(filteredProps, emits)
 
 <template>
   <DropdownMenuRadioItem
+    v-if="props.value !== undefined"
     data-slot="dropdown-menu-radio-item"
+    :value="props.value"
     v-bind="forwarded"
     :class="cn(
       'focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-4',

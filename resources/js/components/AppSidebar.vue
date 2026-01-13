@@ -13,16 +13,38 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import { BookOpen, Folder, LayoutGrid, Film, Bookmark, Star } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
+
+const page = usePage();
+const auth = page.props.auth as { user: any };
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
+        href: dashboard().url,
         icon: LayoutGrid,
     },
+    {
+        title: 'Movies',
+        href: '/movies',
+        icon: Film,
+    },
+    {
+        title: 'Watchlist',
+        href: '/watchlist',
+        icon: Bookmark,
+    },
+    ...(auth?.user?.is_admin
+        ? [
+              {
+                  title: 'Featured Slots',
+                  href: '/featured-slots',
+                  icon: Star,
+              },
+          ]
+        : []),
 ];
 
 const footerNavItems: NavItem[] = [
@@ -45,7 +67,7 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link :href="dashboard().url">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>

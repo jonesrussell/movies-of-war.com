@@ -68,7 +68,7 @@ const posterImage = props.movie.poster_url || '/images/placeholders/poster-place
             </span>
           </div>
 
-          <p class="mb-8 max-w-2xl text-lg leading-relaxed text-zinc-300">
+          <p class="mb-8 max-w-2xl text-lg leading-relaxed text-zinc-300 line-clamp-none">
             {{ movie.synopsis }}
           </p>
 

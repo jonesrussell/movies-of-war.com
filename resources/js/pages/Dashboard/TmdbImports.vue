@@ -179,16 +179,16 @@ function handleImport() {
                     />
                 </div>
 
-                <!-- Pagination -->
-                <div v-if="props.tmdbDrafts?.meta && props.tmdbDrafts.meta.last_page > 1" class="mb-6">
-                    <Pagination :meta="props.tmdbDrafts.meta" />
-                </div>
-
-                <div v-if="!props.tmdbDrafts?.data || props.tmdbDrafts.data.length === 0" class="rounded-lg border border-border bg-card py-16 text-center">
+                <div v-if="!props.tmdbDrafts?.data || props.tmdbDrafts.data.length === 0" class="mb-6 rounded-lg border border-border bg-card py-16 text-center">
                     <p class="text-muted-foreground">No TMDB imports found</p>
                     <p class="mt-2 text-sm text-muted-foreground">
                         Click "Import Movies" above to import movies from TMDB
                     </p>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="props.tmdbDrafts?.meta && props.tmdbDrafts.meta.last_page > 1">
+                    <Pagination :meta="props.tmdbDrafts.meta" />
                 </div>
             </div>
         </div>

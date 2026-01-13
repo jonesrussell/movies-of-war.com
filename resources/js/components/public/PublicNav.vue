@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
+import { usePublicNav } from '@/composables/use-public-nav';
 import { useActive } from '@/composables/useActive';
 
 interface Props {
@@ -12,55 +12,8 @@ const props = withDefaults(defineProps<Props>(), {
     canRegister: false,
 });
 
-const page = usePage();
-const auth = computed(() => page.props.auth as { user: any });
 const { activeClass } = useActive();
-
-interface NavItem {
-    href: string;
-    label: string;
-    isButton?: boolean;
-}
-
-const navItems = computed<NavItem[]>(() => {
-    const items: NavItem[] = [
-        {
-            href: '/movies',
-            label: 'Browse Movies',
-        },
-    ];
-
-    if (auth.value?.user) {
-        items.push(
-            {
-                href: '/watchlist',
-                label: 'Watchlist',
-            },
-            {
-                href: '/dashboard',
-                label: 'Dashboard',
-                isButton: true,
-            },
-        );
-    } else {
-        items.push(
-            {
-                href: '/login',
-                label: 'Login',
-            },
-        );
-
-        if (props.canRegister) {
-            items.push({
-                href: '/register',
-                label: 'Register',
-                isButton: true,
-            });
-        }
-    }
-
-    return items;
-});
+const { navItems } = usePublicNav(props.canRegister);
 </script>
 
 <template>

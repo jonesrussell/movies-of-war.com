@@ -4,6 +4,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
 
 import AppLayout from '@/layouts/AppLayout.vue'

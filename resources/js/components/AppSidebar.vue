@@ -23,6 +23,16 @@ import { type NavItem } from '@/types';
 
 
 
+
+
+
+
+
+
+
+
+
+
 const page = usePage();
 const auth = page.props.auth as { user: any };
 

@@ -4,6 +4,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Filter, Search, X } from 'lucide-vue-next';
 import { ref, watch } from 'vue';

@@ -4,6 +4,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 import { Link } from '@inertiajs/vue3'
 import { Play, Plus, Info } from 'lucide-vue-next'
 import type { Movie } from '@/types'

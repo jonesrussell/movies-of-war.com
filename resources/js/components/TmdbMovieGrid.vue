@@ -7,6 +7,16 @@ import type { Movie } from '@/types/models';
 
 
 
+
+
+
+
+
+
+
+
+
+
 interface Props {
     movies: Movie[];
 }

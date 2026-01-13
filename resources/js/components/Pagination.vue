@@ -7,6 +7,16 @@ import type { PaginationMeta } from '@/types/models';
 
 
 
+
+
+
+
+
+
+
+
+
+
 interface Props {
     meta: PaginationMeta;
 }

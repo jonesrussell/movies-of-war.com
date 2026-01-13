@@ -15,7 +15,7 @@ withDefaults(defineProps<Props>(), {
         <img
             src="/images/branding/logo.png"
             alt="Movies of War"
-            class="h-10 sm:h-11 lg:h-12 transition-transform hover:scale-105"
+            class="h-24 sm:h-28 lg:h-32 transition-transform hover:scale-105"
         />
         <span
             v-if="showText"

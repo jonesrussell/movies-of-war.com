@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { Menu } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -11,6 +11,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
+import { usePublicNav } from '@/composables/use-public-nav';
 import { useActive } from '@/composables/useActive';
 
 interface Props {
@@ -21,56 +22,9 @@ const props = withDefaults(defineProps<Props>(), {
     canRegister: false,
 });
 
-const page = usePage();
-const auth = computed(() => page.props.auth as { user: any });
 const { activeClass } = useActive();
+const { navItems } = usePublicNav(props.canRegister);
 const isOpen = ref(false);
-
-interface NavItem {
-    href: string;
-    label: string;
-    isButton?: boolean;
-}
-
-const navItems = computed<NavItem[]>(() => {
-    const items: NavItem[] = [
-        {
-            href: '/movies',
-            label: 'Browse Movies',
-        },
-    ];
-
-    if (auth.value?.user) {
-        items.push(
-            {
-                href: '/watchlist',
-                label: 'Watchlist',
-            },
-            {
-                href: '/dashboard',
-                label: 'Dashboard',
-                isButton: true,
-            },
-        );
-    } else {
-        items.push(
-            {
-                href: '/login',
-                label: 'Login',
-            },
-        );
-
-        if (props.canRegister) {
-            items.push({
-                href: '/register',
-                label: 'Register',
-                isButton: true,
-            });
-        }
-    }
-
-    return items;
-});
 
 function handleLinkClick() {
     isOpen.value = false;

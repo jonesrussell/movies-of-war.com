@@ -4,6 +4,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Calendar, Check, Clock, Film, MapPin, Play, Plus } from 'lucide-vue-next';
 

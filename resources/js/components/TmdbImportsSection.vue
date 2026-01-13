@@ -4,6 +4,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 import { Link, router, useForm } from '@inertiajs/vue3';
 import { ArrowRight, Download } from 'lucide-vue-next';
 import { ref } from 'vue';

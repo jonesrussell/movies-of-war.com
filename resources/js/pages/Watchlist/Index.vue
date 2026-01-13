@@ -4,6 +4,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 import { Head, Link } from '@inertiajs/vue3';
 import { Bookmark } from 'lucide-vue-next';
 

@@ -16,9 +16,11 @@ interface Props {
     };
 }
 
+import type { User } from '@/types/models';
+
 const props = defineProps<Props>();
 const page = usePage();
-const auth = page.props.auth as { user?: import('@/types/models').User };
+const auth = page.props.auth as { user?: User };
 
 const statsArray = computed(() => [
     { title: 'Published Movies', value: props.stats.movies },

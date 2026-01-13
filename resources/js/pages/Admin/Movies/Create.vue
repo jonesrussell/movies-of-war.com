@@ -17,7 +17,6 @@
 import type { Tag } from '@/types/models'
 
 import { Head, useForm, usePage } from '@inertiajs/vue3'
-import { ref } from 'vue'
 
 import AppLayout from '@/layouts/AppLayout.vue'
 
@@ -25,9 +24,8 @@ interface Props {
   tags: Tag[]
 }
 
-const props = defineProps<Props>()
-const page = usePage()
-const auth = page.props.auth as { user?: import('@/types/models').User }
+defineProps<Props>()
+usePage()
 
 const form = useForm({
   title: '',

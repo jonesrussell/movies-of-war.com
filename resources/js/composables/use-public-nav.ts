@@ -9,7 +9,9 @@ export interface NavItem {
 
 export function usePublicNav(canRegister = false) {
     const page = usePage();
-    const auth = computed(() => page.props.auth as { user?: import('@/types/models').User });
+import type { User } from '@/types/models';
+
+    const auth = computed(() => page.props.auth as { user?: User });
 
     const navItems = computed<NavItem[]>(() => {
         const items: NavItem[] = [

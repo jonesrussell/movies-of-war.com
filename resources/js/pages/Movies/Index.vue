@@ -18,7 +18,7 @@ import type { MovieFilters, PaginatedMovies, Tag } from '@/types';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Filter, Search, X } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
@@ -36,11 +36,12 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const search = ref(props.queryParams.search || '')
-const selectedYear = ref(props.queryParams.year || '')
-const selectedCountry = ref(props.queryParams.country || '')
-const selectedConflict = ref(props.queryParams.conflict || '')
-const selectedTag = ref(props.queryParams.tag || '')
+const queryParams = computed(() => props.queryParams);
+const search = ref(queryParams.value?.search || '')
+const selectedYear = ref(queryParams.value?.year || '')
+const selectedCountry = ref(queryParams.value?.country || '')
+const selectedConflict = ref(queryParams.value?.conflict || '')
+const selectedTag = ref(queryParams.value?.tag || '')
 const showFilters = ref(false)
 
 watch([search, selectedYear, selectedCountry, selectedConflict, selectedTag], () => {

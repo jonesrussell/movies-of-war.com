@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { toRef } from 'vue';
 
 import { usePublicNav } from '@/composables/use-public-nav';
 import { useActive } from '@/composables/useActive';
@@ -13,7 +14,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { activeClass } = useActive();
-const { navItems } = usePublicNav(props.canRegister);
+const canRegisterRef = toRef(props, 'canRegister');
+const { navItems } = usePublicNav(canRegisterRef.value);
 </script>
 
 <template>

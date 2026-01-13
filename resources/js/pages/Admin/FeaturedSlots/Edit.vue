@@ -17,6 +17,7 @@
 import type { FeaturedSlot } from '@/types/models'
 
 import { Head, useForm, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue';
 
 import AppLayout from '@/layouts/AppLayout.vue'
 
@@ -26,8 +27,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const page = usePage()
-const auth = page.props.auth as { user?: import('@/types/models').User }
+usePage()
 
 // Format datetime for datetime-local input
 function formatDateTimeLocal(dateString: string | null): string {
@@ -36,11 +36,12 @@ function formatDateTimeLocal(dateString: string | null): string {
   return date.toISOString().slice(0, 16)
 }
 
+const slot = computed(() => props.slot);
 const form = useForm({
-  movie_id: props.slot.movie_id,
-  slot: props.slot.slot,
-  starts_at: formatDateTimeLocal(props.slot.starts_at),
-  ends_at: formatDateTimeLocal(props.slot.ends_at),
+  movie_id: slot.value.movie_id,
+  slot: slot.value.slot,
+  starts_at: formatDateTimeLocal(slot.value.starts_at),
+  ends_at: formatDateTimeLocal(slot.value.ends_at),
 })
 
 function submit() {

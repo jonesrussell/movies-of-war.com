@@ -1,7 +1,5 @@
 import type { InertiaLinkProps } from '@inertiajs/vue3';
 
-import { computed } from 'vue';
-
 import { useActiveUrl } from '@/composables/useActiveUrl';
 
 export function useActive() {

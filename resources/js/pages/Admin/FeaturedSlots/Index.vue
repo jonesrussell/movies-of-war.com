@@ -24,9 +24,8 @@ interface Props {
   slots: PaginatedFeaturedSlots
 }
 
-const props = defineProps<Props>()
-const page = usePage()
-const auth = page.props.auth as { user?: import('@/types/models').User }
+defineProps<Props>()
+usePage()
 
 function deleteSlot(slot: FeaturedSlot) {
   if (confirm(`Are you sure you want to delete this featured slot?`)) {

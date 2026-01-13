@@ -14,7 +14,6 @@
 
 
 
-import type { Movie } from '@/types/models'
 
 import { Head, useForm, usePage } from '@inertiajs/vue3'
 
@@ -24,9 +23,8 @@ interface Props {
   movies: { id: number; title: string }[]
 }
 
-const props = defineProps<Props>()
-const page = usePage()
-const auth = page.props.auth as { user?: import('@/types/models').User }
+defineProps<Props>()
+usePage()
 
 const form = useForm({
   movie_id: null as number | null,

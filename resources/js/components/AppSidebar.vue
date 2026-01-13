@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { User } from '@/types/models';
+
 import { Link, usePage } from '@inertiajs/vue3';
 import { Bookmark, BookOpen, Database, Film, Folder, LayoutGrid, Star } from 'lucide-vue-next';
 import { computed } from 'vue';
@@ -20,22 +22,8 @@ import { type NavItem } from '@/types';
 
 import AppLogo from './AppLogo.vue';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const page = usePage();
-const auth = page.props.auth as { user?: import('@/types/models').User };
+const auth = page.props.auth as { user?: User };
 
 const mainNavItems = computed<NavItem[]>(() => [
     {

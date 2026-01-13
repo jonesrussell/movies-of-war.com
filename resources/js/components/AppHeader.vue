@@ -49,8 +49,10 @@ const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 });
 
+import type { User } from '@/types/models';
+
 const page = usePage();
-const auth = computed(() => page.props.auth as { user?: import('@/types/models').User });
+const auth = computed(() => page.props.auth as { user?: User });
 const { urlIsActive } = useActiveUrl();
 
 function activeItemStyles(url: NonNullable<InertiaLinkProps['href']>) {

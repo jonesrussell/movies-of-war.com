@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { Menu } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, toRef } from 'vue';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,8 +22,11 @@ const props = withDefaults(defineProps<Props>(), {
     canRegister: false,
 });
 
+import { toRef } from 'vue';
+
 const { activeClass } = useActive();
-const { navItems } = usePublicNav(props.canRegister);
+const canRegisterRef = toRef(props, 'canRegister');
+const { navItems } = usePublicNav(canRegisterRef.value);
 const isOpen = ref(false);
 
 function handleLinkClick() {

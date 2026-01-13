@@ -19,7 +19,7 @@ import type { Movie, PaginatedMovies } from '@/types/models';
 import { Head, router } from '@inertiajs/vue3';
 import { useForm } from '@inertiajs/vue3';
 import { Download } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import Pagination from '@/components/Pagination.vue';
@@ -49,7 +49,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const search = ref(props.queryParams.search || '');
+const queryParams = computed(() => props.queryParams);
+const search = ref(queryParams.value?.search || '');
 const confirmDialogOpen = ref(false);
 const pendingAction = ref<{ type: 'publish' | 'archive'; movie: Movie } | null>(null);
 const dialogOpen = ref(false);

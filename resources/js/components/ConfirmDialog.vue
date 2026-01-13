@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, toRef, watch } from 'vue';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -33,7 +33,8 @@ const emit = defineEmits<{
     (e: 'cancel'): void;
 }>();
 
-const isOpen = ref(props.open);
+const openProp = toRef(props, 'open');
+const isOpen = ref(openProp.value);
 
 watch(() => props.open, (value) => {
     isOpen.value = value;

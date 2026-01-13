@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { Input } from '@/components/ui/input';
 
@@ -10,6 +10,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    modelValue: undefined,
     placeholder: 'Search...',
 });
 
@@ -17,14 +18,15 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void;
 }>();
 
-const searchValue = ref(props.modelValue || '');
+const modelValue = computed(() => props.modelValue);
+const searchValue = ref(modelValue.value || '');
 
 const debouncedEmit = useDebounceFn((value: string) => {
     emit('update:modelValue', value);
 }, 300);
 
 watch(searchValue, (value) => {
-    debouncedEmit(value);
+    void debouncedEmit(value);
 });
 
 watch(() => props.modelValue, (value) => {

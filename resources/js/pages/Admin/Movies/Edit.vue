@@ -17,6 +17,7 @@
 import type { Movie, Tag } from '@/types/models'
 
 import { Head, useForm, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue';
 
 import AppLayout from '@/layouts/AppLayout.vue'
 
@@ -26,22 +27,22 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const page = usePage()
-const auth = page.props.auth as { user?: import('@/types/models').User }
+usePage()
 
+const movie = computed(() => props.movie);
 const form = useForm({
-  title: props.movie.title,
-  release_year: props.movie.release_year,
-  release_date: props.movie.release_date || '',
-  synopsis: props.movie.synopsis,
-  runtime: props.movie.runtime,
-  country: props.movie.country || '',
-  conflict: props.movie.conflict || '',
-  poster_url: props.movie.poster_url || '',
-  trailer_url: props.movie.trailer_url || '',
-  imdb_id: props.movie.imdb_id || '',
-  is_upcoming: props.movie.is_upcoming,
-  tags: props.movie.tags?.map(tag => tag.id) || [],
+  title: movie.value.title,
+  release_year: movie.value.release_year,
+  release_date: movie.value.release_date || '',
+  synopsis: movie.value.synopsis,
+  runtime: movie.value.runtime,
+  country: movie.value.country || '',
+  conflict: movie.value.conflict || '',
+  poster_url: movie.value.poster_url || '',
+  trailer_url: movie.value.trailer_url || '',
+  imdb_id: movie.value.imdb_id || '',
+  is_upcoming: movie.value.is_upcoming,
+  tags: movie.value.tags?.map(tag => tag.id) || [],
 })
 
 function submit() {

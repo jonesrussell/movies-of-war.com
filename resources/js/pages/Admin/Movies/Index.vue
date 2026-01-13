@@ -17,7 +17,7 @@
 import type { Movie, PaginatedMovies } from '@/types/models'
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import AppLayout from '@/layouts/AppLayout.vue'
 
@@ -29,10 +29,10 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const page = usePage()
-const auth = page.props.auth as { user?: import('@/types/models').User }
+usePage()
 
-const search = ref(props.queryParams.search || '')
+const queryParams = computed(() => props.queryParams);
+const search = ref(queryParams.value?.search || '')
 
 watch(search, (value) => {
   router.get('/dashboard/movies', {

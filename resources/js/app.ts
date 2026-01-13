@@ -25,6 +25,7 @@ import { initializeTheme } from './composables/useAppearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) =>
@@ -43,4 +44,4 @@ createInertiaApp({
 });
 
 // This will set light / dark mode on page load...
-initializeTheme();
+void initializeTheme();

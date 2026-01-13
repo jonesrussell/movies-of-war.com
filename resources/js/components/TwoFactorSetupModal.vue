@@ -77,7 +77,7 @@ const handleModalNextStep = () => {
     if (props.requiresConfirmation) {
         showVerificationStep.value = true;
 
-        nextTick(() => {
+        void nextTick(() => {
             pinInputContainerRef.value?.querySelector('input')?.focus();
         });
 

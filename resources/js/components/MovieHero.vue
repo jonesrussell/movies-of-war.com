@@ -17,7 +17,7 @@
 import type { Movie } from '@/types'
 
 import { Link } from '@inertiajs/vue3'
-import { Info, Play, Plus } from 'lucide-vue-next'
+import { Info, Play } from 'lucide-vue-next'
 
 interface Props {
   movie: Movie

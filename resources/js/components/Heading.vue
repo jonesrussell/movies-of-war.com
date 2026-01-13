@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 interface Props {
     title: string;
     description?: string;
@@ -7,6 +9,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     size: 'md',
+    description: undefined,
 });
 
 const headingClasses = {
@@ -21,8 +24,8 @@ const wrapperClasses = {
     lg: 'mb-8 space-y-0.5',
 };
 
-const headingTag = props.size === 'lg' ? 'h2' : 'h3';
-const wrapperTag = props.size === 'lg' ? 'div' : 'header';
+const headingTag = computed(() => props.size === 'lg' ? 'h2' : 'h3');
+const wrapperTag = computed(() => props.size === 'lg' ? 'div' : 'header');
 </script>
 
 <template>

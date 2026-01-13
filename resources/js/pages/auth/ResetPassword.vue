@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,8 @@ const props = defineProps<{
     email: string;
 }>();
 
-const inputEmail = ref(props.email);
+const email = computed(() => props.email);
+const inputEmail = ref(email.value ?? '');
 </script>
 
 <template>

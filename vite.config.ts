@@ -28,6 +28,7 @@ export default defineConfig({
         https: {},
         host: '0.0.0.0',
         strictPort: false,
+        cors: true,
         hmr: {
             protocol: 'wss',
             host: 'movies-of-war.com.ddev.site',

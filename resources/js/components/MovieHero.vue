@@ -30,7 +30,7 @@ const posterImage = props.movie.poster_url || '/images/placeholders/poster-place
 </script>
 
 <template>
-  <div class="relative min-h-[70vh] overflow-hidden bg-zinc-950 py-12">
+  <div class="relative min-h-[70vh] overflow-hidden bg-zinc-950 py-6 sm:py-12">
     <div class="absolute inset-0">
       <img
         :src="posterImage"
@@ -41,7 +41,7 @@ const posterImage = props.movie.poster_url || '/images/placeholders/poster-place
       <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
     </div>
 
-    <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div class="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20">
       <div class="grid gap-8 lg:grid-cols-12">
         <div class="lg:col-span-4">
           <img
@@ -68,7 +68,7 @@ const posterImage = props.movie.poster_url || '/images/placeholders/poster-place
             </span>
           </div>
 
-          <p class="mb-8 max-w-2xl text-lg leading-relaxed text-zinc-300">
+          <p class="mb-8 text-lg leading-relaxed text-zinc-300">
             {{ movie.synopsis }}
           </p>
 

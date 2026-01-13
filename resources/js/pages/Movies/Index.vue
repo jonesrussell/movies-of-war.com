@@ -104,7 +104,7 @@ const hasActiveFilters = () => {
       <div class="mb-8">
         <h1 class="mb-4 text-4xl font-bold text-white">Browse War Films</h1>
         <p class="text-zinc-400">
-          {{ movies.meta.total }} films spanning multiple conflicts and eras
+          {{ movies.meta?.total ?? 0 }} films spanning multiple conflicts and eras
         </p>
       </div>
 
@@ -196,12 +196,12 @@ const hasActiveFilters = () => {
         </div>
       </div>
 
-      <div v-if="movies.data.length > 0">
+      <div v-if="movies.data && movies.data.length > 0">
         <div class="mb-8 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           <MovieCard v-for="movie in movies.data" :key="movie.id" :movie="movie" />
         </div>
 
-        <div v-if="movies.meta.last_page > 1" class="flex items-center justify-center gap-2">
+        <div v-if="movies.meta && movies.meta.last_page > 1" class="flex items-center justify-center gap-2">
           <Link
             v-for="link in movies.meta.links"
             :key="link.label"

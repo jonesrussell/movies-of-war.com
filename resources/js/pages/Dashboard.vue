@@ -82,7 +82,7 @@ const stats = [
 
             <!-- Admin TMDB Section -->
             <TmdbImportsSection
-                v-if="auth.user?.is_admin && Array.isArray(tmdbDrafts.data)"
+                v-if="auth.user?.is_admin && tmdbDrafts && typeof tmdbDrafts === 'object' && 'data' in tmdbDrafts && Array.isArray(tmdbDrafts.data)"
                 :tmdb-drafts="tmdbDrafts"
                 :search="search"
                 @update:search="handleSearchUpdate"

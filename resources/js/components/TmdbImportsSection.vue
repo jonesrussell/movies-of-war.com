@@ -7,11 +7,11 @@ import type { Movie, PaginatedMovies } from '@/types/models';
 import { ArrowRight } from 'lucide-vue-next';
 
 interface Props {
-    tmdbDrafts: PaginatedMovies;
+    tmdbDrafts: PaginatedMovies | { data: Movie[]; meta?: PaginatedMovies['meta'] };
     search?: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
     (e: 'update:search', value: string): void;
@@ -30,7 +30,7 @@ function handleSearchUpdate(value: string) {
             <div>
                 <h2 class="text-2xl font-bold">TMDB Imports</h2>
                 <p class="mt-1 text-sm text-muted-foreground">
-                    {{ tmdbDrafts.meta?.total || 0 }} movies awaiting review
+                    {{ props.tmdbDrafts?.meta?.total ?? 0 }} movies awaiting review
                 </p>
             </div>
 
@@ -53,17 +53,17 @@ function handleSearchUpdate(value: string) {
         </div>
 
         <!-- TMDB Movies Grid -->
-        <div v-if="tmdbDrafts.data && tmdbDrafts.data.length > 0" class="mb-6">
+        <div v-if="props.tmdbDrafts?.data && props.tmdbDrafts.data.length > 0" class="mb-6">
             <TmdbMovieGrid
-                :movies="tmdbDrafts.data"
+                :movies="props.tmdbDrafts.data"
                 @publish="emit('publish', $event)"
                 @archive="emit('archive', $event)"
             />
 
             <!-- Pagination -->
             <Pagination
-                v-if="tmdbDrafts.meta && tmdbDrafts.meta.last_page > 1"
-                :meta="tmdbDrafts.meta"
+                v-if="props.tmdbDrafts?.meta && props.tmdbDrafts.meta.last_page > 1"
+                :meta="props.tmdbDrafts.meta"
             />
         </div>
 

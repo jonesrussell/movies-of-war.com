@@ -27,11 +27,15 @@ const mainNavItems = computed<NavItem[]>(() => [
         href: dashboard().url,
         icon: LayoutGrid,
     },
-    {
-        title: 'Movies',
-        href: '/movies',
-        icon: Film,
-    },
+    ...(auth?.user?.is_admin
+        ? [
+              {
+                  title: 'Movies',
+                  href: '/dashboard/movies',
+                  icon: Film,
+              },
+          ]
+        : []),
     {
         title: 'Watchlist',
         href: '/watchlist',

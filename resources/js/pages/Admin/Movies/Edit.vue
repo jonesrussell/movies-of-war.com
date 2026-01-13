@@ -28,7 +28,7 @@ const form = useForm({
 })
 
 function submit() {
-  form.put(`/admin/movies/${props.movie.id}`)
+  form.put(`/movies/${props.movie.id}`)
 }
 </script>
 
@@ -253,7 +253,7 @@ function submit() {
         <!-- Actions -->
         <div class="flex justify-end gap-4">
           <a
-            href="/admin/movies"
+            href="/dashboard/movies"
             class="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
           >
             Cancel

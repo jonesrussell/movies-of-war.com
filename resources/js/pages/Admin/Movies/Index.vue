@@ -18,7 +18,7 @@ const auth = page.props.auth as { user: any }
 const search = ref(props.queryParams.search || '')
 
 watch(search, (value) => {
-  router.get('/admin/movies', {
+  router.get('/dashboard/movies', {
     search: value || undefined,
   }, {
     preserveState: true,
@@ -26,10 +26,24 @@ watch(search, (value) => {
   })
 }, { debounce: 300 })
 
-function deleteMovie(movie: Movie) {
-  if (confirm(`Are you sure you want to delete "${movie.title}"?`)) {
-    router.delete(`/admin/movies/${movie.id}`)
+function archiveMovie(movie: Movie) {
+  if (confirm(`Are you sure you want to archive "${movie.title}"?`)) {
+    router.delete(`/movies/${movie.id}`, {
+      preserveScroll: true,
+    })
   }
+}
+
+function publishMovie(movie: Movie) {
+  router.post(`/movies/${movie.id}/publish`, {}, {
+    preserveScroll: true,
+  })
+}
+
+function unpublishMovie(movie: Movie) {
+  router.post(`/movies/${movie.id}/unpublish`, {}, {
+    preserveScroll: true,
+  })
 }
 </script>
 
@@ -45,7 +59,7 @@ function deleteMovie(movie: Movie) {
           <p class="mt-2 text-zinc-400">{{ movies.total }} total movies</p>
         </div>
         <Link
-          :href="'/admin/movies/create'"
+          :href="'/movies/create'"
           class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
         >
           Add New Movie
@@ -75,6 +89,9 @@ function deleteMovie(movie: Movie) {
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">
                 Tags
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">
+                Status
               </th>
               <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-zinc-400">
                 Actions
@@ -118,19 +135,50 @@ function deleteMovie(movie: Movie) {
                   </span>
                 </div>
               </td>
+              <td class="px-6 py-4">
+                <span
+                  :class="[
+                    'inline-flex rounded-full px-2 py-1 text-xs font-semibold',
+                    movie.status === 'published'
+                      ? 'bg-green-900/50 text-green-300'
+                      : movie.status === 'draft'
+                      ? 'bg-yellow-900/50 text-yellow-300'
+                      : 'bg-zinc-800 text-zinc-400',
+                  ]"
+                >
+                  {{ movie.status === 'published' ? 'Published' : movie.status === 'draft' ? 'Draft' : 'Archived' }}
+                </span>
+              </td>
               <td class="px-6 py-4 text-right text-sm">
-                <Link
-                  :href="`/admin/movies/${movie.id}/edit`"
-                  class="text-red-500 hover:text-red-400 mr-4"
-                >
-                  Edit
-                </Link>
-                <button
-                  @click="deleteMovie(movie)"
-                  class="text-zinc-400 hover:text-white"
-                >
-                  Delete
-                </button>
+                <div class="flex items-center justify-end gap-2">
+                  <Link
+                    :href="`/movies/${movie.id}/edit`"
+                    class="text-red-500 hover:text-red-400"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    v-if="movie.status !== 'published'"
+                    @click="publishMovie(movie)"
+                    class="text-green-500 hover:text-green-400"
+                  >
+                    Publish
+                  </button>
+                  <button
+                    v-if="movie.status === 'published'"
+                    @click="unpublishMovie(movie)"
+                    class="text-yellow-500 hover:text-yellow-400"
+                  >
+                    Unpublish
+                  </button>
+                  <button
+                    v-if="movie.status !== 'archived'"
+                    @click="archiveMovie(movie)"
+                    class="text-zinc-400 hover:text-white"
+                  >
+                    Archive
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>

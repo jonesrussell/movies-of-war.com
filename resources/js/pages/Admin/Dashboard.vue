@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3'
+
 import AppLayout from '@/layouts/AppLayout.vue'
 
 interface Props {

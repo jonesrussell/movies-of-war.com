@@ -1,55 +1,26 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3'
-import { Bookmark } from 'lucide-vue-next'
-import type { Movie } from '@/types'
-import MovieCard from '@/components/MovieCard.vue'
+
+
+
+
+
+import { Head, Link } from '@inertiajs/vue3';
+import { Bookmark } from 'lucide-vue-next';
+
+import MovieCard from '@/components/MovieCard.vue';
+import PublicLayout from '@/layouts/PublicLayout.vue';
+import type { Movie } from '@/types';
 
 interface Props {
-  movies: Movie[]
+    movies: Movie[];
 }
 
-defineProps<Props>()
-const page = usePage()
-const auth = page.props.auth as { user: any }
+defineProps<Props>();
 </script>
 
 <template>
-  <Head title="My Watchlist - Movies of War" />
-
-  <div class="min-h-screen bg-zinc-950">
-    <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm">
-      <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between">
-          <Link href="/" class="flex items-center">
-            <img src="/images/branding/logo.png" alt="Movies of War" class="h-8" />
-          </Link>
-
-          <nav class="flex items-center gap-6">
-            <Link
-              href="/movies"
-              class="text-zinc-300 transition-colors hover:text-white"
-            >
-              Browse Movies
-            </Link>
-
-            <Link
-              href="/watchlist"
-              class="text-red-500"
-            >
-              Watchlist
-            </Link>
-
-
-            <Link
-              href="/dashboard"
-              class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700"
-            >
-              Dashboard
-            </Link>
-          </nav>
-        </div>
-      </div>
-    </header>
+    <PublicLayout>
+        <Head title="My Watchlist - Movies of War" />
 
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="mb-8">
@@ -84,13 +55,6 @@ const auth = page.props.auth as { user: any }
         >
           Browse Movies
         </Link>
-      </div>
-    </div>
-
-    <footer class="border-t border-zinc-800 bg-zinc-900 py-8 mt-16">
-      <div class="mx-auto max-w-7xl px-4 text-center text-zinc-500 sm:px-6 lg:px-8">
-        <p>&copy; 2026 Movies of War. All rights reserved.</p>
-      </div>
-    </footer>
-  </div>
+        </div>
+    </PublicLayout>
 </template>

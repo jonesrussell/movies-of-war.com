@@ -2,6 +2,11 @@
 import TmdbMovieCard from './TmdbMovieCard.vue';
 import type { Movie } from '@/types/models';
 
+
+
+
+
+
 interface Props {
     movies: Movie[];
 }

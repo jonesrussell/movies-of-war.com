@@ -1,11 +1,17 @@
 <script setup lang="ts">
+
+
+
+
+
 import { Head, useForm, usePage } from '@inertiajs/vue3'
+
 import AppLayout from '@/layouts/AppLayout.vue'
 import type { FeaturedSlot } from '@/types/models'
 
 interface Props {
   slot: FeaturedSlot
-  movies: Array<{ id: number; title: string }>
+  movies: { id: number; title: string }[]
 }
 
 const props = defineProps<Props>()

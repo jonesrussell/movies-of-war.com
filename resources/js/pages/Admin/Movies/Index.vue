@@ -1,6 +1,12 @@
 <script setup lang="ts">
+
+
+
+
+
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import { ref, watch } from 'vue'
+
 import AppLayout from '@/layouts/AppLayout.vue'
 import type { Movie, PaginatedMovies } from '@/types/models'
 

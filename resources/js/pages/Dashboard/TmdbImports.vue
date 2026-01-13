@@ -1,14 +1,19 @@
 <script setup lang="ts">
+
+
+
+
+
 import { Head, router } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
+import { Download } from 'lucide-vue-next';
 import { ref } from 'vue';
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import Pagination from '@/components/Pagination.vue';
 import SearchInput from '@/components/SearchInput.vue';
 import TmdbMovieGrid from '@/components/TmdbMovieGrid.vue';
-import Pagination from '@/components/Pagination.vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -19,9 +24,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import type { Movie, PaginatedMovies } from '@/types/models';
-import { Download } from 'lucide-vue-next';
-import { useForm } from '@inertiajs/vue3';
 
 interface Props {
     tmdbDrafts: PaginatedMovies | { data: Movie[]; meta?: PaginatedMovies['meta'] };

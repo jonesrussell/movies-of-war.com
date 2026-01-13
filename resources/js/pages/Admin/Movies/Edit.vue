@@ -1,5 +1,11 @@
 <script setup lang="ts">
+
+
+
+
+
 import { Head, useForm, usePage } from '@inertiajs/vue3'
+
 import AppLayout from '@/layouts/AppLayout.vue'
 import type { Movie, Tag } from '@/types/models'
 

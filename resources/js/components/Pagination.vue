@@ -2,6 +2,11 @@
 import { Link } from '@inertiajs/vue3';
 import type { PaginationMeta } from '@/types/models';
 
+
+
+
+
+
 interface Props {
     meta: PaginationMeta;
 }

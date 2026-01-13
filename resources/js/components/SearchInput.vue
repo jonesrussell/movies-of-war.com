@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Input } from '@/components/ui/input';
-import { ref, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
+import { ref, watch } from 'vue';
+
+import { Input } from '@/components/ui/input';
 
 interface Props {
     modelValue?: string;

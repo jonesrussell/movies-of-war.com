@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Link } from '@inertiajs/vue3';
-import { ArrowRight, Film, Bookmark } from 'lucide-vue-next';
+import { ArrowRight, Bookmark, Film } from 'lucide-vue-next';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 </script>
 
 <template>

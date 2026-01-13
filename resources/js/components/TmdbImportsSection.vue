@@ -1,12 +1,14 @@
 <script setup lang="ts">
+
+
+
+
+
 import { Link, router, useForm } from '@inertiajs/vue3';
+import { ArrowRight, Download } from 'lucide-vue-next';
 import { ref } from 'vue';
-import SearchInput from './SearchInput.vue';
-import TmdbMovieGrid from './TmdbMovieGrid.vue';
-import Pagination from './Pagination.vue';
+
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -17,8 +19,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+import Pagination from './Pagination.vue';
+import SearchInput from './SearchInput.vue';
+import TmdbMovieGrid from './TmdbMovieGrid.vue';
 import type { Movie, PaginatedMovies } from '@/types/models';
-import { ArrowRight, Download } from 'lucide-vue-next';
 
 interface Props {
     tmdbDrafts: PaginatedMovies | { data: Movie[]; meta?: PaginatedMovies['meta'] };

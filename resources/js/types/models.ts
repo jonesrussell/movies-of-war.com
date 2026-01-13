@@ -52,11 +52,11 @@ export interface PaginatedFeaturedSlots {
   last_page: number
   per_page: number
   total: number
-  links: Array<{
+  links: {
     url: string | null
     label: string
     active: boolean
-  }>
+  }[]
 }
 
 export interface PaginationLinks {
@@ -70,11 +70,11 @@ export interface PaginationMeta {
   current_page: number
   from: number | null
   last_page: number
-  links: Array<{
+  links: {
     url: string | null
     label: string
     active: boolean
-  }>
+  }[]
   path: string
   per_page: number
   to: number | null

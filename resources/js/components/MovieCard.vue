@@ -1,8 +1,14 @@
 <script setup lang="ts">
+
+
+
+
+
 import { Link, router, usePage } from '@inertiajs/vue3';
+import { CheckCircle, Archive, XCircle } from 'lucide-vue-next';
+
 import { Button } from '@/components/ui/button';
 import type { Movie } from '@/types';
-import { CheckCircle, Archive, XCircle } from 'lucide-vue-next';
 
 interface Props {
     movie: Movie;

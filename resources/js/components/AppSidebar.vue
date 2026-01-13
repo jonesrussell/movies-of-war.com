@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { Link, usePage } from '@inertiajs/vue3';
+import { Bookmark, BookOpen, Database, Film, Folder, LayoutGrid, Star } from 'lucide-vue-next';
+import { computed } from 'vue';
+
+import AppLogo from './AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -13,10 +18,10 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Film, Bookmark, Star, Database } from 'lucide-vue-next';
-import { computed } from 'vue';
-import AppLogo from './AppLogo.vue';
+
+
+
+
 
 const page = usePage();
 const auth = page.props.auth as { user: any };

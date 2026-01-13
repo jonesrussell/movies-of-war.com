@@ -1,24 +1,29 @@
 <script setup lang="ts">
-import { Head, Link, router, usePage } from '@inertiajs/vue3'
-import { ref, watch } from 'vue'
-import { Search, Filter, X } from 'lucide-vue-next'
-import type { Movie, Tag, PaginatedMovies, MovieFilters } from '@/types'
-import MovieCard from '@/components/MovieCard.vue'
+
+
+
+
+
+import { Head, Link, router } from '@inertiajs/vue3';
+import { Filter, Search, X } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
+
+import MovieCard from '@/components/MovieCard.vue';
+import PublicLayout from '@/layouts/PublicLayout.vue';
+import type { MovieFilters, PaginatedMovies, Tag } from '@/types';
 
 interface Props {
-  movies: PaginatedMovies
-  filters: {
-    countries: string[]
-    conflicts: string[]
-    years: number[]
-    tags: Tag[]
-  }
-  queryParams: MovieFilters
+    filters: {
+        conflicts: string[];
+        countries: string[];
+        tags: Tag[];
+        years: number[];
+    };
+    movies: PaginatedMovies;
+    queryParams: MovieFilters;
 }
 
-const props = defineProps<Props>()
-const page = usePage()
-const auth = page.props.auth as { user: any }
+const props = defineProps<Props>();
 
 const search = ref(props.queryParams.search || '')
 const selectedYear = ref(props.queryParams.year || '')
@@ -54,53 +59,10 @@ const hasActiveFilters = () => {
 </script>
 
 <template>
-  <Head title="Browse Movies - Movies of War" />
+    <PublicLayout>
+        <Head title="Browse Movies - Movies of War" />
 
-  <div class="min-h-screen bg-zinc-950">
-    <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm">
-      <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between">
-          <Link href="/" class="flex items-center">
-            <img src="/images/branding/logo.png" alt="Movies of War" class="h-8" />
-          </Link>
-
-          <nav class="flex items-center gap-6">
-            <Link
-              href="/movies"
-              class="text-red-500"
-            >
-              Browse Movies
-            </Link>
-
-            <template v-if="auth.user">
-              <Link
-                href="/watchlist"
-                class="text-zinc-300 transition-colors hover:text-white"
-              >
-                Watchlist
-              </Link>
-              <Link
-                href="/dashboard"
-                class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700"
-              >
-                Dashboard
-              </Link>
-            </template>
-
-            <template v-else>
-              <Link
-                href="/login"
-                class="text-zinc-300 transition-colors hover:text-white"
-              >
-                Login
-              </Link>
-            </template>
-          </nav>
-        </div>
-      </div>
-    </header>
-
-    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="mb-8">
         <h1 class="mb-4 text-4xl font-bold text-white">Browse War Films</h1>
         <p class="text-zinc-400">
@@ -234,7 +196,6 @@ const hasActiveFilters = () => {
         >
           Clear filters
         </button>
-      </div>
-    </div>
-  </div>
+        </div>
+    </PublicLayout>
 </template>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3';
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+import QuickActionsSection from '@/components/QuickActionsSection.vue';
 import StatsGrid from '@/components/StatsGrid.vue';
 import TmdbImportsSummaryCard from '@/components/TmdbImportsSummaryCard.vue';
-import QuickActionsSection from '@/components/QuickActionsSection.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
     stats: {

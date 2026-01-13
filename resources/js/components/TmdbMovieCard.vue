@@ -1,7 +1,13 @@
 <script setup lang="ts">
+
+
+
+
+
+import { CheckCircle, Archive } from 'lucide-vue-next';
+
 import { Button } from '@/components/ui/button';
 import type { Movie } from '@/types/models';
-import { CheckCircle, Archive } from 'lucide-vue-next';
 
 interface Props {
     movie: Movie;

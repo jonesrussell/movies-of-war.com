@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
+
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -7,8 +10,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ref, watch } from 'vue';
 
 interface Props {
     open?: boolean;

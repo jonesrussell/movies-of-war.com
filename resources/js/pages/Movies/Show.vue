@@ -14,12 +14,13 @@
 
 
 
+import type { Movie } from '@/types';
+
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Calendar, Check, Clock, Film, MapPin, Play, Plus } from 'lucide-vue-next';
 
 import MovieCard from '@/components/MovieCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { Movie } from '@/types';
 
 interface Props {
     movie: Movie;

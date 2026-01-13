@@ -14,10 +14,11 @@
 
 
 
+import type { Movie } from '@/types/models'
+
 import { Head, useForm, usePage } from '@inertiajs/vue3'
 
 import AppLayout from '@/layouts/AppLayout.vue'
-import type { Movie } from '@/types/models'
 
 interface Props {
   movies: { id: number; title: string }[]

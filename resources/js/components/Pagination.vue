@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
 import type { PaginationMeta } from '@/types/models';
+
+import { Link } from '@inertiajs/vue3';
 
 
 

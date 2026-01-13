@@ -14,11 +14,12 @@
 
 
 
+import type { Movie } from '@/types';
+
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { CheckCircle, Archive, XCircle } from 'lucide-vue-next';
+import { Archive, CheckCircle, XCircle } from 'lucide-vue-next';
 
 import { Button } from '@/components/ui/button';
-import type { Movie } from '@/types';
 
 interface Props {
     movie: Movie;

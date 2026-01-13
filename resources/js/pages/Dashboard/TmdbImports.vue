@@ -14,6 +14,8 @@
 
 
 
+import type { Movie, PaginatedMovies } from '@/types/models';
+
 import { Head, router } from '@inertiajs/vue3';
 import { useForm } from '@inertiajs/vue3';
 import { Download } from 'lucide-vue-next';
@@ -37,7 +39,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
-import type { Movie, PaginatedMovies } from '@/types/models';
 
 interface Props {
     tmdbDrafts: PaginatedMovies | { data: Movie[]; meta?: PaginatedMovies['meta'] };

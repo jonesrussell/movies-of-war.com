@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 import QuickActionsSection from '@/components/QuickActionsSection.vue';
 import StatsGrid from '@/components/StatsGrid.vue';
@@ -19,11 +20,11 @@ const props = defineProps<Props>();
 const page = usePage();
 const auth = page.props.auth as { user: any };
 
-const stats = [
+const statsArray = computed(() => [
     { title: 'Published Movies', value: props.stats.movies },
     { title: 'Total Tags', value: props.stats.tags },
     { title: 'Active Features', value: props.stats.activeFeatures },
-];
+]);
 </script>
 
 <template>
@@ -32,7 +33,7 @@ const stats = [
     <AppSidebarLayout>
         <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
             <!-- Stats Grid -->
-            <StatsGrid :stats="stats" class="mb-8" />
+            <StatsGrid :stats="statsArray" class="mb-8" />
 
             <!-- Admin TMDB Summary Card -->
             <div v-if="auth.user?.is_admin" class="mb-8">

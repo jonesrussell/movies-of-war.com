@@ -14,13 +14,14 @@
 
 
 
+import type { MovieFilters, PaginatedMovies, Tag } from '@/types';
+
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Filter, Search, X } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { MovieFilters, PaginatedMovies, Tag } from '@/types';
 
 interface Props {
     filters: {

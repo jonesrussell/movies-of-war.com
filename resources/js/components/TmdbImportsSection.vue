@@ -14,6 +14,8 @@
 
 
 
+import type { Movie, PaginatedMovies } from '@/types/models';
+
 import { Link, router, useForm } from '@inertiajs/vue3';
 import { ArrowRight, Download } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -35,7 +37,6 @@ import { Label } from '@/components/ui/label';
 import Pagination from './Pagination.vue';
 import SearchInput from './SearchInput.vue';
 import TmdbMovieGrid from './TmdbMovieGrid.vue';
-import type { Movie, PaginatedMovies } from '@/types/models';
 
 interface Props {
     tmdbDrafts: PaginatedMovies | { data: Movie[]; meta?: PaginatedMovies['meta'] };

@@ -1,5 +1,6 @@
-import { InertiaLinkProps } from '@inertiajs/vue3';
 import type { LucideIcon } from 'lucide-vue-next';
+
+import { type InertiaLinkProps } from '@inertiajs/vue3';
 
 
 

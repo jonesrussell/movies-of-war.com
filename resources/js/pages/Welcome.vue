@@ -1,18 +1,5 @@
 <script setup lang="ts">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import type { Movie } from '@/types';
 
 import { Head, Link } from '@inertiajs/vue3';
 
@@ -20,7 +7,6 @@ import FeaturedMovie from '@/components/FeaturedMovie.vue';
 import MovieCard from '@/components/MovieCard.vue';
 import MovieHero from '@/components/MovieHero.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { Movie } from '@/types';
 
 interface Props {
     canRegister: boolean;
@@ -34,6 +20,7 @@ defineProps<Props>();
 
 <template>
     <PublicLayout :can-register="canRegister">
+
         <Head title="Movies of War - Curated War Films Database" />
 
         <MovieHero v-if="heroMovie" :movie="heroMovie" subtitle="Featured Upcoming Release" />
@@ -55,10 +42,7 @@ defineProps<Props>();
             <div>
                 <div class="mb-8 flex items-center justify-between">
                     <h2 class="text-3xl font-bold text-white">Latest Releases</h2>
-                    <Link
-                        href="/movies"
-                        class="text-red-500 transition-colors hover:text-red-400"
-                    >
+                    <Link href="/movies" class="text-red-500 transition-colors hover:text-red-400">
                         View All →
                     </Link>
                 </div>
@@ -75,10 +59,8 @@ defineProps<Props>();
                 <p class="mb-6 text-zinc-400">
                     Discover 30+ carefully selected war films spanning WWI, WWII, Vietnam, and modern conflicts
                 </p>
-                <Link
-                    href="/movies"
-                    class="inline-block rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
-                >
+                <Link href="/movies"
+                    class="inline-block rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700">
                     Browse All Movies
                 </Link>
             </div>

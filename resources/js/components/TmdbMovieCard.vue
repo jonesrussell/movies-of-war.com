@@ -14,10 +14,11 @@
 
 
 
-import { CheckCircle, Archive } from 'lucide-vue-next';
+import type { Movie } from '@/types/models';
+
+import { Archive, CheckCircle } from 'lucide-vue-next';
 
 import { Button } from '@/components/ui/button';
-import type { Movie } from '@/types/models';
 
 interface Props {
     movie: Movie;

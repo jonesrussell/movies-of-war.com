@@ -14,10 +14,11 @@
 
 
 
+import type { FeaturedSlot } from '@/types/models'
+
 import { Head, useForm, usePage } from '@inertiajs/vue3'
 
 import AppLayout from '@/layouts/AppLayout.vue'
-import type { FeaturedSlot } from '@/types/models'
 
 interface Props {
   slot: FeaturedSlot

@@ -2,7 +2,6 @@
 import { usePage } from '@inertiajs/vue3';
 import { ChevronsUpDown } from 'lucide-vue-next';
 
-import UserMenuContent from './UserMenuContent.vue';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,6 +14,8 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import UserInfo from '@/components/UserInfo.vue';
+
+import UserMenuContent from './UserMenuContent.vue';
 
 
 

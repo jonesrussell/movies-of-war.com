@@ -41,21 +41,7 @@ export default defineConfigWithVueTs(
             }],
 
             // Import hygiene
-            'import/order': ['error', {
-                groups: [
-                    'builtin',
-                    'external',
-                    'internal',
-                    'parent',
-                    'sibling',
-                    'index',
-                ],
-                'newlines-between': 'always',
-                alphabetize: {
-                    order: 'asc',
-                    caseInsensitive: true,
-                },
-            }],
+            'import/order': 'off', // Disabled in favor of perfectionist/sort-imports
             'import/no-cycle': ['error', {
                 maxDepth: 10,
             }],
@@ -81,6 +67,7 @@ export default defineConfigWithVueTs(
                     'internal',
                     ['parent', 'sibling', 'index'],
                 ],
+                newlinesBetween: 1,
             }],
             'perfectionist/sort-named-imports': ['error', {
                 type: 'natural',

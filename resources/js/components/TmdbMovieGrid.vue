@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import TmdbMovieCard from './TmdbMovieCard.vue';
 import type { Movie } from '@/types/models';
+
+import TmdbMovieCard from './TmdbMovieCard.vue';
 
 
 

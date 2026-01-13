@@ -14,12 +14,13 @@
 
 
 
+import type { Movie } from '@/types';
+
 import { Head, Link } from '@inertiajs/vue3';
 import { Bookmark } from 'lucide-vue-next';
 
 import MovieCard from '@/components/MovieCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-import type { Movie } from '@/types';
 
 interface Props {
     movies: Movie[];

@@ -14,10 +14,11 @@
 
 
 
+import type { FeaturedSlot, PaginatedFeaturedSlots } from '@/types/models'
+
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
 
 import AppLayout from '@/layouts/AppLayout.vue'
-import type { FeaturedSlot, PaginatedFeaturedSlots } from '@/types/models'
 
 interface Props {
   slots: PaginatedFeaturedSlots

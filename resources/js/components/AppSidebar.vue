@@ -35,7 +35,7 @@ import AppLogo from './AppLogo.vue';
 
 
 const page = usePage();
-const auth = page.props.auth as { user: any };
+const auth = page.props.auth as { user?: import('@/types/models').User };
 
 const mainNavItems = computed<NavItem[]>(() => [
     {

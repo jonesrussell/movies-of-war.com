@@ -30,7 +30,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const page = usePage()
-const auth = page.props.auth as { user: any }
+const auth = page.props.auth as { user?: import('@/types/models').User }
 
 const search = ref(props.queryParams.search || '')
 

@@ -37,6 +37,7 @@ const { urlIsActive } = useActiveUrl();
 <template>
     <div class="px-4 py-6">
         <Heading
+            size="lg"
             title="Settings"
             description="Manage your profile and account settings"
         />

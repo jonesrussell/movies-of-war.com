@@ -27,7 +27,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const page = usePage()
-const auth = page.props.auth as { user: any }
+const auth = page.props.auth as { user?: import('@/types/models').User }
 
 // Format datetime for datetime-local input
 function formatDateTimeLocal(dateString: string | null): string {

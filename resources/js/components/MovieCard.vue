@@ -27,7 +27,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const page = usePage();
-const auth = page.props.auth as { user: any };
+const auth = page.props.auth as { user?: import('@/types/models').User };
 
 const posterImage = props.movie.poster_url || '/images/placeholders/poster-placeholder.png';
 const isAdmin = auth?.user?.is_admin;

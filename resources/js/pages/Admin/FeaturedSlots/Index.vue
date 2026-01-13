@@ -26,7 +26,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const page = usePage()
-const auth = page.props.auth as { user: any }
+const auth = page.props.auth as { user?: import('@/types/models').User }
 
 function deleteSlot(slot: FeaturedSlot) {
   if (confirm(`Are you sure you want to delete this featured slot?`)) {

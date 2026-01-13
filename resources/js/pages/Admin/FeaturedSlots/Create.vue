@@ -26,7 +26,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const page = usePage()
-const auth = page.props.auth as { user: any }
+const auth = page.props.auth as { user?: import('@/types/models').User }
 
 const form = useForm({
   movie_id: null as number | null,

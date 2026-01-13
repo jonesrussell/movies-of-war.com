@@ -88,3 +88,14 @@ export interface MovieFilters {
   conflict?: string
   tag?: string
 }
+
+export interface User {
+  id: number
+  name: string
+  email: string
+  is_admin: boolean
+  avatar?: string | null
+  email_verified_at?: string | null
+  created_at: string
+  updated_at: string
+}

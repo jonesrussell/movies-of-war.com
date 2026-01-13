@@ -55,6 +55,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin-only TMDB movie management
     Route::middleware('admin')->group(function () {
+        Route::post('/tmdb/import', [App\Http\Controllers\DashboardController::class, 'importTmdbMovies'])->name('tmdb.import');
         Route::post('/movies/{movie}/publish', [App\Http\Controllers\DashboardController::class, 'publishMovie'])->name('movies.publish');
         Route::post('/movies/{movie}/unpublish', [App\Http\Controllers\DashboardController::class, 'unpublishMovie'])->name('movies.unpublish');
         Route::post('/movies/{movie}/archive', [App\Http\Controllers\DashboardController::class, 'archiveMovie'])->name('movies.archive');

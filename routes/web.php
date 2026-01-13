@@ -59,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/movies/{movie}/unpublish', [App\Http\Controllers\DashboardController::class, 'unpublishMovie'])->name('movies.unpublish');
         Route::post('/movies/{movie}/archive', [App\Http\Controllers\DashboardController::class, 'archiveMovie'])->name('movies.archive');
 
-        Route::resource('movies', App\Http\Controllers\Admin\MovieController::class)->except(['index']);
+        Route::resource('movies', App\Http\Controllers\Admin\MovieController::class)->except(['index', 'show']);
         Route::resource('featured-slots', App\Http\Controllers\Admin\FeaturedSlotController::class);
     });
 });

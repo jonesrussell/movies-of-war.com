@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/vue3';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useActiveUrl } from '@/composables/useActiveUrl';
+import { useActiveUrl } from '@/composables/use-active-url';
 import { toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';

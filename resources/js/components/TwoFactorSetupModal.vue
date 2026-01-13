@@ -20,8 +20,8 @@ import {
     InputOTPSlot,
 } from '@/components/ui/input-otp';
 import { Spinner } from '@/components/ui/spinner';
-import { useAppearance } from '@/composables/useAppearance';
-import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { useAppearance } from '@/composables/use-appearance';
+import { useTwoFactorAuth } from '@/composables/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 
 interface Props {
@@ -173,6 +173,7 @@ watch(
                                     v-else
                                     class="relative z-10 overflow-hidden border p-5"
                                 >
+                                    <!-- eslint-disable vue/no-v-html -->
                                     <div
                                         v-html="qrCodeSvg"
                                         class="flex aspect-square size-full items-center justify-center"
@@ -183,6 +184,7 @@ watch(
                                                     : undefined,
                                         }"
                                     />
+                                    <!-- eslint-enable vue/no-v-html -->
                                 </div>
                             </div>
                         </div>

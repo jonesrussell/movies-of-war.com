@@ -19,7 +19,7 @@ import type { User } from '@/types';
 import { computed } from 'vue';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useInitials } from '@/composables/useInitials';
+import { useInitials } from '@/composables/use-initials';
 
 interface Props {
     user: User;

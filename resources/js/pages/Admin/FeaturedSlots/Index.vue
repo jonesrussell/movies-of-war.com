@@ -175,8 +175,10 @@ function isActive(slot: FeaturedSlot): boolean {
               ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
               : 'bg-zinc-900 text-zinc-600 cursor-not-allowed',
           ]"
-          v-html="page.label"
-        />
+        >
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <span v-html="page.label" />
+        </Link>
       </div>
     </div>
   </AppLayout>

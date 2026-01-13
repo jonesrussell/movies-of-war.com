@@ -8,7 +8,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { useActiveUrl } from '@/composables/useActiveUrl';
+import { useActiveUrl } from '@/composables/use-active-url';
 import { type NavItem } from '@/types';
 
 defineProps<{

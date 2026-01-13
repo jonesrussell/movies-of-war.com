@@ -2,8 +2,8 @@
 import { Link } from '@inertiajs/vue3';
 import { toRef } from 'vue';
 
+import { useActive } from '@/composables/use-active';
 import { usePublicNav } from '@/composables/use-public-nav';
-import { useActive } from '@/composables/useActive';
 
 interface Props {
     canRegister?: boolean;

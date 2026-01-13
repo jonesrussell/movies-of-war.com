@@ -21,7 +21,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 
-import { initializeTheme } from './composables/useAppearance';
+import { initializeTheme } from './composables/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

@@ -40,6 +40,7 @@ defineProps<Props>();
                     : 'bg-muted text-muted-foreground cursor-not-allowed pointer-events-none',
             ]"
         >
+            <!-- eslint-disable-next-line vue/no-v-html -->
             <span v-html="link.label" />
         </Link>
     </div>

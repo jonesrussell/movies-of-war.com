@@ -11,8 +11,8 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
+import { useActive } from '@/composables/use-active';
 import { usePublicNav } from '@/composables/use-public-nav';
-import { useActive } from '@/composables/useActive';
 
 interface Props {
     canRegister?: boolean;

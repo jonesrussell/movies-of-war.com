@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 
-import { type ResolvedAppearance, useAppearance } from '@/composables/useAppearance';
+import { type ResolvedAppearance, useAppearance } from '@/composables/use-appearance';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type ResolvedTheme = ResolvedAppearance;

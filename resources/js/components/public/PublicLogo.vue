@@ -3,10 +3,12 @@ import { Link } from '@inertiajs/vue3';
 
 interface Props {
     showText?: boolean;
+    scrolled?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
     showText: false,
+    scrolled: false,
 });
 </script>
 
@@ -15,7 +17,10 @@ withDefaults(defineProps<Props>(), {
         <img
             src="/images/branding/logo.png"
             alt="Movies of War"
-            class="h-24 sm:h-28 lg:h-32 transition-transform hover:scale-105"
+            :class="[
+                'transition-all duration-300 hover:scale-105',
+                scrolled ? 'h-12 sm:h-14 lg:h-16' : 'h-24 sm:h-28 lg:h-32',
+            ]"
         />
         <span
             v-if="showText"

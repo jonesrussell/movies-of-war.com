@@ -57,10 +57,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard/tmdb-imports', [App\Http\Controllers\DashboardController::class, 'tmdbImports'])->name('dashboard.tmdb-imports');
         Route::post('/tmdb/import', [App\Http\Controllers\DashboardController::class, 'importTmdbMovies'])->name('tmdb.import');
-        Route::post('/movies/{movie}/publish', [App\Http\Controllers\DashboardController::class, 'publishMovie'])->name('movies.publish');
-        Route::post('/movies/{movie}/unpublish', [App\Http\Controllers\DashboardController::class, 'unpublishMovie'])->name('movies.unpublish');
-        Route::post('/movies/{movie}/archive', [App\Http\Controllers\DashboardController::class, 'archiveMovie'])->name('movies.archive');
+        Route::post('/movies/{movie}/publish', [App\Http\Controllers\DashboardController::class, 'publishMovie'])->name('tmdb.movies.publish');
+        Route::post('/movies/{movie}/archive', [App\Http\Controllers\DashboardController::class, 'archiveMovie'])->name('tmdb.movies.archive');
 
+        Route::get('/dashboard/movies', [App\Http\Controllers\Admin\MovieController::class, 'index'])->name('dashboard.movies');
+        Route::post('/movies/{movie}/publish', [App\Http\Controllers\Admin\MovieController::class, 'publish'])->name('admin.movies.publish');
+        Route::post('/movies/{movie}/unpublish', [App\Http\Controllers\Admin\MovieController::class, 'unpublish'])->name('admin.movies.unpublish');
         Route::resource('movies', App\Http\Controllers\Admin\MovieController::class)->except(['index', 'show']);
         Route::resource('featured-slots', App\Http\Controllers\Admin\FeaturedSlotController::class);
     });

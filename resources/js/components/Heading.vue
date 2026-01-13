@@ -3,13 +3,12 @@ import { computed } from 'vue';
 
 interface Props {
     title: string;
-    description?: string;
+    description?: string; // eslint-disable-line vue/require-default-prop
     size?: 'sm' | 'md' | 'lg';
 }
 
 const props = withDefaults(defineProps<Props>(), {
     size: 'md',
-    description: undefined,
 });
 
 const headingClasses = {

@@ -77,6 +77,34 @@ ddev artisan user:make-admin user@example.com
 ddev artisan user:make-admin user@example.com --revoke
 ```
 
+### X (Twitter) Post Management
+
+**Queue Worker** (required for publishing):
+```bash
+# Start the queue worker (required for X post publishing)
+ddev artisan queue:work
+
+# Run in background with auto-restart
+ddev artisan queue:work --tries=3 --daemon
+```
+
+**Scheduler** (required for scheduled posts):
+```bash
+# The scheduler runs automatically every minute via cron
+# Ensure your server has the Laravel scheduler configured:
+* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+**X API Configuration:**
+Add these to your `.env` file:
+```env
+TWITTER_API_KEY=your_api_key
+TWITTER_API_SECRET=your_api_secret
+TWITTER_ACCESS_TOKEN=your_access_token
+TWITTER_ACCESS_TOKEN_SECRET=your_access_token_secret
+TWITTER_BEARER_TOKEN=your_bearer_token
+```
+
 ## Application Architecture
 
 ### Movie Status Workflow
@@ -115,6 +143,16 @@ Movies have three statuses managed through `App\Models\Movie` constants:
 - `is_admin` flag controls access to dashboard TMDB section
 - `belongsToMany(Movie::class, 'watchlists')` - Personal watchlist
 
+**XPost** (`app/Models/XPost.php`)
+- `belongsTo(User::class)` - Post creator/owner
+- Status workflow: `draft` → `scheduled` → `published` (or `failed`, `cancelled`)
+- Scopes: `draft()`, `scheduled()`, `published()`, `failed()`, `cancelled()`, `readyToPublish()`
+- Support for threads (up to 25 tweets) via `thread_parts` JSON field
+- Support for media attachments (up to 4 images) via `media_urls` JSON field
+- Character limit: 280 characters per tweet (constant: `MAX_TWEET_LENGTH`)
+- Helper methods: `canPublish()`, `hasThread()`, `hasMedia()`, `getFullThreadContent()`
+- State transitions: `markAsScheduled()`, `markAsPublished()`, `markAsFailed()`, `cancel()`
+
 ### TMDB Integration
 
 **Service:** `app/Services/TMDBService.php`
@@ -133,6 +171,48 @@ Movies have three statuses managed through `App\Models\Movie` constants:
 **Configuration:** `config/tmdb.php`
 - Requires `TMDB_API_KEY` in `.env`
 - Free API key: https://www.themoviedb.org/settings/api
+
+### X (Twitter) Post Integration
+
+**Status Workflow:**
+1. Create **draft** post via admin UI (`/x-posts`)
+2. Either:
+   - Schedule for future publishing (status → `scheduled`)
+   - Publish immediately (dispatches `PublishXPost` job)
+3. Scheduler checks every minute for posts ready to publish
+4. Job publishes to X API and marks as `published` with `x_post_id`
+5. On failure: status → `failed`, `error_message` stored, retries 3 times
+
+**Publishing Job:** `app/Jobs/PublishXPost.php`
+- Queued job with 3 retry attempts and exponential backoff (1m, 5m, 15m)
+- Handles single tweets and threads (replies chained via `in_reply_to_tweet_id`)
+- Supports media upload via X API v1.1 media endpoint
+- Posts tweets via X API v2 `/2/tweets` endpoint
+- Includes comprehensive error handling and logging
+
+**Scheduler:** Configured in `routes/console.php`
+- Runs every minute: finds posts where `status = 'scheduled'` AND `scheduled_for <= now()`
+- Dispatches `PublishXPost` job for each ready post
+- Uses `withoutOverlapping()` to prevent duplicate executions
+
+**Queue Configuration:**
+- Uses database queue driver by default
+- Jobs stored in `jobs` table
+- Failed jobs stored in `failed_jobs` table with full context
+- Run worker: `ddev artisan queue:work --tries=3`
+
+**X API Package:** `atymic/twitter`
+- Install: `composer require atymic/twitter`
+- Supports both X API v1.1 (media upload) and v2 (post tweets)
+- Configure credentials in `.env` (see X API Configuration section above)
+
+**Admin Routes:**
+- `/x-posts` - List all posts with status filtering
+- `/x-posts/create` - Create new draft or scheduled post
+- `/x-posts/{id}/edit` - Edit draft or failed posts only
+- `/x-posts/{id}/schedule` - Schedule a draft post
+- `/x-posts/{id}/publish` - Publish immediately
+- `/x-posts/{id}/cancel` - Cancel a scheduled post
 
 ### Frontend Structure
 

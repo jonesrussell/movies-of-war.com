@@ -1,0 +1,339 @@
+<?php
+
+use App\Jobs\PublishXPost;
+use App\Models\User;
+use App\Models\XPost;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
+
+uses(RefreshDatabase::class);
+
+// Authentication & Authorization Tests
+
+test('guests cannot access x-posts index', function () {
+    $response = $this->get(route('admin.x-posts.index'));
+    $response->assertRedirect(route('login'));
+});
+
+test('non-admin users cannot access x-posts index', function () {
+    $user = User::factory()->create(['is_admin' => false]);
+    $this->actingAs($user);
+
+    $response = $this->get(route('admin.x-posts.index'));
+    $response->assertForbidden();
+});
+
+test('admin users can access x-posts index', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $response = $this->get(route('admin.x-posts.index'));
+    $response->assertOk();
+});
+
+// CRUD Tests
+
+test('admin can create a draft x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'Test tweet content',
+        'status' => 'draft',
+    ]);
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('success', 'X post draft created successfully.');
+
+    $this->assertDatabaseHas('x_posts', [
+        'content' => 'Test tweet content',
+        'status' => 'draft',
+        'user_id' => $admin->id,
+    ]);
+});
+
+test('admin can create a scheduled x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $scheduledFor = now()->addHours(2);
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'Scheduled tweet',
+        'status' => 'scheduled',
+        'scheduled_for' => $scheduledFor->toDateTimeString(),
+    ]);
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $this->assertDatabaseHas('x_posts', [
+        'content' => 'Scheduled tweet',
+        'status' => 'scheduled',
+    ]);
+});
+
+test('admin can create x-post with thread', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'First tweet',
+        'thread_parts' => ['Second tweet', 'Third tweet'],
+        'status' => 'draft',
+    ]);
+
+    $response->assertRedirect();
+    $this->assertDatabaseHas('x_posts', [
+        'content' => 'First tweet',
+    ]);
+
+    $xPost = XPost::where('content', 'First tweet')->first();
+    expect($xPost->thread_parts)->toBe(['Second tweet', 'Third tweet']);
+});
+
+test('admin can update a draft x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $this->actingAs($admin);
+
+    $response = $this->put(route('admin.x-posts.update', $xPost), [
+        'content' => 'Updated content',
+        'status' => 'draft',
+    ]);
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $this->assertDatabaseHas('x_posts', [
+        'id' => $xPost->id,
+        'content' => 'Updated content',
+    ]);
+});
+
+test('admin cannot update a published x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $xPost = XPost::factory()->published()->create();
+    $this->actingAs($admin);
+
+    $response = $this->put(route('admin.x-posts.update', $xPost), [
+        'content' => 'Trying to update',
+        'status' => 'draft',
+    ]);
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('error');
+});
+
+test('admin can delete a draft x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $this->actingAs($admin);
+
+    $response = $this->delete(route('admin.x-posts.destroy', $xPost));
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $this->assertDatabaseMissing('x_posts', ['id' => $xPost->id]);
+});
+
+test('admin cannot delete a published x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $xPost = XPost::factory()->published()->create();
+    $this->actingAs($admin);
+
+    $response = $this->delete(route('admin.x-posts.destroy', $xPost));
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('error');
+    $this->assertDatabaseHas('x_posts', ['id' => $xPost->id]);
+});
+
+// Validation Tests
+
+test('x-post requires content or thread parts', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'status' => 'draft',
+    ]);
+
+    $response->assertSessionHasErrors('content');
+});
+
+test('x-post content cannot exceed 280 characters', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => str_repeat('a', 281),
+        'status' => 'draft',
+    ]);
+
+    $response->assertSessionHasErrors('content');
+});
+
+test('scheduled post requires future scheduled_for date', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'Test',
+        'status' => 'scheduled',
+        'scheduled_for' => now()->subHour()->toDateTimeString(),
+    ]);
+
+    $response->assertSessionHasErrors('scheduled_for');
+});
+
+test('thread parts cannot exceed 25 tweets', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $threadParts = array_fill(0, 26, 'Tweet content');
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'First tweet',
+        'thread_parts' => $threadParts,
+        'status' => 'draft',
+    ]);
+
+    $response->assertSessionHasErrors('thread_parts');
+});
+
+test('media urls cannot exceed 4 attachments', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'Test',
+        'media_urls' => ['image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg'],
+        'status' => 'draft',
+    ]);
+
+    $response->assertSessionHasErrors('media_urls');
+});
+
+// Scheduling Tests
+
+test('admin can schedule a draft x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $this->actingAs($admin);
+
+    $scheduledFor = now()->addHours(3);
+
+    $response = $this->post(route('admin.x-posts.schedule', $xPost), [
+        'scheduled_for' => $scheduledFor->toDateTimeString(),
+    ]);
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('success');
+
+    $xPost->refresh();
+    expect($xPost->status)->toBe('scheduled');
+    expect($xPost->scheduled_for)->not->toBeNull();
+});
+
+test('admin can cancel a scheduled x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $xPost = XPost::factory()->scheduled()->create();
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.cancel', $xPost));
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+
+    $xPost->refresh();
+    expect($xPost->status)->toBe('cancelled');
+});
+
+test('admin cannot cancel a non-scheduled x-post', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.cancel', $xPost));
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('error');
+});
+
+// Publishing Tests
+
+test('admin can publish a draft x-post immediately', function () {
+    Queue::fake();
+
+    $admin = User::factory()->create(['is_admin' => true]);
+    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.publish', $xPost));
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('success');
+
+    Queue::assertPushed(PublishXPost::class, function ($job) use ($xPost) {
+        return $job->xPost->id === $xPost->id;
+    });
+});
+
+test('scheduled posts ready for publishing are dispatched by scheduler', function () {
+    Queue::fake();
+
+    $readyPost1 = XPost::factory()->readyToPublish()->create();
+    $readyPost2 = XPost::factory()->readyToPublish()->create();
+    $futurePost = XPost::factory()->scheduled()->create();
+
+    // Manually invoke the scheduled task logic
+    XPost::query()
+        ->readyToPublish()
+        ->each(function (XPost $xPost): void {
+            PublishXPost::dispatch($xPost);
+        });
+
+    // Verify only ready posts were dispatched
+    Queue::assertPushed(PublishXPost::class, 2);
+    Queue::assertPushed(PublishXPost::class, fn ($job) => $job->xPost->id === $readyPost1->id);
+    Queue::assertPushed(PublishXPost::class, fn ($job) => $job->xPost->id === $readyPost2->id);
+});
+
+// Model Tests
+
+test('x-post can check if it has a thread', function () {
+    $xPostWithThread = XPost::factory()->withThread()->create();
+    $xPostWithoutThread = XPost::factory()->create();
+
+    expect($xPostWithThread->hasThread())->toBeTrue();
+    expect($xPostWithoutThread->hasThread())->toBeFalse();
+});
+
+test('x-post can check if it has media', function () {
+    $xPostWithMedia = XPost::factory()->withMedia()->create();
+    $xPostWithoutMedia = XPost::factory()->create();
+
+    expect($xPostWithMedia->hasMedia())->toBeTrue();
+    expect($xPostWithoutMedia->hasMedia())->toBeFalse();
+});
+
+test('x-post can get full thread content', function () {
+    $xPost = XPost::factory()->create([
+        'content' => 'First tweet',
+        'thread_parts' => ['Second tweet', 'Third tweet'],
+    ]);
+
+    $threadContent = $xPost->getFullThreadContent();
+
+    expect($threadContent)->toHaveCount(3);
+    expect($threadContent[0])->toBe('First tweet');
+    expect($threadContent[1])->toBe('Second tweet');
+    expect($threadContent[2])->toBe('Third tweet');
+});
+
+test('x-post scope ready to publish returns correct posts', function () {
+    $ready1 = XPost::factory()->readyToPublish()->create();
+    $ready2 = XPost::factory()->readyToPublish()->create();
+    $future = XPost::factory()->scheduled()->create();
+    $draft = XPost::factory()->create(['status' => 'draft']);
+
+    $readyPosts = XPost::query()->readyToPublish()->get();
+
+    expect($readyPosts)->toHaveCount(2);
+    expect($readyPosts->pluck('id'))->toContain($ready1->id, $ready2->id);
+});

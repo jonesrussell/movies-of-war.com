@@ -14,7 +14,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Film, Bookmark, Star } from 'lucide-vue-next';
+import { BookOpen, Folder, LayoutGrid, Film, Bookmark, Star, Database } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const page = usePage();
@@ -38,6 +38,11 @@ const mainNavItems: NavItem[] = [
     },
     ...(auth?.user?.is_admin
         ? [
+              {
+                  title: 'TMDB',
+                  href: '/dashboard',
+                  icon: Database,
+              },
               {
                   title: 'Featured Slots',
                   href: '/featured-slots',

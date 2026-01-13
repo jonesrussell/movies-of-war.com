@@ -39,7 +39,6 @@ Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index
     ->name('dashboard');
 
 Route::get('/movies', [App\Http\Controllers\MovieController::class, 'index'])->name('movies.index');
-Route::get('/movies/{slug}', [App\Http\Controllers\MovieController::class, 'show'])->name('movies.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/watchlist', function () {
@@ -75,6 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('x-posts', App\Http\Controllers\Admin\XPostController::class)->names('admin.x-posts');
     });
 });
+
+// Public movie show route - must be after admin routes to avoid conflicts
+Route::get('/movies/{slug}', [App\Http\Controllers\MovieController::class, 'show'])->name('movies.show');
 
 // Redirect old /admin routes to /dashboard
 Route::get('/admin', function () {

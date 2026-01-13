@@ -8,11 +8,10 @@ import { provideSidebarContext, SIDEBAR_COOKIE_MAX_AGE, SIDEBAR_COOKIE_NAME, SID
 
 const props = withDefaults(defineProps<{
   defaultOpen?: boolean
-  open?: boolean
+  open?: boolean | undefined
   class?: HTMLAttributes["class"]
 }>(), {
   defaultOpen: !defaultDocument?.cookie.includes(`${SIDEBAR_COOKIE_NAME}=false`),
-  open: undefined,
 })
 
 const emits = defineEmits<{

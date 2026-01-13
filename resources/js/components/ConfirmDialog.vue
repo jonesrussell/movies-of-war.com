@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref, toRef, watch } from 'vue';
+
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -7,8 +10,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ref, watch } from 'vue';
 
 interface Props {
     open?: boolean;
@@ -32,11 +33,15 @@ const emit = defineEmits<{
     (e: 'cancel'): void;
 }>();
 
-const isOpen = ref(props.open);
+const openProp = toRef(props, 'open');
+const isOpen = ref(openProp.value);
 
-watch(() => props.open, (value) => {
-    isOpen.value = value;
-});
+watch(
+    () => props.open,
+    (value) => {
+        isOpen.value = value;
+    },
+);
 
 watch(isOpen, (value) => {
     emit('update:open', value);

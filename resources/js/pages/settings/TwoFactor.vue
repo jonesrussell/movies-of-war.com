@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import HeadingSmall from '@/components/HeadingSmall.vue';
+import { Form, Head } from '@inertiajs/vue3';
+import { ShieldBan, ShieldCheck } from 'lucide-vue-next';
+import { onUnmounted, ref } from 'vue';
+
+import Heading from '@/components/Heading.vue';
 import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue';
 import TwoFactorSetupModal from '@/components/TwoFactorSetupModal.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { useTwoFactorAuth } from '@/composables/use-two-factor-auth';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { disable, enable, show } from '@/routes/two-factor';
-import { BreadcrumbItem } from '@/types';
-import { Form, Head } from '@inertiajs/vue3';
-import { ShieldBan, ShieldCheck } from 'lucide-vue-next';
-import { onUnmounted, ref } from 'vue';
+import { type BreadcrumbItem } from '@/types';
 
 interface Props {
     requiresConfirmation?: boolean;
@@ -46,7 +47,7 @@ onUnmounted(() => {
 
         <SettingsLayout>
             <div class="space-y-6">
-                <HeadingSmall
+                <Heading
                     title="Two-Factor Authentication"
                     description="Manage your two-factor authentication settings"
                 />
@@ -115,8 +116,8 @@ onUnmounted(() => {
 
                 <TwoFactorSetupModal
                     v-model:isOpen="showSetupModal"
-                    :requiresConfirmation="requiresConfirmation"
-                    :twoFactorEnabled="twoFactorEnabled"
+                    :requiresConfirmation="requiresConfirmation ?? false"
+                    :twoFactorEnabled="twoFactorEnabled ?? false"
                 />
             </div>
         </SettingsLayout>

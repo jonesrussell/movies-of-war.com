@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { Form } from '@inertiajs/vue3';
+import { useClipboard } from '@vueuse/core';
+import { Check, Copy, ScanLine } from 'lucide-vue-next';
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
+
 import AlertError from '@/components/AlertError.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -15,13 +20,9 @@ import {
     InputOTPSlot,
 } from '@/components/ui/input-otp';
 import { Spinner } from '@/components/ui/spinner';
-import { useAppearance } from '@/composables/useAppearance';
-import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { useAppearance } from '@/composables/use-appearance';
+import { useTwoFactorAuth } from '@/composables/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
-import { Form } from '@inertiajs/vue3';
-import { useClipboard } from '@vueuse/core';
-import { Check, Copy, ScanLine } from 'lucide-vue-next';
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 
 interface Props {
     requiresConfirmation: boolean;
@@ -76,7 +77,7 @@ const handleModalNextStep = () => {
     if (props.requiresConfirmation) {
         showVerificationStep.value = true;
 
-        nextTick(() => {
+        void nextTick(() => {
             pinInputContainerRef.value?.querySelector('input')?.focus();
         });
 
@@ -112,7 +113,7 @@ watch(
 </script>
 
 <template>
-    <Dialog :open="isOpen" @update:open="isOpen = $event">
+    <Dialog :open="isOpen ?? false" @update:open="isOpen = $event">
         <DialogContent class="sm:max-w-md">
             <DialogHeader class="flex items-center justify-center">
                 <div
@@ -172,6 +173,7 @@ watch(
                                     v-else
                                     class="relative z-10 overflow-hidden border p-5"
                                 >
+                                    <!-- eslint-disable vue/no-v-html -->
                                     <div
                                         v-html="qrCodeSvg"
                                         class="flex aspect-square size-full items-center justify-center"
@@ -182,6 +184,7 @@ watch(
                                                     : undefined,
                                         }"
                                     />
+                                    <!-- eslint-enable vue/no-v-html -->
                                 </div>
                             </div>
                         </div>
@@ -269,10 +272,7 @@ watch(
                                     </InputOTPGroup>
                                 </InputOTP>
                                 <InputError
-                                    :message="
-                                        errors?.confirmTwoFactorAuthentication
-                                            ?.code
-                                    "
+                                    :message="errors?.confirmTwoFactorAuthentication"
                                 />
                             </div>
 

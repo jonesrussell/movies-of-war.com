@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Link } from '@inertiajs/vue3';
-import { ArrowRight, Film, Bookmark } from 'lucide-vue-next';
+import { ArrowRight, Bookmark, Film } from 'lucide-vue-next';
+
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 </script>
 
 <template>
@@ -18,7 +25,9 @@ import { ArrowRight, Film, Bookmark } from 'lucide-vue-next';
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div class="text-sm font-medium text-primary group-hover:underline flex items-center gap-1">
+                    <div
+                        class="flex items-center gap-1 text-sm font-medium text-primary group-hover:underline"
+                    >
                         View All Movies
                         <ArrowRight class="size-4" />
                     </div>
@@ -33,12 +42,12 @@ import { ArrowRight, Film, Bookmark } from 'lucide-vue-next';
                         <Bookmark class="size-5" />
                         My Watchlist
                     </CardTitle>
-                    <CardDescription>
-                        View your saved movies
-                    </CardDescription>
+                    <CardDescription> View your saved movies </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div class="text-sm font-medium text-primary group-hover:underline flex items-center gap-1">
+                    <div
+                        class="flex items-center gap-1 text-sm font-medium text-primary group-hover:underline"
+                    >
                         View Watchlist
                         <ArrowRight class="size-4" />
                     </div>

@@ -12,8 +12,10 @@ const props = withDefaults(defineProps<PrimitiveProps & { class?: HTMLAttributes
 <template>
   <Primitive
     data-slot="breadcrumb-link"
-    :as="as"
-    :as-child="asChild"
+    v-bind="{
+      ...(as !== undefined ? { as } : {}),
+      ...(asChild !== undefined ? { asChild } : {}),
+    }"
     :class="cn('hover:text-foreground transition-colors', props.class)"
   >
     <slot />

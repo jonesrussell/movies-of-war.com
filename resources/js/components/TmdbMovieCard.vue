@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
 import type { Movie } from '@/types/models';
-import { CheckCircle, Archive } from 'lucide-vue-next';
+
+import { Archive, CheckCircle } from 'lucide-vue-next';
+
+import { Button } from '@/components/ui/button';
 
 interface Props {
     movie: Movie;
@@ -24,10 +26,13 @@ function handleArchive() {
 </script>
 
 <template>
-    <div class="group relative overflow-hidden rounded-lg bg-card border">
+    <div class="group relative overflow-hidden rounded-lg border bg-card">
         <div class="aspect-[2/3]">
             <img
-                :src="movie.poster_url || '/images/placeholders/poster-placeholder.png'"
+                :src="
+                    movie.poster_url ||
+                    '/images/placeholders/poster-placeholder.png'
+                "
                 :alt="movie.title"
                 class="h-full w-full object-cover"
             />

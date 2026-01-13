@@ -32,13 +32,13 @@ class ChangeUserPassword extends Command
         $user = User::where('email', $email)->first();
 
         if (! $user) {
-            $this->error("User with email '{$email}' not found.");
+            $this->error('User with email \''.$email.'\' not found.');
 
             return self::FAILURE;
         }
 
         $this->info("Found user: {$user->name} ({$user->email})");
-        $this->info("Is admin: ".($user->is_admin ? 'Yes' : 'No'));
+        $this->info('Is admin: '.($user->is_admin ? 'Yes' : 'No'));
 
         $password = $this->secret('Enter new password');
         $passwordConfirmation = $this->secret('Confirm new password');

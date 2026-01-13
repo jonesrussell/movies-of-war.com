@@ -12,7 +12,9 @@ defineProps<Props>();
 <template>
     <Card>
         <CardHeader>
-            <div class="text-sm font-medium text-muted-foreground">{{ title }}</div>
+            <div class="text-sm font-medium text-muted-foreground">
+                {{ title }}
+            </div>
         </CardHeader>
         <CardContent>
             <div class="text-3xl font-bold">{{ value }}</div>

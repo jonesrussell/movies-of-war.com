@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { Form, Head } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,15 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { update } from '@/routes/password';
-import { Form, Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
 
 const props = defineProps<{
     token: string;
     email: string;
 }>();
 
-const inputEmail = ref(props.email);
+const email = computed(() => props.email);
+const inputEmail = ref(email.value ?? '');
 </script>
 
 <template>

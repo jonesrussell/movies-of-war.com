@@ -16,7 +16,14 @@ const props = defineProps<DropdownMenuRadioItemProps & { class?: HTMLAttributes[
 const emits = defineEmits<DropdownMenuRadioItemEmits>()
 
 const delegatedProps = reactiveOmit(props, "class")
-const filteredProps = computed(() => filterUndefinedProps(delegatedProps))
+const filteredProps = computed(() => {
+  const filtered = filterUndefinedProps(delegatedProps);
+  // Ensure value is always provided (required by component)
+  if (!('value' in filtered) && props.value !== undefined) {
+    return { ...filtered, value: props.value };
+  }
+  return filtered;
+})
 
 const forwarded = useForwardPropsEmits(filteredProps, emits)
 </script>

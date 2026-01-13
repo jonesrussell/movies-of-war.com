@@ -9,10 +9,7 @@ interface Props {
     placeholder?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    modelValue: undefined,
-    placeholder: 'Search...',
-});
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void;

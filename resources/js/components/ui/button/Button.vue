@@ -20,8 +20,10 @@ const props = withDefaults(defineProps<Props>(), {
 <template>
   <Primitive
     data-slot="button"
-    :as="as"
-    :as-child="asChild"
+    v-bind="{
+      ...(as !== undefined ? { as } : {}),
+      ...(asChild !== undefined ? { asChild } : {}),
+    }"
     :class="cn(buttonVariants({ variant, size }), props.class)"
   >
     <slot />

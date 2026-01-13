@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { DropdownMenuItemProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
+import { computed } from "vue"
 import { reactiveOmit } from "@vueuse/core"
 import { DropdownMenuItem, useForwardProps } from "reka-ui"
-import { cn } from "@/lib/utils"
+import { cn, filterUndefinedProps } from "@/lib/utils"
 
 const props = withDefaults(defineProps<DropdownMenuItemProps & {
   class?: HTMLAttributes["class"]
@@ -14,8 +15,9 @@ const props = withDefaults(defineProps<DropdownMenuItemProps & {
 })
 
 const delegatedProps = reactiveOmit(props, "inset", "variant", "class")
+const filteredProps = computed(() => filterUndefinedProps(delegatedProps))
 
-const forwardedProps = useForwardProps(delegatedProps)
+const forwardedProps = useForwardProps(filteredProps)
 </script>
 
 <template>

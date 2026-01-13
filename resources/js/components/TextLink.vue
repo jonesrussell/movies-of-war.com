@@ -14,6 +14,7 @@ defineProps<Props>();
 
 <template>
     <Link
+        v-if="href"
         :href="href"
         v-bind="{
             ...(tabindex !== undefined ? { tabindex } : {}),

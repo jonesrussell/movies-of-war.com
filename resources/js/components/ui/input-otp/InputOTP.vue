@@ -12,7 +12,14 @@ const props = defineProps<OTPInputProps & { class?: HTMLAttributes["class"] }>()
 const emits = defineEmits<OTPInputEmits>()
 
 const delegatedProps = reactiveOmit(props, "class")
-const filteredProps = computed(() => filterUndefinedProps(delegatedProps))
+const filteredProps = computed(() => {
+  const filtered = filterUndefinedProps(delegatedProps);
+  // Ensure maxlength is always provided (required by component)
+  if (!('maxlength' in filtered) && props.maxlength !== undefined) {
+    return { ...filtered, maxlength: props.maxlength };
+  }
+  return filtered;
+})
 
 const forwarded = useForwardPropsEmits(filteredProps, emits)
 </script>

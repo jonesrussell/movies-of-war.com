@@ -25,11 +25,13 @@ const wrapperClasses = {
 
 const headingTag = computed(() => (props.size === 'lg' ? 'h2' : 'h3'));
 const wrapperTag = computed(() => (props.size === 'lg' ? 'div' : 'header'));
+
+const sizeValue = computed(() => props.size ?? 'md');
 </script>
 
 <template>
-    <component :is="wrapperTag" :class="wrapperClasses[size]">
-        <component :is="headingTag" :class="headingClasses[size]">{{
+    <component :is="wrapperTag" :class="wrapperClasses[sizeValue]">
+        <component :is="headingTag" :class="headingClasses[sizeValue]">{{
             title
         }}</component>
         <p v-if="description" class="text-sm text-muted-foreground">

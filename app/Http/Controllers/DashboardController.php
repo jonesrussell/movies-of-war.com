@@ -62,4 +62,16 @@ class DashboardController extends Controller
 
         return redirect()->back()->with('success', 'Movie archived successfully.');
     }
+
+    public function unpublishMovie(Movie $movie): RedirectResponse
+    {
+        if (! auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $movie->status = Movie::STATUS_DRAFT;
+        $movie->save();
+
+        return redirect()->back()->with('success', 'Movie unpublished successfully.');
+    }
 }

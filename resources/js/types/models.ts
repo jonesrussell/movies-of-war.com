@@ -13,6 +13,7 @@ export interface Movie {
   trailer_url: string | null
   imdb_id: string | null
   is_upcoming: boolean
+  status?: 'draft' | 'published' | 'archived'
   created_at: string
   updated_at: string
   tags?: Tag[]

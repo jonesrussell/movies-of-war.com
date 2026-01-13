@@ -13,7 +13,7 @@ class MovieController extends Controller
     public function index(Request $request): Response
     {
         $query = Movie::query()->with('tags');
-        
+
         // For non-admins, only show published movies
         if (! auth()->check() || ! auth()->user()->is_admin) {
             $query->published();

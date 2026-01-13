@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ImportTmdbMoviesRequest;
+use App\Jobs\ImportTmdbMoviesJob;
 use App\Models\Movie;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,22 +20,29 @@ class DashboardController extends Controller
             'movies' => Movie::published()->count(),
             'tags' => \App\Models\Tag::count(),
             'activeFeatures' => \App\Models\FeaturedSlot::active()->count(),
+            'tmdbDrafts' => $user->is_admin ? Movie::draft()->count() : 0,
         ];
-
-        // Only show TMDB draft movies to admins
-        $tmdbDrafts = collect();
-        if ($user->is_admin) {
-            $query = Movie::query()->draft()->with('tags')->latest();
-
-            if ($search = $request->get('search')) {
-                $query->where('title', 'like', "%{$search}%");
-            }
-
-            $tmdbDrafts = $query->paginate(24)->withQueryString();
-        }
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,
+        ]);
+    }
+
+    public function tmdbImports(Request $request): Response
+    {
+        if (! auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $query = Movie::query()->draft()->with('tags')->latest();
+
+        if ($search = $request->get('search')) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        $tmdbDrafts = $query->paginate(24)->withQueryString();
+
+        return Inertia::render('Dashboard/TmdbImports', [
             'tmdbDrafts' => $tmdbDrafts,
             'queryParams' => $request->only(['search']),
         ]);
@@ -48,7 +57,7 @@ class DashboardController extends Controller
         $movie->status = Movie::STATUS_PUBLISHED;
         $movie->save();
 
-        return redirect()->back()->with('success', 'Movie published successfully.');
+        return redirect()->route('dashboard.tmdb-imports')->with('success', 'Movie published successfully.');
     }
 
     public function archiveMovie(Movie $movie): RedirectResponse
@@ -60,7 +69,7 @@ class DashboardController extends Controller
         $movie->status = Movie::STATUS_ARCHIVED;
         $movie->save();
 
-        return redirect()->back()->with('success', 'Movie archived successfully.');
+        return redirect()->route('dashboard.tmdb-imports')->with('success', 'Movie archived successfully.');
     }
 
     public function unpublishMovie(Movie $movie): RedirectResponse
@@ -73,5 +82,15 @@ class DashboardController extends Controller
         $movie->save();
 
         return redirect()->back()->with('success', 'Movie unpublished successfully.');
+    }
+
+    public function importTmdbMovies(ImportTmdbMoviesRequest $request): RedirectResponse
+    {
+        $limit = $request->validated()['limit'] ?? 30;
+        $downloadPosters = $request->validated()['download_posters'] ?? false;
+
+        ImportTmdbMoviesJob::dispatch($limit, $downloadPosters);
+
+        return redirect()->route('dashboard.tmdb-imports')->with('success', "TMDB import job queued. Importing up to {$limit} movies...");
     }
 }

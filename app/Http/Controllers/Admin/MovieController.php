@@ -55,13 +55,15 @@ class MovieController extends Controller
             'tags.*' => 'exists:tags,id',
         ]);
 
+        $validated['status'] = $validated['status'] ?? Movie::STATUS_DRAFT;
+
         $movie = Movie::create($validated);
 
         if (isset($validated['tags'])) {
             $movie->tags()->sync($validated['tags']);
         }
 
-        return redirect()->route('admin.movies.index')
+        return redirect()->route('dashboard.movies')
             ->with('success', 'Movie created successfully.');
     }
 
@@ -100,15 +102,34 @@ class MovieController extends Controller
             $movie->tags()->sync($validated['tags']);
         }
 
-        return redirect()->route('admin.movies.index')
+        return redirect()->route('dashboard.movies')
             ->with('success', 'Movie updated successfully.');
     }
 
     public function destroy(Movie $movie): RedirectResponse
     {
-        $movie->delete();
+        $movie->status = Movie::STATUS_ARCHIVED;
+        $movie->save();
 
-        return redirect()->route('admin.movies.index')
-            ->with('success', 'Movie deleted successfully.');
+        return redirect()->route('dashboard.movies')
+            ->with('success', 'Movie archived successfully.');
+    }
+
+    public function publish(Movie $movie): RedirectResponse
+    {
+        $movie->status = Movie::STATUS_PUBLISHED;
+        $movie->save();
+
+        return redirect()->route('dashboard.movies')
+            ->with('success', 'Movie published successfully.');
+    }
+
+    public function unpublish(Movie $movie): RedirectResponse
+    {
+        $movie->status = Movie::STATUS_DRAFT;
+        $movie->save();
+
+        return redirect()->route('dashboard.movies')
+            ->with('success', 'Movie unpublished successfully.');
     }
 }

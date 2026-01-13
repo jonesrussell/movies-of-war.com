@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -50,12 +49,19 @@ class TMDBService
         $response = Http::get("{$this->baseUrl}/discover/movie", [
             'api_key' => $this->apiKey,
             'with_genres' => '10752', // War genre
+            'with_original_language' => 'en', // English only
             'sort_by' => 'vote_average.desc',
             'vote_count.gte' => 100,
             'page' => $page,
         ]);
 
-        return $response->json()['results'] ?? [];
+        $data = $response->json();
+
+        return [
+            'results' => $data['results'] ?? [],
+            'total_pages' => $data['total_pages'] ?? 1,
+            'total_results' => $data['total_results'] ?? 0,
+        ];
     }
 
     public function downloadPoster(string $posterPath): ?string

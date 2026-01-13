@@ -40,5 +40,5 @@ task('deploy:build', function () {
 // Hooks
 
 after('deploy:update_code', 'deploy:npm');
-after('deploy:npm', 'deploy:build');
+after('deploy:vendors', 'deploy:build');
 after('deploy:failed', 'deploy:unlock');

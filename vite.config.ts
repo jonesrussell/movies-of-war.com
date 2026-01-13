@@ -24,4 +24,14 @@ export default defineConfig({
             },
         }),
     ],
+    server: {
+        https: {},
+        host: '0.0.0.0',
+        strictPort: false,
+        hmr: {
+            protocol: 'wss',
+            host: 'movies-of-war.com.ddev.site',
+            clientPort: 5173,
+        },
+    },
 });

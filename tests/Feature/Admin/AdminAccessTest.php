@@ -12,7 +12,7 @@ test('guests cannot access admin routes', function () {
 test('regular users cannot access admin routes', function () {
     $user = User::factory()->create(['is_admin' => false]);
 
-    $response = $this->actingAs($user)->get('/admin');
+    $response = $this->actingAs($user)->get('/dashboard/movies');
 
     $response->assertForbidden();
 });
@@ -20,7 +20,7 @@ test('regular users cannot access admin routes', function () {
 test('admin users can access admin dashboard', function () {
     $user = User::factory()->create(['is_admin' => true]);
 
-    $response = $this->actingAs($user)->get('/admin');
+    $response = $this->actingAs($user)->get('/dashboard');
 
     $response->assertOk();
 });
@@ -28,7 +28,7 @@ test('admin users can access admin dashboard', function () {
 test('admin users can access admin movies page', function () {
     $user = User::factory()->create(['is_admin' => true]);
 
-    $response = $this->actingAs($user)->get('/admin/movies');
+    $response = $this->actingAs($user)->get('/dashboard/movies');
 
     $response->assertOk();
 });
@@ -36,7 +36,7 @@ test('admin users can access admin movies page', function () {
 test('admin users can access admin featured slots page', function () {
     $user = User::factory()->create(['is_admin' => true]);
 
-    $response = $this->actingAs($user)->get('/admin/featured-slots');
+    $response = $this->actingAs($user)->get('/featured-slots');
 
     $response->assertOk();
 });
@@ -44,7 +44,7 @@ test('admin users can access admin featured slots page', function () {
 test('regular users cannot create movies', function () {
     $user = User::factory()->create(['is_admin' => false]);
 
-    $response = $this->actingAs($user)->get('/admin/movies/create');
+    $response = $this->actingAs($user)->get('/movies/create');
 
     $response->assertForbidden();
 });
@@ -53,7 +53,7 @@ test('regular users cannot edit movies', function () {
     $user = User::factory()->create(['is_admin' => false]);
     $movie = \App\Models\Movie::factory()->create();
 
-    $response = $this->actingAs($user)->get("/admin/movies/{$movie->id}/edit");
+    $response = $this->actingAs($user)->get("/movies/{$movie->id}/edit");
 
     $response->assertForbidden();
 });

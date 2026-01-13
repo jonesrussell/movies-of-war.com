@@ -1,3 +1,265 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**Movies of War** is a curated database of war films built with Laravel 12, Vue 3, Inertia.js v2, and Tailwind CSS 4. It features TMDB API integration for importing movie metadata, an admin dashboard for content curation, and public browsing with watchlists.
+
+## Development Environment
+
+This project uses **DDEV** for local development. All commands should be prefixed with `ddev` when running locally:
+
+```bash
+# Examples
+ddev artisan migrate
+ddev artisan test
+ddev composer install
+ddev npm install
+```
+
+## Common Commands
+
+### Development
+```bash
+# Frontend development server
+npm run dev
+
+# Build frontend for production
+npm run build
+
+# Format code
+npm run format
+
+# Lint TypeScript/Vue
+npm run lint
+```
+
+### Backend
+```bash
+# Run migrations
+ddev artisan migrate
+
+# Run all tests
+ddev artisan test --compact
+
+# Run specific test file
+ddev artisan test --compact tests/Feature/MovieTest.php
+
+# Run tests matching a pattern
+ddev artisan test --compact --filter=MovieTest
+
+# Format PHP code
+ddev exec vendor/bin/pint
+```
+
+### TMDB Movie Import
+```bash
+# Import war movies from TMDB (creates draft movies)
+ddev artisan tmdb:import --download-posters --limit=50
+
+# Import without downloading posters (uses TMDB URLs)
+ddev artisan tmdb:import --limit=30
+```
+
+### User Management
+```bash
+# Change user password
+ddev artisan user:change-password user@example.com
+
+# Grant admin access
+ddev artisan user:make-admin user@example.com
+
+# Revoke admin access
+ddev artisan user:make-admin user@example.com --revoke
+```
+
+## Application Architecture
+
+### Movie Status Workflow
+
+Movies have three statuses managed through `App\Models\Movie` constants:
+- **draft** - TMDB imports start here, hidden from public
+- **published** - Visible on public site, searchable, can be featured
+- **archived** - Hidden but preserved, can be restored
+
+**Admin Workflow:**
+1. Run `tmdb:import` → movies created as **draft**
+2. Review drafts in `/dashboard` (admin only)
+3. Click "Publish" to make visible or "Archive" to hide
+4. Published movies appear on `/movies` and homepage
+
+### Core Models & Relationships
+
+**Movie** (`app/Models/Movie.php`)
+- `belongsToMany(Tag::class)` - Genre, era, theme tags
+- `hasMany(FeaturedSlot::class)` - Hero/Pick of Week slots
+- `belongsToMany(User::class, 'watchlists')` - User watchlists
+- Scopes: `draft()`, `published()`, `archived()`
+- Auto-generates slug from title on creation
+
+**FeaturedSlot** (`app/Models/FeaturedSlot.php`)
+- `belongsTo(Movie::class)`
+- Slots: `hero` (homepage hero section), `pick_of_week`
+- Scopes: `active()` (date-based), `slot($type)`
+- Date range: `starts_at` → `ends_at` (null = indefinite)
+
+**Tag** (`app/Models/Tag.php`)
+- Types: `genre`, `theme`, `era`
+- Used for filtering and movie categorization
+
+**User** (`app/Models/User.php`)
+- `is_admin` flag controls access to dashboard TMDB section
+- `belongsToMany(Movie::class, 'watchlists')` - Personal watchlist
+
+### TMDB Integration
+
+**Service:** `app/Services/TMDBService.php`
+- `discoverWarMovies($page)` - Fetches movies with War genre (ID: 10752)
+- `getMovieDetails($tmdbId)` - Full metadata including videos, keywords
+- `downloadPoster($path)` - Downloads to `storage/app/public/posters/`
+- `getPosterUrl($path)` - Returns TMDB CDN URL
+
+**Import Command:** `app/Console/Commands/ImportTmdbMovies.php`
+- Uses `updateOrCreate` with `tmdb_id` to avoid duplicates
+- New movies: status = `draft`
+- Existing movies: preserves current status
+- Auto-tags with genres and detected eras (WWI, WWII, Vietnam)
+- Rate limited to 4 requests/second
+
+**Configuration:** `config/tmdb.php`
+- Requires `TMDB_API_KEY` in `.env`
+- Free API key: https://www.themoviedb.org/settings/api
+
+### Frontend Structure
+
+**Public Pages** (no auth required):
+- `/` - Homepage with hero, pick of week, latest movies grid
+- `/movies` - Browse all published movies with filters
+- `/movies/{slug}` - Movie detail page with related movies
+
+**Authenticated Pages:**
+- `/dashboard` - Stats + TMDB draft management (admins only)
+- `/watchlist` - User's saved movies
+
+**Admin-Only Features:**
+- `/featured-slots` - Manage hero and pick of week
+- `/movies/{id}/publish` - Publish draft movie
+- `/movies/{id}/archive` - Archive movie
+- TMDB section in dashboard
+
+### Inertia Pages Location
+
+Vue components live in `resources/js/pages/`:
+- `Welcome.vue` - Homepage
+- `Dashboard.vue` - Unified dashboard (replaces old `/admin`)
+- `Movies/Index.vue` - Browse page with search/filters
+- `Movies/Show.vue` - Movie detail page
+- `Watchlist/Index.vue` - User watchlist
+- `Admin/*` - Admin-only management pages
+
+**Shared Components:** `resources/js/components/`
+- `MovieCard.vue` - Poster card with hover overlay
+- `MovieHero.vue` - Full-width cinematic hero section
+- `FeaturedMovie.vue` - Horizontal featured card (pick of week)
+
+### Route Organization
+
+**Public Routes** (`routes/web.php`):
+- Movies filtered with `->published()` scope
+- Featured slots filtered with `->active()` scope
+
+**Authenticated Routes:**
+- Dashboard accessible to all users
+- Watchlist CRUD operations
+
+**Admin Routes:**
+- Middleware: `['auth', 'verified', 'admin']`
+- TMDB publish/archive actions
+- Movie and featured slot management
+
+### TypeScript Types
+
+Core types in `resources/js/types/models.ts`:
+```typescript
+interface Movie {
+  id: number
+  tmdb_id: number | null
+  title: string
+  slug: string
+  status: 'draft' | 'published' | 'archived'
+  release_year: number
+  synopsis: string
+  poster_url: string | null
+  trailer_url: string | null
+  tags?: Tag[]
+}
+
+interface FeaturedSlot {
+  id: number
+  movie_id: number
+  slot: 'hero' | 'pick_of_week'
+  starts_at: string
+  ends_at: string | null
+  movie?: Movie
+}
+```
+
+### Authentication & Authorization
+
+- **Laravel Fortify** handles auth (login, register, 2FA, password reset)
+- **Admin access** via `is_admin` boolean on User model
+- **Middleware:** `admin` alias for `EnsureUserIsAdmin` (checks `is_admin` flag)
+- **Views:** Admin-specific UI conditionally rendered with `auth.user?.is_admin`
+
+### Image Assets
+
+**Structure:** `public/images/`
+- `branding/` - logo.png, favicon.png, hero-bg.png
+- `placeholders/` - poster-placeholder.png
+- `illustrations/` - 404.png, no-movies-found.png, watchlist-placeholder.png, etc.
+
+**Downloaded Posters:** `storage/app/public/posters/` (symlinked to `public/storage/posters/`)
+
+### Dark Theme
+
+Uses zinc color palette from Tailwind with red accents:
+- Background: `bg-zinc-950`, `bg-zinc-900`
+- Text: `text-white`, `text-zinc-400`
+- Accents: `bg-red-600`, `text-red-500`
+
+## Testing Strategy
+
+- **Feature tests** for all user-facing functionality
+- **Admin access tests** in `tests/Feature/Admin/AdminAccessTest.php`
+- Always use factories for model creation in tests
+- Run minimal tests with `--filter` during development
+
+## Important Notes
+
+### Movie Queries
+Always use status scopes for public routes:
+```php
+// Public routes - only published movies
+Movie::query()->published()->with('tags')->get();
+
+// Admin routes - show drafts
+Movie::query()->draft()->with('tags')->get();
+```
+
+### Inertia Shared Props
+Access auth data via `usePage()` hook, not via extends:
+```typescript
+const page = usePage()
+const auth = page.props.auth as { user: any }
+```
+
+### TMDB Rate Limiting
+Import command includes `usleep(250000)` for 4 req/sec limit. Do not increase rate without checking TMDB API limits.
+
+### Migration Order
+Featured slots and watchlists depend on movies table. Ensure migration timestamps maintain foreign key order.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

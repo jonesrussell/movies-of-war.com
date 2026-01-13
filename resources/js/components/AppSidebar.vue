@@ -41,7 +41,7 @@ const mainNavItems = computed<NavItem[]>(() => [
         ? [
               {
                   title: 'TMDB',
-                  href: '/dashboard#tmdb-imports',
+                  href: '/dashboard/tmdb-imports',
                   icon: Database,
               },
               {

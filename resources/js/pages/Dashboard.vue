@@ -1,69 +1,22 @@
 <script setup lang="ts">
-import { Head, router, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, usePage } from '@inertiajs/vue3';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import StatsGrid from '@/components/StatsGrid.vue';
-import TmdbImportsSection from '@/components/TmdbImportsSection.vue';
+import TmdbImportsSummaryCard from '@/components/TmdbImportsSummaryCard.vue';
 import QuickActionsSection from '@/components/QuickActionsSection.vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import type { Movie, PaginatedMovies } from '@/types/models';
 
 interface Props {
     stats: {
         movies: number;
         tags: number;
         activeFeatures: number;
-    };
-    tmdbDrafts: PaginatedMovies | [];
-    queryParams: {
-        search?: string;
+        tmdbDrafts: number;
     };
 }
 
 const props = defineProps<Props>();
 const page = usePage();
 const auth = page.props.auth as { user: any };
-
-const search = ref(props.queryParams.search || '');
-const confirmDialogOpen = ref(false);
-const pendingAction = ref<{ type: 'publish' | 'archive'; movie: Movie } | null>(null);
-
-function handleSearchUpdate(value: string) {
-    search.value = value;
-    router.get('/dashboard', {
-        search: value || undefined,
-    }, {
-        preserveState: true,
-        preserveScroll: true,
-    });
-}
-
-function publishMovie(movie: Movie) {
-    pendingAction.value = { type: 'publish', movie };
-    confirmDialogOpen.value = true;
-}
-
-function archiveMovie(movie: Movie) {
-    pendingAction.value = { type: 'archive', movie };
-    confirmDialogOpen.value = true;
-}
-
-function handleConfirm() {
-    if (!pendingAction.value) {
-        return;
-    }
-
-    const { type, movie } = pendingAction.value;
-    const action = type === 'publish' ? 'publish' : 'archive';
-
-    router.post(`/movies/${movie.id}/${action}`, {}, {
-        preserveScroll: true,
-    });
-}
-
-function handleCancel() {
-    pendingAction.value = null;
-}
 
 const stats = [
     { title: 'Published Movies', value: props.stats.movies },
@@ -80,30 +33,13 @@ const stats = [
             <!-- Stats Grid -->
             <StatsGrid :stats="stats" class="mb-8" />
 
-            <!-- Admin TMDB Section -->
-            <TmdbImportsSection
-                v-if="auth.user?.is_admin && tmdbDrafts && typeof tmdbDrafts === 'object' && 'data' in tmdbDrafts && Array.isArray(tmdbDrafts.data)"
-                :tmdb-drafts="tmdbDrafts"
-                :search="search"
-                @update:search="handleSearchUpdate"
-                @publish="publishMovie"
-                @archive="archiveMovie"
-            />
+            <!-- Admin TMDB Summary Card -->
+            <div v-if="auth.user?.is_admin" class="mb-8">
+                <TmdbImportsSummaryCard :draft-count="props.stats.tmdbDrafts" />
+            </div>
 
             <!-- Quick Actions for Regular Users -->
             <QuickActionsSection v-if="!auth.user?.is_admin" />
         </div>
-
-        <!-- Confirm Dialog -->
-        <ConfirmDialog
-            v-if="pendingAction"
-            v-model:open="confirmDialogOpen"
-            :title="`${pendingAction.type === 'publish' ? 'Publish' : 'Archive'} Movie?`"
-            :description="`Are you sure you want to ${pendingAction.type === 'publish' ? 'publish' : 'archive'} '${pendingAction.movie.title}'?`"
-            :confirm-text="pendingAction.type === 'publish' ? 'Publish' : 'Archive'"
-            :variant="pendingAction.type === 'archive' ? 'destructive' : 'default'"
-            @confirm="handleConfirm"
-            @cancel="handleCancel"
-        />
     </AppSidebarLayout>
 </template>

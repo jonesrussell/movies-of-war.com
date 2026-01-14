@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FeaturedSlot } from '@/types/models';
 
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
@@ -38,7 +38,7 @@ function submit() {
     <AppSidebarLayout>
         <Head title="Edit Featured Slot - Admin" />
 
-        <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-white">
                     Edit Featured Slot
@@ -98,9 +98,9 @@ function submit() {
                                 v-model="form.slot"
                                 type="radio"
                                 value="hero"
-                                class="text-red-600 focus:ring-red-500"
+                                class="shrink-0 text-red-600 focus:ring-red-500"
                             />
-                            <div>
+                            <div class="min-w-0 flex-1">
                                 <div class="font-medium text-white">
                                     Hero Section
                                 </div>
@@ -121,9 +121,9 @@ function submit() {
                                 v-model="form.slot"
                                 type="radio"
                                 value="pick_of_week"
-                                class="text-red-600 focus:ring-red-500"
+                                class="shrink-0 text-red-600 focus:ring-red-500"
                             />
-                            <div>
+                            <div class="min-w-0 flex-1">
                                 <div class="font-medium text-white">
                                     Pick of the Week
                                 </div>
@@ -193,12 +193,12 @@ function submit() {
 
                 <!-- Actions -->
                 <div class="flex justify-end gap-4">
-                    <a
+                    <Link
                         href="/dashboard/featured-slots"
                         class="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
                     >
                         Cancel
-                    </a>
+                    </Link>
                     <button
                         type="submit"
                         :disabled="form.processing"

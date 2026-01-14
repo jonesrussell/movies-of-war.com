@@ -5,7 +5,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
-import AppLayout from '@/layouts/AppLayout.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
     movies: PaginatedMovies;
@@ -67,7 +67,7 @@ function unpublishMovie(movie: Movie) {
 </script>
 
 <template>
-    <AppLayout>
+    <AppSidebarLayout>
         <Head title="Manage Movies - Admin" />
 
         <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -268,5 +268,5 @@ function unpublishMovie(movie: Movie) {
                 </Link>
             </div>
         </div>
-    </AppLayout>
+    </AppSidebarLayout>
 </template>

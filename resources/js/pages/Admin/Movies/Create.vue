@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Tag } from '@/types/models';
 
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
-import AppLayout from '@/layouts/AppLayout.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
     tags: Tag[];
@@ -33,7 +33,7 @@ function submit() {
 </script>
 
 <template>
-    <AppLayout>
+    <AppSidebarLayout>
         <Head title="Add New Movie - Admin" />
 
         <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -326,12 +326,12 @@ function submit() {
 
                 <!-- Actions -->
                 <div class="flex justify-end gap-4">
-                    <a
+                    <Link
                         href="/dashboard/movies"
                         class="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
                     >
                         Cancel
-                    </a>
+                    </Link>
                     <button
                         type="submit"
                         :disabled="form.processing"
@@ -342,5 +342,5 @@ function submit() {
                 </div>
             </form>
         </div>
-    </AppLayout>
+    </AppSidebarLayout>
 </template>

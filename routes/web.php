@@ -64,7 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/movies/{movie}/unpublish', [App\Http\Controllers\Admin\MovieController::class, 'unpublish'])->name('admin.movies.unpublish');
         Route::resource('movies', App\Http\Controllers\Admin\MovieController::class)->except(['index', 'show']);
         Route::get('/dashboard/featured-slots', [App\Http\Controllers\Admin\FeaturedSlotController::class, 'index'])->name('dashboard.featured-slots');
-        Route::resource('featured-slots', App\Http\Controllers\Admin\FeaturedSlotController::class);
+        Route::resource('featured-slots', App\Http\Controllers\Admin\FeaturedSlotController::class)->except(['index']);
 
         // X Post Management
         Route::prefix('x-posts')->name('admin.x-posts.')->group(function () {

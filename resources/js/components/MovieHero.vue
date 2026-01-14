@@ -3,7 +3,9 @@ import type { Movie } from '@/types';
 
 import { Link } from '@inertiajs/vue3';
 import { Info, Play } from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue';
 
+import { DotPattern, GradientOverlay } from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 
 interface Props {
@@ -14,53 +16,82 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const posterImage =
-    props.movie.poster_url || '/images/placeholders/poster-placeholder.png';
+const posterImage = computed(
+    () =>
+        props.movie.poster_url || '/images/placeholders/poster-placeholder.png',
+);
+
+// Entrance animation state
+const isVisible = ref(false);
+
+onMounted(() => {
+    requestAnimationFrame(() => {
+        isVisible.value = true;
+    });
+});
 </script>
 
 <template>
     <section class="relative overflow-hidden bg-zinc-950">
+        <!-- Background layers -->
         <div class="absolute inset-0">
+            <!-- Blurred poster background with scale animation -->
             <img
                 :src="posterImage"
                 :alt="movie.title"
-                class="h-full w-full object-cover opacity-25 blur-xl"
+                class="h-full w-full scale-110 object-cover opacity-25 blur-xl transition-transform duration-[2000ms] [transition-timing-function:var(--ease-smooth-out)]"
+                :class="isVisible ? 'scale-100' : 'scale-110'"
                 fetchpriority="high"
                 decoding="async"
             />
-            <div
-                class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-zinc-950/10"
-            />
-            <div
-                class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/10"
-            />
-            <div
-                class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px] opacity-[0.06]"
-            />
+
+            <!-- Multiple gradient layers for depth -->
+            <GradientOverlay direction="to-r" intensity="heavy" />
+            <GradientOverlay direction="to-t" intensity="medium" />
+            <div class="absolute inset-0 bg-zinc-950/20" />
+
+            <!-- Film texture pattern -->
+            <DotPattern size="md" :opacity="0.06" />
         </div>
 
         <PublicContainer as="div" class="relative py-14 sm:py-16 lg:py-20">
             <div class="grid gap-8 lg:grid-cols-12">
-                <div class="lg:col-span-4">
+                <!-- Poster with entrance animation -->
+                <div
+                    class="transition-all delay-150 duration-700 [transition-timing-function:var(--ease-smooth-out)] lg:col-span-4"
+                    :class="
+                        isVisible
+                            ? 'translate-y-0 opacity-100'
+                            : 'translate-y-8 opacity-0'
+                    "
+                >
                     <img
                         :src="posterImage"
                         :alt="movie.title"
-                        class="w-full rounded-2xl shadow-2xl ring-1 ring-white/10"
+                        class="w-full rounded-2xl shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:ring-white/20"
                         fetchpriority="high"
                         decoding="async"
                     />
                 </div>
 
-                <div class="flex flex-col justify-center lg:col-span-8 lg:pr-8">
+                <!-- Content with entrance animation -->
+                <div
+                    class="flex flex-col justify-center transition-all delay-300 duration-700 [transition-timing-function:var(--ease-smooth-out)] lg:col-span-8 lg:pr-8"
+                    :class="
+                        isVisible
+                            ? 'translate-y-0 opacity-100'
+                            : 'translate-y-8 opacity-0'
+                    "
+                >
                     <div
                         v-if="subtitle"
-                        class="mb-2 text-xs font-semibold tracking-[0.2em] text-red-500 uppercase"
+                        class="mb-2 text-xs font-semibold tracking-[0.25em] text-red-500 uppercase"
                     >
                         {{ subtitle }}
                     </div>
 
                     <h1
-                        class="mb-4 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
+                        class="mb-4 text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
                     >
                         {{ movie.title }}
                     </h1>
@@ -68,21 +99,27 @@ const posterImage =
                     <div
                         class="mb-6 flex flex-wrap items-center gap-4 text-sm text-zinc-300"
                     >
-                        <span class="font-semibold">{{
+                        <span class="text-lg font-semibold">{{
                             movie.release_year
                         }}</span>
-                        <span v-if="movie.runtime"
-                            >{{ movie.runtime }} min</span
+                        <span
+                            v-if="movie.runtime"
+                            class="flex items-center gap-1"
                         >
+                            <span class="text-zinc-600">|</span>
+                            {{ movie.runtime }} min
+                        </span>
                         <span
                             v-if="movie.conflict"
-                            class="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold ring-1 ring-zinc-800/70"
+                            class="rounded-full bg-zinc-900/80 px-4 py-1.5 text-xs font-semibold ring-1 ring-zinc-800/70 backdrop-blur-sm"
                         >
                             {{ movie.conflict }}
                         </span>
                     </div>
 
-                    <p class="mb-8 text-lg leading-relaxed text-zinc-300">
+                    <p
+                        class="mb-8 line-clamp-4 text-lg leading-relaxed text-zinc-300"
+                    >
                         {{ movie.synopsis }}
                     </p>
 
@@ -93,7 +130,7 @@ const posterImage =
                         <span
                             v-for="tag in movie.tags"
                             :key="tag.id"
-                            class="rounded-full bg-zinc-900 px-3 py-1 text-sm text-zinc-300 ring-1 ring-zinc-800/70"
+                            class="rounded-full bg-zinc-900/80 px-4 py-1.5 text-sm text-zinc-300 ring-1 ring-zinc-800/70 backdrop-blur-sm transition-colors hover:bg-zinc-800"
                         >
                             {{ tag.name }}
                         </span>
@@ -102,7 +139,7 @@ const posterImage =
                     <div class="flex flex-wrap gap-4">
                         <Link
                             :href="`/movies/${movie.slug}`"
-                            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:bg-red-700 hover:shadow-red-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                         >
                             <Info class="size-5" />
                             More Details
@@ -113,7 +150,7 @@ const posterImage =
                             :href="movie.trailer_url"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-semibold text-white ring-1 ring-zinc-800/70 transition-colors hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="inline-flex items-center gap-2 rounded-xl bg-zinc-900/80 px-6 py-3.5 text-sm font-semibold text-white ring-1 ring-zinc-800/70 backdrop-blur-sm transition-all hover:bg-zinc-800 hover:ring-zinc-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                         >
                             <Play class="size-5" />
                             Watch Trailer

@@ -1,0 +1,3 @@
+export { default as DotPattern } from './DotPattern.vue';
+export { default as GradientOverlay } from './GradientOverlay.vue';
+export { default as Poster } from './Poster.vue';

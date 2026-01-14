@@ -5,8 +5,16 @@ import PublicHeader from '@/components/public/PublicHeader.vue';
 
 <template>
     <div class="min-h-screen bg-zinc-950">
+        <!-- Skip link for keyboard accessibility -->
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-red-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+        >
+            Skip to main content
+        </a>
+
         <PublicHeader />
-        <main class="flex-1">
+        <main id="main-content" class="flex-1">
             <slot />
         </main>
         <PublicFooter />

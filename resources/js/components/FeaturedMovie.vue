@@ -27,18 +27,26 @@ const posterImage =
             </span>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-3">
-            <div class="md:col-span-1">
-                <img
-                    :src="posterImage"
-                    :alt="movie.title"
-                    class="h-full w-full object-cover md:max-h-[300px]"
-                    loading="lazy"
-                    decoding="async"
-                />
+        <div class="grid md:grid-cols-12">
+            <div
+                class="flex items-center justify-center border-b border-zinc-800 bg-zinc-950/20 p-6 md:order-2 md:col-span-4 md:border-b-0 md:border-l"
+            >
+                <div
+                    class="aspect-[2/3] w-full max-w-[260px] md:max-w-[220px] lg:max-w-[260px]"
+                >
+                    <img
+                        :src="posterImage"
+                        :alt="movie.title"
+                        class="h-full w-full rounded-md object-contain"
+                        loading="lazy"
+                        decoding="async"
+                    />
+                </div>
             </div>
 
-            <div class="flex flex-col justify-center p-6 md:col-span-2">
+            <div
+                class="flex flex-col justify-center p-6 md:order-1 md:col-span-8"
+            >
                 <h3 class="mb-2 text-2xl font-bold text-white">
                     {{ movie.title }}
                 </h3>

@@ -107,7 +107,7 @@ export async function mockInertiaPage(props: MockPageProps = {}) {
 /**
  * Helper to mount components with common configuration
  */
- 
+
 export function mountWithDefaults(component: Component, options: any = {}) {
     return vueMount(component, {
         global: {

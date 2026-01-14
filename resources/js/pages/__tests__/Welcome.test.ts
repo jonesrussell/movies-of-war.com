@@ -63,7 +63,6 @@ vi.mock('@/layouts/PublicLayout.vue', () => ({
 import Welcome from '../Welcome.vue';
 
 describe('Welcome', () => {
-     
     function mountWelcome(props: any = {}) {
         return mount(Welcome, {
             props: {

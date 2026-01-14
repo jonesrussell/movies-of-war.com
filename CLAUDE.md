@@ -58,11 +58,11 @@ npm run dev
 # Build frontend for production
 npm run build
 
-# Format code
-npm run format
-
-# Lint TypeScript/Vue
+# Lint and format TypeScript/Vue (uses eslint-plugin-prettier)
 npm run lint
+
+# Check for lint/format errors without fixing
+npm run lint:check
 ```
 
 ### Backend

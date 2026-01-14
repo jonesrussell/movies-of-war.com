@@ -47,11 +47,8 @@ describe('toUrl', () => {
     });
 
     it('handles undefined url in object', () => {
-        expect(
-            toUrl({ url: undefined, method: 'get' } as unknown as {
-                url: string;
-            }),
-        ).toBeUndefined();
+        // @ts-expect-error - Testing edge case with undefined url
+        expect(toUrl({ url: undefined, method: 'get' })).toBeUndefined();
     });
 
     it('handles complex URLs', () => {

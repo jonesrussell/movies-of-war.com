@@ -1,5 +1,5 @@
-import type { LucideIcon } from 'lucide-vue-next';
 import type { User } from './models';
+import type { LucideIcon } from 'lucide-vue-next';
 
 import { type InertiaLinkProps } from '@inertiajs/vue3';
 

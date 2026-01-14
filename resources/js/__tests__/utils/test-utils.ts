@@ -1,8 +1,8 @@
 import type { Movie, Tag, User } from '@/types/models';
-
-import { mount as vueMount, type MountingOptions } from '@vue/test-utils';
-import { vi } from 'vitest';
 import type { Component } from 'vue';
+
+import { mount as vueMount } from '@vue/test-utils';
+import { vi } from 'vitest';
 
 /**
  * Creates a mock User object
@@ -107,10 +107,8 @@ export async function mockInertiaPage(props: MockPageProps = {}) {
 /**
  * Helper to mount components with common configuration
  */
-export function mountWithDefaults<T extends Component>(
-    component: T,
-    options: MountingOptions<T> = {},
-) {
+ 
+export function mountWithDefaults(component: Component, options: any = {}) {
     return vueMount(component, {
         global: {
             stubs: {

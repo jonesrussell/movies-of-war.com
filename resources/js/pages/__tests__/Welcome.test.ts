@@ -63,17 +63,12 @@ vi.mock('@/layouts/PublicLayout.vue', () => ({
 import Welcome from '../Welcome.vue';
 
 describe('Welcome', () => {
-    const defaultProps = {
-        canRegister: true,
-        heroMovie: undefined,
-        pickOfWeekMovie: undefined,
-        latestMovies: [],
-    };
-
-    function mountWelcome(props = {}) {
+     
+    function mountWelcome(props: any = {}) {
         return mount(Welcome, {
             props: {
-                ...defaultProps,
+                canRegister: true,
+                latestMovies: [],
                 ...props,
             },
             global: {
@@ -96,7 +91,7 @@ describe('Welcome', () => {
         });
 
         it('renders fallback when no heroMovie', () => {
-            const wrapper = mountWelcome({ heroMovie: undefined });
+            const wrapper = mountWelcome();
 
             expect(wrapper.find('[data-testid="movie-hero"]').exists()).toBe(
                 false,
@@ -119,7 +114,7 @@ describe('Welcome', () => {
         });
 
         it('does not render FeaturedMovie when no pickOfWeekMovie', () => {
-            const wrapper = mountWelcome({ pickOfWeekMovie: undefined });
+            const wrapper = mountWelcome();
 
             expect(
                 wrapper.find('[data-testid="featured-movie"]').exists(),
@@ -216,11 +211,7 @@ describe('Welcome', () => {
         });
 
         it('renders minimal page without optional content', () => {
-            const wrapper = mountWelcome({
-                heroMovie: undefined,
-                pickOfWeekMovie: undefined,
-                latestMovies: [],
-            });
+            const wrapper = mountWelcome();
 
             // Fallback hero
             expect(wrapper.text()).toContain('Movies of War');

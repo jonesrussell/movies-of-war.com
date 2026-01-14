@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
+import { computed } from 'vue';
 
 type Spacing = 'none' | 'sm' | 'md' | 'lg';
 
@@ -21,10 +22,15 @@ const spacingClass: Record<Spacing, string> = {
     md: 'py-10 sm:py-14',
     lg: 'py-14 sm:py-18 lg:py-20',
 };
+
+const resolvedSpacing = computed<Spacing>(() => props.spacing ?? 'md');
 </script>
 
 <template>
-    <component :is="as" :class="cn(spacingClass[spacing], $props.class)">
+    <component
+        :is="as"
+        :class="cn(spacingClass[resolvedSpacing], $props.class)"
+    >
         <slot />
     </component>
 </template>

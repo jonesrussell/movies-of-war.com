@@ -87,9 +87,9 @@ class DashboardController extends Controller
     public function importTmdbMovies(ImportTmdbMoviesRequest $request): RedirectResponse
     {
         $limit = $request->validated()['limit'] ?? 30;
-        $downloadPosters = $request->validated()['download_posters'] ?? false;
+        $upcoming = $request->validated()['upcoming'] ?? false;
 
-        ImportTmdbMoviesJob::dispatch($limit, $downloadPosters);
+        ImportTmdbMoviesJob::dispatch($limit, $upcoming);
 
         return redirect()->route('dashboard.tmdb-imports')->with('success', "TMDB import job queued. Importing up to {$limit} movies...");
     }

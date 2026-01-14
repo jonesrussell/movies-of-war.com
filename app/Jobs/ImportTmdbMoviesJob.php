@@ -16,7 +16,7 @@ class ImportTmdbMoviesJob implements ShouldQueue
      */
     public function __construct(
         public int $limit = 30,
-        public bool $downloadPosters = false,
+        public bool $upcoming = false,
         public bool $random = false
     ) {}
 
@@ -29,8 +29,8 @@ class ImportTmdbMoviesJob implements ShouldQueue
             '--limit' => $this->limit,
         ];
 
-        if ($this->downloadPosters) {
-            $options['--download-posters'] = true;
+        if ($this->upcoming) {
+            $options['--upcoming'] = true;
         }
 
         if ($this->random) {
@@ -39,7 +39,7 @@ class ImportTmdbMoviesJob implements ShouldQueue
 
         Log::info('Starting TMDB import job', [
             'limit' => $this->limit,
-            'download_posters' => $this->downloadPosters,
+            'upcoming' => $this->upcoming,
             'random' => $this->random,
         ]);
 

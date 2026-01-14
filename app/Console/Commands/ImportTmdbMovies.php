@@ -12,7 +12,7 @@ class ImportTmdbMovies extends Command
 {
     protected $signature = 'tmdb:import
                             {--limit=30 : Number of movies to import}
-                            {--download-posters : Download poster images}
+                            {--upcoming : Only upcoming releases}
                             {--force : Re-import existing movies}
                             {--page=1 : Starting page number}
                             {--random : Randomize movie selection}
@@ -35,7 +35,7 @@ class ImportTmdbMovies extends Command
 
         $this->tmdb = app(TMDBService::class);
         $limit = (int) $this->option('limit');
-        $downloadPosters = $this->option('download-posters');
+        $upcoming = (bool) $this->option('upcoming');
         $force = $this->option('force');
         $startPage = (int) $this->option('page');
         $random = $this->option('random');
@@ -43,10 +43,11 @@ class ImportTmdbMovies extends Command
 
         $pageInfo = $startPage > 1 ? " (starting from page {$startPage})" : '';
         $randomInfo = $random ? ' (randomized)' : '';
+        $upcomingInfo = $upcoming ? ' (upcoming only)' : '';
         $debugInfo = $this->debug ? ' [DEBUG MODE]' : '';
-        $this->info("Fetching war movies from TMDB (limit: {$limit}){$pageInfo}{$randomInfo}{$debugInfo}...");
+        $this->info("Fetching war movies from TMDB (limit: {$limit}){$pageInfo}{$randomInfo}{$upcomingInfo}{$debugInfo}...");
 
-        $warMovieIds = $this->getWarMovieIds($limit, $startPage, $random);
+        $warMovieIds = $this->getWarMovieIds($limit, $startPage, $random, $upcoming);
 
         $this->info("Found {$warMovieIds->count()} movies. Importing...");
 
@@ -68,7 +69,7 @@ class ImportTmdbMovies extends Command
                 $details = $this->tmdb->getMovieDetails($tmdbId);
 
                 if ($details) {
-                    $result = $this->importMovie($details, $downloadPosters);
+                    $result = $this->importMovie($details);
                     if ($result['action'] === 'created') {
                         $created++;
                     } else {
@@ -93,13 +94,13 @@ class ImportTmdbMovies extends Command
         return self::SUCCESS;
     }
 
-    protected function getWarMovieIds(int $limit, int $startPage, bool $random): \Illuminate\Support\Collection
+    protected function getWarMovieIds(int $limit, int $startPage, bool $random, bool $upcoming): \Illuminate\Support\Collection
     {
         $ids = collect();
 
         if ($random) {
             // Get total pages available from TMDB
-            $firstPageData = $this->tmdb->discoverWarMovies(1);
+            $firstPageData = $this->tmdb->discoverWarMovies(1, $upcoming);
 
             if ($this->debug) {
                 $this->line("\n=== DEBUG: First Page Response ===");
@@ -120,7 +121,7 @@ class ImportTmdbMovies extends Command
             $this->line('Fetching from random pages: '.implode(', ', $pagesToFetch->take(10)->toArray()).'...');
 
             foreach ($pagesToFetch as $page) {
-                $data = $this->tmdb->discoverWarMovies($page);
+                $data = $this->tmdb->discoverWarMovies($page, $upcoming);
 
                 if ($this->debug) {
                     $this->line("\n=== DEBUG: Page {$page} Response ===");
@@ -154,7 +155,7 @@ class ImportTmdbMovies extends Command
             $page = $startPage;
 
             while ($ids->count() < $limit) {
-                $data = $this->tmdb->discoverWarMovies($page);
+                $data = $this->tmdb->discoverWarMovies($page, $upcoming);
 
                 if ($this->debug) {
                     $this->line("\n=== DEBUG: Page {$page} Response ===");
@@ -188,7 +189,7 @@ class ImportTmdbMovies extends Command
         return $ids;
     }
 
-    protected function importMovie(array $details, bool $downloadPosters): array
+    protected function importMovie(array $details): array
     {
         if ($this->debug) {
             $this->line("\n=== DEBUG: Movie Details Response ===");
@@ -200,9 +201,7 @@ class ImportTmdbMovies extends Command
         $posterUrl = null;
 
         if ($details['poster_path']) {
-            if ($downloadPosters) {
-                $posterPath = $this->tmdb->downloadPoster($details['poster_path']);
-            }
+            $posterPath = $this->tmdb->downloadPoster($details['poster_path']);
             $posterUrl = $this->tmdb->getPosterUrl($details['poster_path']);
         }
 

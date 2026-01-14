@@ -86,10 +86,10 @@ ddev exec vendor/bin/pint
 ### TMDB Movie Import
 ```bash
 # Import war movies from TMDB (creates draft movies)
-ddev artisan tmdb:import --download-posters --limit=50
+ddev artisan tmdb:import --limit=50
 
-# Import without downloading posters (uses TMDB URLs)
-ddev artisan tmdb:import --limit=30
+# Import only upcoming releases
+ddev artisan tmdb:import --upcoming --limit=30
 ```
 
 ### User Management

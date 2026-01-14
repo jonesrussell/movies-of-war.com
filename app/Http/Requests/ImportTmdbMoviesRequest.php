@@ -23,7 +23,7 @@ class ImportTmdbMoviesRequest extends FormRequest
     {
         return [
             'limit' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'download_posters' => ['sometimes', 'boolean'],
+            'upcoming' => ['sometimes', 'boolean'],
         ];
     }
 }

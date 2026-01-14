@@ -45,7 +45,7 @@ const dialogOpen = ref(false);
 
 const form = useForm({
     limit: 30,
-    download_posters: false,
+    upcoming: false,
 });
 
 function handleSearchUpdate(value: string) {
@@ -156,15 +156,12 @@ function handleImport() {
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <Checkbox
-                                        id="download_posters"
-                                        v-model:checked="form.download_posters"
+                                        id="upcoming"
+                                        v-model:checked="form.upcoming"
                                         :disabled="form.processing"
                                     />
-                                    <Label
-                                        for="download_posters"
-                                        class="cursor-pointer"
-                                    >
-                                        Download poster images
+                                    <Label for="upcoming" class="cursor-pointer">
+                                        Upcoming releases only
                                     </Label>
                                 </div>
                                 <DialogFooter>

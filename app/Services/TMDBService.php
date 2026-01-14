@@ -44,16 +44,24 @@ class TMDBService
         return null;
     }
 
-    public function discoverWarMovies(int $page = 1): array
+    public function discoverWarMovies(int $page = 1, bool $upcoming = false): array
     {
-        $response = Http::get("{$this->baseUrl}/discover/movie", [
+        $query = [
             'api_key' => $this->apiKey,
             'with_genres' => '10752', // War genre
             'with_original_language' => 'en', // English only
-            'sort_by' => 'vote_average.desc',
-            'vote_count.gte' => 100,
             'page' => $page,
-        ]);
+        ];
+
+        if ($upcoming) {
+            $query['primary_release_date.gte'] = now()->toDateString();
+            $query['sort_by'] = 'primary_release_date.asc';
+        } else {
+            $query['sort_by'] = 'vote_average.desc';
+            $query['vote_count.gte'] = 100;
+        }
+
+        $response = Http::get("{$this->baseUrl}/discover/movie", $query);
 
         $data = $response->json();
 

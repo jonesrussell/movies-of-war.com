@@ -51,7 +51,7 @@ withDefaults(defineProps<Props>(), {
 
         <p
             v-if="description"
-            class="max-w-3xl text-base leading-relaxed text-pretty text-zinc-400 sm:text-lg"
+            class="max-w-prose text-base leading-relaxed text-pretty text-zinc-400 sm:text-lg"
             :class="align === 'center' ? 'mx-auto' : ''"
         >
             {{ description }}

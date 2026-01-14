@@ -9,7 +9,6 @@ import MovieHero from '@/components/MovieHero.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {
-    canRegister: boolean;
     heroMovie?: Movie;
     pickOfWeekMovie?: Movie;
     latestMovies: Movie[];
@@ -19,7 +18,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <PublicLayout :can-register="canRegister">
+    <PublicLayout>
         <Head title="Movies of War - Curated War Films Database" />
 
         <MovieHero

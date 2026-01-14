@@ -21,6 +21,33 @@ ddev exec vendor/bin/pint
 
 **Important:** Always use `ddev` to run commands. Never run commands directly (e.g., `php artisan`, `composer`, `npm`) - always use `ddev` prefix (e.g., `ddev artisan`, `ddev composer`, `ddev npm`).
 
+### PHP Commands
+
+**All PHP/Artisan commands must be run through DDEV:**
+
+```bash
+# Artisan commands
+ddev artisan migrate
+ddev artisan test
+ddev artisan make:migration
+ddev artisan make:model
+ddev artisan route:list
+ddev artisan tinker
+
+# PHP scripts
+ddev exec php script.php
+ddev exec vendor/bin/pint
+ddev exec vendor/bin/phpunit
+
+# Never use direct PHP commands:
+# ❌ php artisan migrate
+# ❌ php script.php
+# ✅ ddev artisan migrate
+# ✅ ddev exec php script.php
+```
+
+**When running PHP commands in this project, always prefix with `ddev` to ensure they execute in the correct containerized environment.**
+
 ## Common Commands
 
 ### Development
@@ -92,7 +119,8 @@ ddev artisan queue:work --tries=3 --daemon
 ```bash
 # The scheduler runs automatically every minute via cron
 # Ensure your server has the Laravel scheduler configured:
-* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
+# For DDEV: * * * * * cd /path-to-project && ddev artisan schedule:run >> /dev/null 2>&1
+# For production: * * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 **X API Configuration:**
@@ -520,7 +548,7 @@ Route::get('/users', function () {
 - Use Laravel's query builder for very complex database operations.
 
 ### Model Creation
-- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `list-artisan-commands` to check the available options to `php artisan make:model`.
+- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `list-artisan-commands` to check the available options to `ddev artisan make:model`.
 
 ### APIs & Eloquent Resources
 - For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.
@@ -581,7 +609,7 @@ Wayfinder generates TypeScript functions and types for Laravel controllers and r
 - Always use the `search-docs` tool to check Wayfinder correct usage before implementing any features.
 - Always prefer named imports for tree-shaking (e.g., `import { show } from '@/actions/...'`).
 - Avoid default controller imports (prevents tree-shaking).
-- Run `php artisan wayfinder:generate` after route changes if Vite plugin isn't installed.
+- Run `ddev artisan wayfinder:generate` after route changes if Vite plugin isn't installed.
 
 ### Feature Overview
 - Form Support: Use `.form()` with `--with-form` flag for HTML form attributes — `<form {...store.form()}>` → `action="/posts" method="post"`.

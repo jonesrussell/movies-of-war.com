@@ -101,13 +101,21 @@ function formatDate(dateString: string | null): string {
 
 function publishPost(xPost: XPost) {
     if (confirm('Are you sure you want to publish this post now?')) {
-        router.post(`/x-posts/${xPost.id}/publish`, {}, { preserveScroll: true });
+        router.post(
+            `/x-posts/${xPost.id}/publish`,
+            {},
+            { preserveScroll: true },
+        );
     }
 }
 
 function cancelPost(xPost: XPost) {
     if (confirm('Are you sure you want to cancel this scheduled post?')) {
-        router.post(`/x-posts/${xPost.id}/cancel`, {}, { preserveScroll: true });
+        router.post(
+            `/x-posts/${xPost.id}/cancel`,
+            {},
+            { preserveScroll: true },
+        );
     }
 }
 
@@ -130,7 +138,9 @@ function getXPostUrl(xPostId: string): string {
             <!-- Header -->
             <div class="mb-8 flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-white">Manage X Posts</h1>
+                    <h1 class="text-3xl font-bold text-white">
+                        Manage X Posts
+                    </h1>
                     <p class="mt-2 text-zinc-400">
                         {{ xPosts?.total ?? 0 }} total posts
                     </p>
@@ -276,11 +286,15 @@ function getXPostUrl(xPostId: string): string {
                             </td>
                             <td class="px-6 py-4 text-sm text-zinc-300">
                                 <div v-if="xPost.status === 'scheduled'">
-                                    <span class="text-zinc-500">Scheduled:</span>
+                                    <span class="text-zinc-500"
+                                        >Scheduled:</span
+                                    >
                                     {{ formatDate(xPost.scheduled_for) }}
                                 </div>
                                 <div v-else-if="xPost.status === 'published'">
-                                    <span class="text-zinc-500">Published:</span>
+                                    <span class="text-zinc-500"
+                                        >Published:</span
+                                    >
                                     {{ formatDate(xPost.published_at) }}
                                 </div>
                                 <div v-else>

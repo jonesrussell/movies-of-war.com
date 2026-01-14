@@ -11,12 +11,7 @@ interface Props {
     class?: string;
 }
 
-withDefaults(defineProps<Props>(), {
-    kicker: undefined,
-    description: undefined,
-    align: 'left',
-    class: '',
-});
+withDefaults(defineProps<Props>(), { align: 'left', class: '' });
 </script>
 
 <template>

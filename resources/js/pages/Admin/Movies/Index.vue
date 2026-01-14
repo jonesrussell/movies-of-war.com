@@ -76,7 +76,7 @@ function unpublishMovie(movie: Movie) {
                 <div>
                     <h1 class="text-3xl font-bold text-white">Manage Movies</h1>
                     <p class="mt-2 text-zinc-400">
-                        {{ movies.meta.total }} total movies
+                        {{ movies?.meta?.total ?? 0 }} total movies
                     </p>
                 </div>
                 <Link
@@ -131,7 +131,15 @@ function unpublishMovie(movie: Movie) {
                     </thead>
                     <tbody class="divide-y divide-zinc-800">
                         <tr
-                            v-for="movie in movies.data"
+                            v-if="movies?.data?.length === 0"
+                            class="hover:bg-zinc-800/50"
+                        >
+                            <td colspan="5" class="px-6 py-12 text-center text-zinc-400">
+                                No movies found.
+                            </td>
+                        </tr>
+                        <tr
+                            v-for="movie in movies?.data"
                             :key="movie.id"
                             class="hover:bg-zinc-800/50"
                         >
@@ -239,11 +247,11 @@ function unpublishMovie(movie: Movie) {
 
             <!-- Pagination -->
             <div
-                v-if="movies.meta.last_page > 1"
+                v-if="movies?.meta?.last_page && movies?.meta?.last_page > 1"
                 class="mt-6 flex justify-center gap-2"
             >
                 <Link
-                    v-for="page in movies.meta.links"
+                    v-for="page in movies?.meta?.links"
                     :key="page.label"
                     :href="page.url || '#'"
                     :class="[

@@ -9,14 +9,12 @@ Route::get('/', function () {
         ->with('movie.tags')
         ->active()
         ->slot('hero')
-        ->latest('starts_at')
         ->first();
 
     $pickOfWeekSlot = \App\Models\FeaturedSlot::query()
         ->with('movie.tags')
         ->active()
         ->slot('pick_of_week')
-        ->latest('starts_at')
         ->first();
 
     $latestMovies = \App\Models\Movie::query()

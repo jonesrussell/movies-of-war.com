@@ -161,7 +161,6 @@ Movies have three statuses managed through `App\Models\Movie` constants:
 - `belongsTo(Movie::class)`
 - Slots: `hero` (homepage hero section), `pick_of_week`
 - Scopes: `active()` (date-based), `slot($type)`
-- Date range: `starts_at` → `ends_at` (null = indefinite)
 
 **Tag** (`app/Models/Tag.php`)
 - Types: `genre`, `theme`, `era`
@@ -310,8 +309,6 @@ interface FeaturedSlot {
   id: number
   movie_id: number
   slot: 'hero' | 'pick_of_week'
-  starts_at: string
-  ends_at: string | null
   movie?: Movie
 }
 ```

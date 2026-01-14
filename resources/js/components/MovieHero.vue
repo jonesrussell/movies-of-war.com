@@ -4,6 +4,8 @@ import type { Movie } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { Info, Play } from 'lucide-vue-next';
 
+import PublicContainer from '@/components/public/PublicContainer.vue';
+
 interface Props {
     movie: Movie;
     title?: string;
@@ -17,44 +19,49 @@ const posterImage =
 </script>
 
 <template>
-    <div
-        class="relative min-h-[70vh] overflow-hidden bg-zinc-950 py-6 sm:py-12"
-    >
+    <section class="relative overflow-hidden bg-zinc-950">
         <div class="absolute inset-0">
             <img
                 :src="posterImage"
                 :alt="movie.title"
-                class="h-full w-full object-cover opacity-30 blur-sm"
+                class="h-full w-full object-cover opacity-25 blur-xl"
+                fetchpriority="high"
+                decoding="async"
             />
             <div
-                class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent"
+                class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-zinc-950/10"
             />
             <div
-                class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent"
+                class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/10"
+            />
+            <div
+                class="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px]"
             />
         </div>
 
-        <div
-            class="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20"
-        >
+        <PublicContainer as="div" class="relative py-14 sm:py-16 lg:py-20">
             <div class="grid gap-8 lg:grid-cols-12">
                 <div class="lg:col-span-4">
                     <img
                         :src="posterImage"
                         :alt="movie.title"
-                        class="w-full rounded-lg shadow-2xl"
+                        class="w-full rounded-2xl shadow-2xl ring-1 ring-white/10"
+                        fetchpriority="high"
+                        decoding="async"
                     />
                 </div>
 
                 <div class="flex flex-col justify-center lg:col-span-8 lg:pr-8">
                     <div
                         v-if="subtitle"
-                        class="mb-2 text-sm font-semibold tracking-wider text-red-500 uppercase"
+                        class="mb-2 text-xs font-semibold tracking-[0.2em] text-red-500 uppercase"
                     >
                         {{ subtitle }}
                     </div>
 
-                    <h1 class="mb-4 text-5xl font-bold text-white lg:text-6xl">
+                    <h1
+                        class="mb-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl"
+                    >
                         {{ movie.title }}
                     </h1>
 
@@ -69,7 +76,7 @@ const posterImage =
                         >
                         <span
                             v-if="movie.conflict"
-                            class="rounded bg-zinc-800 px-2 py-1 text-xs font-semibold"
+                            class="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold ring-1 ring-zinc-800/70"
                         >
                             {{ movie.conflict }}
                         </span>
@@ -86,7 +93,7 @@ const posterImage =
                         <span
                             v-for="tag in movie.tags"
                             :key="tag.id"
-                            class="rounded-full bg-zinc-800/80 px-3 py-1 text-sm text-zinc-300"
+                            class="rounded-full bg-zinc-900 px-3 py-1 text-sm text-zinc-300 ring-1 ring-zinc-800/70"
                         >
                             {{ tag.name }}
                         </span>
@@ -95,7 +102,7 @@ const posterImage =
                     <div class="flex flex-wrap gap-4">
                         <Link
                             :href="`/movies/${movie.slug}`"
-                            class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
+                            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                         >
                             <Info class="size-5" />
                             More Details
@@ -106,7 +113,7 @@ const posterImage =
                             :href="movie.trailer_url"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex items-center gap-2 rounded-lg bg-zinc-800 px-6 py-3 font-semibold text-white transition-colors hover:bg-zinc-700"
+                            class="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-semibold text-white ring-1 ring-zinc-800/70 transition-colors hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                         >
                             <Play class="size-5" />
                             Watch Trailer
@@ -114,6 +121,6 @@ const posterImage =
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </PublicContainer>
+    </section>
 </template>

@@ -33,6 +33,8 @@ const posterImage =
                     :src="posterImage"
                     :alt="movie.title"
                     class="h-full w-full object-cover md:max-h-[300px]"
+                    loading="lazy"
+                    decoding="async"
                 />
             </div>
 

@@ -1,5 +1,3 @@
-import type { Mock } from 'vitest';
-
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,17 +5,6 @@ import { createMockMovie, createMockTag } from '@/__tests__/utils/test-utils';
 
 // Mock Inertia - must be before any imports that use it
 vi.mock('@inertiajs/vue3', () => ({
-    usePage: vi.fn(() => ({
-        props: {
-            auth: { user: null },
-        },
-        url: '/',
-    })),
-    router: {
-        post: vi.fn(),
-        get: vi.fn(),
-        visit: vi.fn(),
-    },
     Link: {
         name: 'Link',
         template: '<a :href="href"><slot /></a>',
@@ -25,33 +12,16 @@ vi.mock('@inertiajs/vue3', () => ({
     },
 }));
 
-import { usePage } from '@inertiajs/vue3';
-
 import MovieCard from '../MovieCard.vue';
 
 describe('MovieCard', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        // Reset usePage mock to default
-        (usePage as Mock).mockReturnValue({
-            props: {
-                auth: { user: null },
-            },
-            url: '/',
-        });
     });
 
     const defaultMovie = createMockMovie();
 
-    function mountMovieCard(props = {}, pageProps = {}) {
-        (usePage as Mock).mockReturnValue({
-            props: {
-                auth: { user: null },
-                ...pageProps,
-            },
-            url: '/',
-        });
-
+    function mountMovieCard(props = {}) {
         return mount(MovieCard, {
             props: {
                 movie: defaultMovie,
@@ -62,10 +32,6 @@ describe('MovieCard', () => {
                     Link: {
                         template: '<a :href="href"><slot /></a>',
                         props: ['href'],
-                    },
-                    Button: {
-                        template:
-                            '<button @click="$emit(\'click\', $event)"><slot /></button>',
                     },
                 },
             },
@@ -172,41 +138,6 @@ describe('MovieCard', () => {
             const releasedMovie = createMockMovie({ is_upcoming: false });
             const wrapper = mountMovieCard({ movie: releasedMovie });
             expect(wrapper.text()).not.toContain('Coming Soon');
-        });
-    });
-
-    describe('admin actions', () => {
-        it('does not show admin actions for non-admin users', () => {
-            const wrapper = mountMovieCard();
-            expect(wrapper.text()).not.toContain('Publish');
-            expect(wrapper.text()).not.toContain('Unpublish');
-            expect(wrapper.text()).not.toContain('Archive');
-        });
-
-        it('shows admin actions for admin users', () => {
-            const wrapper = mountMovieCard(
-                {},
-                { auth: { user: { is_admin: true } } },
-            );
-            expect(wrapper.text()).toContain('Archive');
-        });
-
-        it('shows Unpublish button for published movies when admin', () => {
-            const publishedMovie = createMockMovie({ status: 'published' });
-            const wrapper = mountMovieCard(
-                { movie: publishedMovie },
-                { auth: { user: { is_admin: true } } },
-            );
-            expect(wrapper.text()).toContain('Unpublish');
-        });
-
-        it('shows Publish button for draft movies when admin', () => {
-            const draftMovie = createMockMovie({ status: 'draft' });
-            const wrapper = mountMovieCard(
-                { movie: draftMovie },
-                { auth: { user: { is_admin: true } } },
-            );
-            expect(wrapper.text()).toContain('Publish');
         });
     });
 

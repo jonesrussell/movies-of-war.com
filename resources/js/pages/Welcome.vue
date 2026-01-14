@@ -6,6 +6,10 @@ import { Head, Link } from '@inertiajs/vue3';
 import FeaturedMovie from '@/components/FeaturedMovie.vue';
 import MovieCard from '@/components/MovieCard.vue';
 import MovieHero from '@/components/MovieHero.vue';
+import MovieGrid from '@/components/public/MovieGrid.vue';
+import PublicContainer from '@/components/public/PublicContainer.vue';
+import PublicSection from '@/components/public/PublicSection.vue';
+import SectionHeader from '@/components/public/SectionHeader.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {
@@ -27,63 +31,115 @@ defineProps<Props>();
             subtitle="Featured Upcoming Release"
         />
 
-        <div v-else class="bg-zinc-900 py-20">
-            <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-                <h1 class="text-5xl font-bold text-white">Movies of War</h1>
-                <p class="mt-4 text-xl text-zinc-400">
-                    A curated database of war films, documentaries, and related
-                    media
-                </p>
-            </div>
-        </div>
-
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-            <div v-if="pickOfWeekMovie" class="mx-auto mb-12 max-w-4xl">
-                <FeaturedMovie
-                    :movie="pickOfWeekMovie"
-                    title="Pick of the Week"
+        <PublicSection v-else spacing="lg" class="relative overflow-hidden">
+            <div class="absolute inset-0">
+                <div
+                    class="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950 to-zinc-950"
+                />
+                <div
+                    class="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px]"
                 />
             </div>
 
-            <div>
-                <div class="mb-8 flex items-center justify-between">
-                    <h2 class="text-3xl font-bold text-white">
-                        Latest Releases
-                    </h2>
-                    <Link
-                        href="/movies"
-                        class="text-red-500 transition-colors hover:text-red-400"
+            <PublicContainer class="relative">
+                <div class="mx-auto max-w-3xl text-center">
+                    <p
+                        class="text-xs font-semibold tracking-[0.2em] text-red-500 uppercase"
                     >
-                        View All →
-                    </Link>
+                        Curated war cinema
+                    </p>
+                    <h1
+                        class="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl"
+                    >
+                        Movies of War
+                    </h1>
+                    <p class="mt-5 text-lg leading-relaxed text-zinc-300">
+                        A curated database of war films spanning WWI, WWII,
+                        Vietnam, and modern conflicts—built for browsing,
+                        collecting, and discovering.
+                    </p>
+                    <div class="mt-8 flex flex-wrap justify-center gap-3">
+                        <Link
+                            href="/movies"
+                            class="inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                        >
+                            Browse movies
+                        </Link>
+                        <Link
+                            href="/movies?conflict=WWII"
+                            class="inline-flex items-center justify-center rounded-xl bg-zinc-900 px-5 py-3 text-sm font-semibold text-white ring-1 ring-zinc-800/70 transition-colors hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                        >
+                            Start with WWII
+                        </Link>
+                    </div>
                 </div>
+            </PublicContainer>
+        </PublicSection>
 
-                <div
-                    class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
-                >
-                    <MovieCard
-                        v-for="movie in latestMovies"
-                        :key="movie.id"
-                        :movie="movie"
+        <PublicSection spacing="md">
+            <PublicContainer class="flex flex-col gap-10">
+                <div v-if="pickOfWeekMovie" class="mx-auto w-full max-w-5xl">
+                    <FeaturedMovie
+                        :movie="pickOfWeekMovie"
+                        title="Pick of the Week"
                     />
                 </div>
-            </div>
 
-            <div class="mt-16 rounded-lg bg-zinc-900 p-8 text-center">
-                <h3 class="mb-4 text-2xl font-bold text-white">
-                    Explore Our Curated Collection
-                </h3>
-                <p class="mb-6 text-zinc-400">
-                    Discover 30+ carefully selected war films spanning WWI,
-                    WWII, Vietnam, and modern conflicts
-                </p>
-                <Link
-                    href="/movies"
-                    class="inline-block rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
+                <div class="flex flex-col gap-6">
+                    <SectionHeader
+                        title="Latest Releases"
+                        description="Fresh additions to the collection—newly curated, newly discovered, or newly published."
+                    >
+                        <template #action>
+                            <Link
+                                href="/movies"
+                                class="text-sm font-semibold text-red-500 transition-colors hover:text-red-400"
+                            >
+                                View all →
+                            </Link>
+                        </template>
+                    </SectionHeader>
+
+                    <MovieGrid>
+                        <MovieCard
+                            v-for="movie in latestMovies"
+                            :key="movie.id"
+                            :movie="movie"
+                        />
+                    </MovieGrid>
+                </div>
+            </PublicContainer>
+        </PublicSection>
+
+        <PublicSection spacing="md">
+            <PublicContainer>
+                <div
+                    class="relative overflow-hidden rounded-2xl bg-zinc-950 p-8 text-center ring-1 ring-zinc-800/70 sm:p-10"
                 >
-                    Browse All Movies
-                </Link>
-            </div>
-        </div>
+                    <div
+                        class="pointer-events-none absolute inset-0 opacity-[0.10] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px]"
+                    />
+                    <div class="relative">
+                        <h2
+                            class="text-balance text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+                        >
+                            Explore the curated collection
+                        </h2>
+                        <p class="mx-auto mt-3 max-w-2xl text-zinc-400">
+                            Filter by conflict, country, year, and tags—then
+                            build your watchlist as you go.
+                        </p>
+                        <div class="mt-7 flex justify-center">
+                            <Link
+                                href="/movies"
+                                class="inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            >
+                                Browse all movies
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </PublicContainer>
+        </PublicSection>
     </PublicLayout>
 </template>

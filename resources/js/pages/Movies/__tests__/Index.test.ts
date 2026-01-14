@@ -35,6 +35,40 @@ vi.mock('@vueuse/core', () => ({
     useDebounceFn: vi.fn((fn) => fn),
 }));
 
+vi.mock('@/components/ui/button', () => ({
+    Button: {
+        name: 'Button',
+        template: '<button type="button"><slot /></button>',
+        props: ['variant', 'class', 'asChild'],
+    },
+}));
+
+vi.mock('@/components/ui/sheet', () => ({
+    Sheet: {
+        name: 'Sheet',
+        template: '<div><slot /></div>',
+        props: ['open'],
+    },
+    SheetTrigger: {
+        name: 'SheetTrigger',
+        template: '<div><slot /></div>',
+        props: ['asChild'],
+    },
+    SheetContent: {
+        name: 'SheetContent',
+        template: '<div><slot /></div>',
+        props: ['side', 'class'],
+    },
+    SheetHeader: {
+        name: 'SheetHeader',
+        template: '<div><slot /></div>',
+    },
+    SheetTitle: {
+        name: 'SheetTitle',
+        template: '<div><slot /></div>',
+    },
+}));
+
 // Mock child components
 vi.mock('@/components/MovieCard.vue', () => ({
     default: {
@@ -48,7 +82,6 @@ vi.mock('@/layouts/PublicLayout.vue', () => ({
     default: {
         name: 'PublicLayout',
         template: '<div><slot /></div>',
-        props: ['canRegister'],
     },
 }));
 
@@ -169,7 +202,7 @@ describe('Movies/Index', () => {
 
             const yearSelect = wrapper.findAll('select').find((s) => {
                 const options = s.findAll('option');
-                return options.some((o) => o.text() === 'All Years');
+                return options.some((o) => o.text() === 'All years');
             });
             expect(yearSelect).toBeDefined();
             expect(yearSelect?.text()).toContain('2024');
@@ -185,7 +218,7 @@ describe('Movies/Index', () => {
 
             const countrySelect = wrapper.findAll('select').find((s) => {
                 const options = s.findAll('option');
-                return options.some((o) => o.text() === 'All Countries');
+                return options.some((o) => o.text() === 'All countries');
             });
             expect(countrySelect).toBeDefined();
             expect(countrySelect?.text()).toContain('USA');
@@ -201,7 +234,7 @@ describe('Movies/Index', () => {
 
             const conflictSelect = wrapper.findAll('select').find((s) => {
                 const options = s.findAll('option');
-                return options.some((o) => o.text() === 'All Conflicts');
+                return options.some((o) => o.text() === 'All conflicts');
             });
             expect(conflictSelect).toBeDefined();
             expect(conflictSelect?.text()).toContain('WWII');
@@ -217,7 +250,7 @@ describe('Movies/Index', () => {
 
             const tagSelect = wrapper.findAll('select').find((s) => {
                 const options = s.findAll('option');
-                return options.some((o) => o.text() === 'All Tags');
+                return options.some((o) => o.text() === 'All tags');
             });
             expect(tagSelect).toBeDefined();
             expect(tagSelect?.text()).toContain('Action');

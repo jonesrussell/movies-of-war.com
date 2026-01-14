@@ -21,16 +21,30 @@ const emits = defineEmits<{
 const isMobile = useMediaQuery("(max-width: 768px)")
 const openMobile = ref(false)
 
-const open = useVModel(props, "open", emits, {
-  defaultValue: props.defaultOpen ?? false,
-  passive: (props.open === undefined) as false,
-}) as Ref<boolean>
+// Initialize from prop or cookie, preferring prop
+const getInitialOpenState = (): boolean => {
+  if (props.defaultOpen !== undefined) {
+    return props.defaultOpen;
+  }
+  if (defaultDocument) {
+    const cookieValue = defaultDocument.cookie
+      .split('; ')
+      .find(row => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`));
+    if (cookieValue) {
+      return cookieValue.split('=')[1] === 'true';
+    }
+  }
+  return true; // Default to open
+};
+
+const open = ref<boolean>(getInitialOpenState())
 
 function setOpen(value: boolean) {
-  open.value = value // emits('update:open', value)
+  open.value = value
+  emits('update:open', value)
 
   // This sets the cookie to keep the sidebar state.
-  document.cookie = `${SIDEBAR_COOKIE_NAME}=${open.value}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+  document.cookie = `${SIDEBAR_COOKIE_NAME}=${String(value)}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
 }
 
 function setOpenMobile(value: boolean) {

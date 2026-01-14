@@ -131,9 +131,9 @@ export interface PaginatedXPosts {
   last_page: number
   per_page: number
   total: number
-  links: Array<{
+  links: {
     url: string | null
     label: string
     active: boolean
-  }>
+  }[]
 }

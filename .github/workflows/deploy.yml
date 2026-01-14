@@ -49,14 +49,30 @@ jobs:
           sudo mv deployer.phar /usr/local/bin/dep
 
       - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          which ssh-agent || (apt-get update && apt-get install -y openssh-client)
+          eval "$(ssh-agent -s)"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+          if [ -n "$SSH_PRIVATE_KEY_BASE64" ]; then
+            echo "$SSH_PRIVATE_KEY_BASE64" | base64 -d | ssh-add -
+          else
+            echo "$SSH_PRIVATE_KEY" | ssh-add -
+          fi
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY_BASE64: ${{ secrets.SSH_PRIVATE_KEY_BASE64 }}
 
       - name: Add Host Key
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H movies-of-war.com >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config << EOF
+          Host movies-of-war.com
+            User deployer
+            StrictHostKeyChecking no
+          EOF
+          chmod 600 ~/.ssh/config
 
       - name: Deploy
         env:

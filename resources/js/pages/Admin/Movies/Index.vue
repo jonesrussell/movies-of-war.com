@@ -134,7 +134,10 @@ function unpublishMovie(movie: Movie) {
                             v-if="movies?.data?.length === 0"
                             class="hover:bg-zinc-800/50"
                         >
-                            <td colspan="5" class="px-6 py-12 text-center text-zinc-400">
+                            <td
+                                colspan="5"
+                                class="px-6 py-12 text-center text-zinc-400"
+                            >
                                 No movies found.
                             </td>
                         </tr>

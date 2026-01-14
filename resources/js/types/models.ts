@@ -101,39 +101,39 @@ export interface User {
 }
 
 export interface User {
-  id: number
-  name: string
-  email: string
-  is_admin: boolean
-  created_at: string
-  updated_at: string
+    id: number;
+    name: string;
+    email: string;
+    is_admin: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface XPost {
-  id: number
-  content: string | null
-  thread_parts: string[] | null
-  media_urls: string[] | null
-  status: 'draft' | 'scheduled' | 'published' | 'failed' | 'cancelled'
-  scheduled_for: string | null
-  published_at: string | null
-  x_post_id: string | null
-  error_message: string | null
-  user_id: number | null
-  created_at: string
-  updated_at: string
-  user?: User
+    id: number;
+    content: string | null;
+    thread_parts: string[] | null;
+    media_urls: string[] | null;
+    status: 'draft' | 'scheduled' | 'published' | 'failed' | 'cancelled';
+    scheduled_for: string | null;
+    published_at: string | null;
+    x_post_id: string | null;
+    error_message: string | null;
+    user_id: number | null;
+    created_at: string;
+    updated_at: string;
+    user?: User;
 }
 
 export interface PaginatedXPosts {
-  data: XPost[]
-  current_page: number
-  last_page: number
-  per_page: number
-  total: number
-  links: {
-    url: string | null
-    label: string
-    active: boolean
-  }[]
+    data: XPost[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
 }

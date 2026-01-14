@@ -262,7 +262,10 @@ const rightNavItems: NavItem[] = [
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" class="w-56">
-                            <UserMenuContent v-if="auth.user" :user="auth.user" />
+                            <UserMenuContent
+                                v-if="auth.user"
+                                :user="auth.user"
+                            />
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

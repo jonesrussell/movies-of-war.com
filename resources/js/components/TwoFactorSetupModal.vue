@@ -272,7 +272,9 @@ watch(
                                     </InputOTPGroup>
                                 </InputOTP>
                                 <InputError
-                                    :message="errors?.confirmTwoFactorAuthentication"
+                                    :message="
+                                        errors?.confirmTwoFactorAuthentication
+                                    "
                                 />
                             </div>
 

@@ -125,7 +125,7 @@ defineProps<Props>();
                         >
                             Explore the curated collection
                         </h2>
-                        <p class="mx-auto mt-3 max-w-2xl text-zinc-400">
+                        <p class="mx-auto mt-3 max-w-prose text-zinc-400">
                             Filter by conflict, country, year, and tags—then
                             build your watchlist as you go.
                         </p>

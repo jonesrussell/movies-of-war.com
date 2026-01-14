@@ -44,7 +44,7 @@ class FeaturedSlotController extends Controller
 
         FeaturedSlot::create($validated);
 
-        return redirect()->route('admin.featured-slots.index')
+        return redirect()->route('dashboard.featured-slots')
             ->with('success', 'Featured slot created successfully.');
     }
 
@@ -70,7 +70,7 @@ class FeaturedSlotController extends Controller
 
         $featuredSlot->update($validated);
 
-        return redirect()->route('admin.featured-slots.index')
+        return redirect()->route('dashboard.featured-slots')
             ->with('success', 'Featured slot updated successfully.');
     }
 
@@ -78,7 +78,7 @@ class FeaturedSlotController extends Controller
     {
         $featuredSlot->delete();
 
-        return redirect()->route('admin.featured-slots.index')
+        return redirect()->route('dashboard.featured-slots')
             ->with('success', 'Featured slot deleted successfully.');
     }
 }

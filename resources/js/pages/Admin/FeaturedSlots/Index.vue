@@ -3,7 +3,7 @@ import type { FeaturedSlot, PaginatedFeaturedSlots } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 
-import AppLayout from '@/layouts/AppLayout.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
     slots: PaginatedFeaturedSlots;
@@ -14,7 +14,7 @@ usePage();
 
 function deleteSlot(slot: FeaturedSlot) {
     if (confirm(`Are you sure you want to delete this featured slot?`)) {
-        router.delete(`/admin/featured-slots/${slot.id}`);
+        router.delete(`/featured-slots/${slot.id}`);
     }
 }
 
@@ -40,7 +40,7 @@ function isActive(slot: FeaturedSlot): boolean {
 </script>
 
 <template>
-    <AppLayout>
+    <AppSidebarLayout>
         <Head title="Manage Featured Slots - Admin" />
 
         <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -55,7 +55,7 @@ function isActive(slot: FeaturedSlot): boolean {
                     </p>
                 </div>
                 <Link
-                    :href="'/admin/featured-slots/create'"
+                    :href="'/featured-slots/create'"
                     class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
                 >
                     Add Featured Slot
@@ -158,7 +158,7 @@ function isActive(slot: FeaturedSlot): boolean {
                             </td>
                             <td class="px-6 py-4 text-right text-sm">
                                 <Link
-                                    :href="`/admin/featured-slots/${slot.id}/edit`"
+                                    :href="`/featured-slots/${slot.id}/edit`"
                                     class="mr-4 text-red-500 hover:text-red-400"
                                 >
                                     Edit
@@ -198,5 +198,5 @@ function isActive(slot: FeaturedSlot): boolean {
                 </Link>
             </div>
         </div>
-    </AppLayout>
+    </AppSidebarLayout>
 </template>

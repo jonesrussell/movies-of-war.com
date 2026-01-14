@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 
-import AppLayout from '@/layouts/AppLayout.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
     movies: { id: number; title: string }[];
@@ -18,12 +18,12 @@ const form = useForm({
 });
 
 function submit() {
-    form.post('/admin/featured-slots');
+    form.post('/featured-slots');
 }
 </script>
 
 <template>
-    <AppLayout>
+    <AppSidebarLayout>
         <Head title="Add Featured Slot - Admin" />
 
         <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -180,7 +180,7 @@ function submit() {
                 <!-- Actions -->
                 <div class="flex justify-end gap-4">
                     <a
-                        href="/admin/featured-slots"
+                        href="/dashboard/featured-slots"
                         class="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
                     >
                         Cancel
@@ -199,5 +199,5 @@ function submit() {
                 </div>
             </form>
         </div>
-    </AppLayout>
+    </AppSidebarLayout>
 </template>

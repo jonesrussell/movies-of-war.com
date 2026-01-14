@@ -62,7 +62,7 @@ const mainNavItems = computed<NavItem[]>(() => [
               },
               {
                   title: 'Featured Slots',
-                  href: '/featured-slots',
+                  href: '/dashboard/featured-slots',
                   icon: Star,
               },
           ]

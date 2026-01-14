@@ -36,7 +36,7 @@ test('admin users can access admin movies page', function () {
 test('admin users can access admin featured slots page', function () {
     $user = User::factory()->create(['is_admin' => true]);
 
-    $response = $this->actingAs($user)->get('/featured-slots');
+    $response = $this->actingAs($user)->get('/dashboard/featured-slots');
 
     $response->assertOk();
 });

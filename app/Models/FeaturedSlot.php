@@ -14,16 +14,11 @@ class FeaturedSlot extends Model
     protected $fillable = [
         'movie_id',
         'slot',
-        'starts_at',
-        'ends_at',
     ];
 
     protected function casts(): array
     {
-        return [
-            'starts_at' => 'datetime',
-            'ends_at' => 'datetime',
-        ];
+        return [];
     }
 
     public function movie(): BelongsTo
@@ -33,11 +28,7 @@ class FeaturedSlot extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('starts_at', '<=', now())
-            ->where(function ($q) {
-                $q->whereNull('ends_at')
-                    ->orWhere('ends_at', '>=', now());
-            });
+        return $query; // All slots are active
     }
 
     public function scopeSlot($query, string $slot)

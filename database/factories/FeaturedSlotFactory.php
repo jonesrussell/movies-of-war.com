@@ -20,8 +20,6 @@ class FeaturedSlotFactory extends Factory
         return [
             'movie_id' => Movie::factory(),
             'slot' => fake()->randomElement(['hero', 'pick_of_week']),
-            'starts_at' => now(),
-            'ends_at' => now()->addDays(7),
         ];
     }
 }

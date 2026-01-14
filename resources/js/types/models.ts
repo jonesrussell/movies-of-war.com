@@ -33,8 +33,6 @@ export interface FeaturedSlot {
     id: number;
     movie_id: number;
     slot: 'hero' | 'pick_of_week';
-    starts_at: string;
-    ends_at: string | null;
     created_at: string;
     updated_at: string;
     movie?: Movie;

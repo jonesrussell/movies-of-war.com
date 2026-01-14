@@ -16,7 +16,7 @@ class FeaturedSlotController extends Controller
     {
         $slots = FeaturedSlot::query()
             ->with('movie')
-            ->latest('starts_at')
+            ->latest()
             ->paginate(20);
 
         return Inertia::render('Admin/FeaturedSlots/Index', [
@@ -38,8 +38,6 @@ class FeaturedSlotController extends Controller
         $validated = $request->validate([
             'movie_id' => 'required|exists:movies,id',
             'slot' => 'required|in:hero,pick_of_week',
-            'starts_at' => 'required|date',
-            'ends_at' => 'nullable|date|after:starts_at',
         ]);
 
         FeaturedSlot::create($validated);
@@ -64,8 +62,6 @@ class FeaturedSlotController extends Controller
         $validated = $request->validate([
             'movie_id' => 'required|exists:movies,id',
             'slot' => 'required|in:hero,pick_of_week',
-            'starts_at' => 'required|date',
-            'ends_at' => 'nullable|date|after:starts_at',
         ]);
 
         $featuredSlot->update($validated);

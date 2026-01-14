@@ -18,24 +18,8 @@ function deleteSlot(slot: FeaturedSlot) {
     }
 }
 
-function formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-}
-
 function getSlotBadge(slot: string): string {
     return slot === 'hero' ? 'Hero' : 'Pick of Week';
-}
-
-function isActive(slot: FeaturedSlot): boolean {
-    const now = new Date();
-    const start = new Date(slot.starts_at);
-    const end = slot.ends_at ? new Date(slot.ends_at) : null;
-
-    return start <= now && (!end || end >= now);
 }
 </script>
 
@@ -78,21 +62,6 @@ function isActive(slot: FeaturedSlot): boolean {
                                 Slot Type
                             </th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
-                            >
-                                Starts
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
-                            >
-                                Ends
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
-                            >
-                                Status
-                            </th>
-                            <th
                                 class="px-6 py-3 text-right text-xs font-medium tracking-wider text-zinc-400 uppercase"
                             >
                                 Actions
@@ -132,28 +101,6 @@ function isActive(slot: FeaturedSlot): boolean {
                                     ]"
                                 >
                                     {{ getSlotBadge(slot.slot) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-zinc-300">
-                                {{ formatDate(slot.starts_at) }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-zinc-300">
-                                {{
-                                    slot.ends_at
-                                        ? formatDate(slot.ends_at)
-                                        : 'No end date'
-                                }}
-                            </td>
-                            <td class="px-6 py-4">
-                                <span
-                                    :class="[
-                                        'inline-flex rounded-full px-2 py-1 text-xs font-semibold',
-                                        isActive(slot)
-                                            ? 'bg-green-900/50 text-green-300'
-                                            : 'bg-zinc-800 text-zinc-400',
-                                    ]"
-                                >
-                                    {{ isActive(slot) ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right text-sm">

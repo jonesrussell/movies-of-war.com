@@ -13,8 +13,6 @@ usePage();
 const form = useForm({
     movie_id: null as number | null,
     slot: 'hero' as 'hero' | 'pick_of_week',
-    starts_at: '',
-    ends_at: '',
 });
 
 function submit() {
@@ -124,56 +122,6 @@ function submit() {
                         class="mt-1 text-sm text-red-500"
                     >
                         {{ form.errors.slot }}
-                    </div>
-                </div>
-
-                <!-- Dates -->
-                <div class="grid gap-6 sm:grid-cols-2">
-                    <div>
-                        <label
-                            for="starts_at"
-                            class="block text-sm font-medium text-zinc-300"
-                        >
-                            Start Date <span class="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="starts_at"
-                            v-model="form.starts_at"
-                            type="datetime-local"
-                            required
-                            class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 text-white focus:border-red-500 focus:ring-red-500"
-                        />
-                        <div
-                            v-if="form.errors.starts_at"
-                            class="mt-1 text-sm text-red-500"
-                        >
-                            {{ form.errors.starts_at }}
-                        </div>
-                    </div>
-
-                    <div>
-                        <label
-                            for="ends_at"
-                            class="block text-sm font-medium text-zinc-300"
-                        >
-                            End Date
-                            <span class="text-zinc-500">(Optional)</span>
-                        </label>
-                        <input
-                            id="ends_at"
-                            v-model="form.ends_at"
-                            type="datetime-local"
-                            class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 text-white focus:border-red-500 focus:ring-red-500"
-                        />
-                        <p class="mt-1 text-xs text-zinc-500">
-                            Leave empty for no end date
-                        </p>
-                        <div
-                            v-if="form.errors.ends_at"
-                            class="mt-1 text-sm text-red-500"
-                        >
-                            {{ form.errors.ends_at }}
-                        </div>
                     </div>
                 </div>
 

@@ -77,7 +77,7 @@ defineProps<Props>();
         </PublicSection>
 
         <PublicSection spacing="md">
-            <PublicContainer class="flex flex-col gap-10">
+            <PublicContainer class="flex flex-col gap-10 lg:gap-18">
                 <div v-if="pickOfWeekMovie" class="mx-auto w-full max-w-5xl">
                     <FeaturedMovie
                         :movie="pickOfWeekMovie"

@@ -44,4 +44,3 @@ defineProps<{ movie: Movie }>();
         </div>
     </dl>
 </template>
-

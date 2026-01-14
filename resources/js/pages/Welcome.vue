@@ -37,7 +37,7 @@ defineProps<Props>();
                     class="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950 to-zinc-950"
                 />
                 <div
-                    class="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px]"
+                    class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px] opacity-[0.06]"
                 />
             </div>
 
@@ -49,7 +49,7 @@ defineProps<Props>();
                         Curated war cinema
                     </p>
                     <h1
-                        class="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl"
+                        class="mt-4 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
                     >
                         Movies of War
                     </h1>
@@ -117,11 +117,11 @@ defineProps<Props>();
                     class="relative overflow-hidden rounded-2xl bg-zinc-950 p-8 text-center ring-1 ring-zinc-800/70 sm:p-10"
                 >
                     <div
-                        class="pointer-events-none absolute inset-0 opacity-[0.10] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px]"
+                        class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px] opacity-[0.10]"
                     />
                     <div class="relative">
                         <h2
-                            class="text-balance text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+                            class="text-2xl font-semibold tracking-tight text-balance text-white sm:text-3xl"
                         >
                             Explore the curated collection
                         </h2>

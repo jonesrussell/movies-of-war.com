@@ -102,7 +102,10 @@ const hasActiveFilters = () => {
     );
 };
 
-type Chip = { key: 'year' | 'country' | 'conflict' | 'tag' | 'search'; label: string };
+type Chip = {
+    key: 'year' | 'country' | 'conflict' | 'tag' | 'search';
+    label: string;
+};
 
 const activeChips = computed<Chip[]>(() => {
     const chips: Chip[] = [];
@@ -114,15 +117,21 @@ const activeChips = computed<Chip[]>(() => {
         chips.push({ key: 'year', label: `Year: ${selectedYear.value}` });
     }
     if (selectedCountry.value) {
-        chips.push({ key: 'country', label: `Country: ${selectedCountry.value}` });
+        chips.push({
+            key: 'country',
+            label: `Country: ${selectedCountry.value}`,
+        });
     }
     if (selectedConflict.value) {
-        chips.push({ key: 'conflict', label: `Conflict: ${selectedConflict.value}` });
+        chips.push({
+            key: 'conflict',
+            label: `Conflict: ${selectedConflict.value}`,
+        });
     }
     if (selectedTag.value) {
         const tagName =
-            props.filters.tags.find((t) => t.slug === selectedTag.value)?.name ??
-            selectedTag.value;
+            props.filters.tags.find((t) => t.slug === selectedTag.value)
+                ?.name ?? selectedTag.value;
         chips.push({ key: 'tag', label: `Tag: ${tagName}` });
     }
 
@@ -160,7 +169,9 @@ function removeChip(chip: Chip) {
                 />
 
                 <div class="flex flex-col gap-4">
-                    <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+                    <div
+                        class="flex flex-col gap-3 lg:flex-row lg:items-center"
+                    >
                         <div class="relative w-full lg:flex-1">
                             <Search
                                 class="absolute top-1/2 left-3 size-5 -translate-y-1/2 text-zinc-500"
@@ -191,10 +202,7 @@ function removeChip(chip: Chip) {
 
                             <Sheet v-model:open="mobileFiltersOpen">
                                 <SheetTrigger as-child>
-                                    <Button
-                                        variant="outline"
-                                        class="lg:hidden"
-                                    >
+                                    <Button variant="outline" class="lg:hidden">
                                         <SlidersHorizontal class="size-4" />
                                         Filters
                                         <span
@@ -281,10 +289,7 @@ function removeChip(chip: Chip) {
                         @update:tag="selectedTag = $event"
                     />
 
-                    <div
-                        v-if="activeChips.length"
-                        class="flex flex-wrap gap-2"
-                    >
+                    <div v-if="activeChips.length" class="flex flex-wrap gap-2">
                         <FilterChip
                             v-for="chip in activeChips"
                             :key="chip.key"

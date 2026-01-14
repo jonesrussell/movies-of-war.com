@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Skeleton } from '@/components/ui/skeleton';
 import MovieGrid from '@/components/public/MovieGrid.vue';
+import { Skeleton } from '@/components/ui/skeleton';
 
 withDefaults(
     defineProps<{

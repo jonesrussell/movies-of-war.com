@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import PublicHeader from '@/components/public/PublicHeader.vue';
 import PublicFooter from '@/components/public/PublicFooter.vue';
-
+import PublicHeader from '@/components/public/PublicHeader.vue';
 </script>
 
 <template>

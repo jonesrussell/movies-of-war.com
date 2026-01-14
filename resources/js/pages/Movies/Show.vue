@@ -65,7 +65,7 @@ const posterImage =
                     class="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950/80 to-zinc-950"
                 />
                 <div
-                    class="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px]"
+                    class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px] opacity-[0.06]"
                 />
             </div>
 
@@ -130,7 +130,7 @@ const posterImage =
                             </div>
 
                             <h1
-                                class="mb-5 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl"
+                                class="mb-5 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl"
                             >
                                 {{ movie.title }}
                             </h1>

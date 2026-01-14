@@ -11,7 +11,12 @@ interface Props {
     class?: string;
 }
 
-withDefaults(defineProps<Props>(), { align: 'left', class: '' });
+withDefaults(defineProps<Props>(), {
+    kicker: '',
+    description: '',
+    align: 'left',
+    class: '',
+});
 </script>
 
 <template>
@@ -33,7 +38,7 @@ withDefaults(defineProps<Props>(), { align: 'left', class: '' });
 
         <div class="flex items-end justify-between gap-4">
             <h1
-                class="text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl"
+                class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl lg:text-5xl"
                 :class="align === 'center' ? 'mx-auto' : ''"
             >
                 {{ title }}
@@ -46,7 +51,7 @@ withDefaults(defineProps<Props>(), { align: 'left', class: '' });
 
         <p
             v-if="description"
-            class="max-w-3xl text-pretty text-base leading-relaxed text-zinc-400 sm:text-lg"
+            class="max-w-3xl text-base leading-relaxed text-pretty text-zinc-400 sm:text-lg"
             :class="align === 'center' ? 'mx-auto' : ''"
         >
             {{ description }}

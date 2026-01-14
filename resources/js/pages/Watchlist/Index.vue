@@ -51,7 +51,7 @@ defineProps<Props>();
                     class="relative overflow-hidden rounded-2xl bg-zinc-950 p-10 text-center ring-1 ring-zinc-800/70"
                 >
                     <div
-                        class="pointer-events-none absolute inset-0 opacity-[0.10] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px]"
+                        class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px] opacity-[0.10]"
                     />
                     <div class="relative">
                         <img
@@ -62,7 +62,7 @@ defineProps<Props>();
                             decoding="async"
                         />
                         <h2
-                            class="text-balance text-2xl font-semibold tracking-tight text-white"
+                            class="text-2xl font-semibold tracking-tight text-balance text-white"
                         >
                             Your watchlist is empty
                         </h2>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils';
 import { computed } from 'vue';
+
+import { cn } from '@/lib/utils';
 
 type Spacing = 'none' | 'sm' | 'md' | 'lg';
 

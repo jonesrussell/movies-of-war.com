@@ -115,6 +115,11 @@
     --radius-xl: 0.75rem;
     --radius-2xl: 1rem;
     --radius-full: 9999px;
+
+    /* Custom easing functions for cinematic animations */
+    --ease-cinematic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-smooth-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-dramatic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 /*
@@ -142,6 +147,22 @@
             'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
             'Noto Color Emoji';
+    }
+
+    /* Focus ring utility for consistent accessibility */
+    .focus-ring {
+        @apply outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950;
+    }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
 

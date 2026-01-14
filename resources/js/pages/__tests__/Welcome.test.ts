@@ -56,7 +56,6 @@ vi.mock('@/layouts/PublicLayout.vue', () => ({
     default: {
         name: 'PublicLayout',
         template: '<div><slot /></div>',
-        props: ['canRegister'],
     },
 }));
 
@@ -66,7 +65,6 @@ describe('Welcome', () => {
     function mountWelcome(props: any = {}) {
         return mount(Welcome, {
             props: {
-                canRegister: true,
                 latestMovies: [],
                 ...props,
             },
@@ -143,7 +141,7 @@ describe('Welcome', () => {
 
             const viewAllLink = wrapper
                 .findAll('a')
-                .find((a) => a.text().includes('View All'));
+                .find((a) => a.text().toLowerCase().includes('view all'));
             expect(viewAllLink).toBeDefined();
             expect(viewAllLink?.attributes('href')).toBe('/movies');
         });
@@ -160,8 +158,8 @@ describe('Welcome', () => {
         it('renders CTA section', () => {
             const wrapper = mountWelcome();
 
-            expect(wrapper.text()).toContain('Explore Our Curated Collection');
-            expect(wrapper.text()).toContain('Discover');
+            expect(wrapper.text()).toContain('Explore the curated collection');
+            expect(wrapper.text()).toContain('Filter by conflict');
         });
 
         it('renders Browse All Movies link', () => {
@@ -169,7 +167,7 @@ describe('Welcome', () => {
 
             const browseLink = wrapper
                 .findAll('a')
-                .find((a) => a.text().includes('Browse All Movies'));
+                .find((a) => a.text().toLowerCase().includes('browse all'));
             expect(browseLink).toBeDefined();
             expect(browseLink?.attributes('href')).toBe('/movies');
         });
@@ -206,7 +204,7 @@ describe('Welcome', () => {
             );
 
             // CTA
-            expect(wrapper.text()).toContain('Browse All Movies');
+            expect(wrapper.text()).toContain('Browse all movies');
         });
 
         it('renders minimal page without optional content', () => {
@@ -226,7 +224,7 @@ describe('Welcome', () => {
             );
 
             // CTA still shows
-            expect(wrapper.text()).toContain('Browse All Movies');
+            expect(wrapper.text()).toContain('Browse all movies');
         });
     });
 });

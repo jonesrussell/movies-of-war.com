@@ -5,6 +5,11 @@ import { Head, Link } from '@inertiajs/vue3';
 import { Bookmark } from 'lucide-vue-next';
 
 import MovieCard from '@/components/MovieCard.vue';
+import MovieGrid from '@/components/public/MovieGrid.vue';
+import PublicContainer from '@/components/public/PublicContainer.vue';
+import PublicSection from '@/components/public/PublicSection.vue';
+import SectionHeader from '@/components/public/SectionHeader.vue';
+import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {
@@ -18,52 +23,61 @@ defineProps<Props>();
     <PublicLayout>
         <Head title="My Watchlist - Movies of War" />
 
-        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <div class="mb-8">
-                <div class="flex items-center gap-3">
-                    <Bookmark class="size-8 text-red-500" />
-                    <h1 class="text-4xl font-bold text-white">My Watchlist</h1>
-                </div>
-                <p class="mt-2 text-zinc-400">
-                    {{ movies.length }}
-                    {{ movies.length === 1 ? 'film' : 'films' }} saved
-                </p>
-            </div>
+        <PublicSection spacing="md">
+            <PublicContainer class="flex flex-col gap-8">
+                <SectionHeader
+                    title="My Watchlist"
+                    :description="`${movies.length} ${
+                        movies.length === 1 ? 'film' : 'films'
+                    } saved`"
+                >
+                    <template #action>
+                        <Bookmark class="size-6 text-red-500" />
+                    </template>
+                </SectionHeader>
 
-            <div v-if="movies.length > 0">
+                <div v-if="movies.length > 0">
+                    <MovieGrid>
+                        <MovieCard
+                            v-for="movie in movies"
+                            :key="movie.id"
+                            :movie="movie"
+                        />
+                    </MovieGrid>
+                </div>
+
                 <div
-                    class="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
+                    v-else
+                    class="relative overflow-hidden rounded-2xl bg-zinc-950 p-10 text-center ring-1 ring-zinc-800/70"
                 >
-                    <MovieCard
-                        v-for="movie in movies"
-                        :key="movie.id"
-                        :movie="movie"
+                    <div
+                        class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px] opacity-[0.10]"
                     />
+                    <div class="relative">
+                        <img
+                            src="/images/illustrations/watchlist-placeholder.png"
+                            alt="Empty watchlist"
+                            class="mx-auto mb-6 h-32 w-32 opacity-60"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <h2
+                            class="text-2xl font-semibold tracking-tight text-balance text-white"
+                        >
+                            Your watchlist is empty
+                        </h2>
+                        <p class="mx-auto mt-3 max-w-lg text-zinc-400">
+                            Save films you want to revisit later—then come back
+                            when you’re ready for a deep dive.
+                        </p>
+                        <div class="mt-7 flex justify-center">
+                            <Button as-child>
+                                <Link href="/movies">Browse movies</Link>
+                            </Button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div
-                v-else
-                class="rounded-lg border border-zinc-800 bg-zinc-900 py-16 text-center"
-            >
-                <img
-                    src="/images/illustrations/watchlist-placeholder.png"
-                    alt="Empty watchlist"
-                    class="mx-auto mb-6 h-32 w-32 opacity-50"
-                />
-                <h2 class="mb-2 text-xl font-bold text-white">
-                    Your watchlist is empty
-                </h2>
-                <p class="mb-6 text-zinc-400">
-                    Start adding films you want to watch
-                </p>
-                <Link
-                    href="/movies"
-                    class="inline-block rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
-                >
-                    Browse Movies
-                </Link>
-            </div>
-        </div>
+            </PublicContainer>
+        </PublicSection>
     </PublicLayout>
 </template>

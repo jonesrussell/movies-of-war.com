@@ -1,27 +1,22 @@
 <script setup lang="ts">
+import PublicFooter from '@/components/public/PublicFooter.vue';
 import PublicHeader from '@/components/public/PublicHeader.vue';
-
-interface Props {
-    canRegister?: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
-    canRegister: false,
-});
 </script>
 
 <template>
     <div class="min-h-screen bg-zinc-950">
+        <!-- Skip link for keyboard accessibility -->
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-red-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+        >
+            Skip to main content
+        </a>
+
         <PublicHeader />
-        <main class="flex-1">
+        <main id="main-content" class="flex-1">
             <slot />
         </main>
-        <footer class="border-t border-zinc-800 bg-zinc-900 py-8">
-            <div
-                class="mx-auto max-w-7xl px-4 text-center text-zinc-500 sm:px-6 lg:px-8"
-            >
-                <p>&copy; 2026 Movies of War. All rights reserved.</p>
-            </div>
-        </footer>
+        <PublicFooter />
     </div>
 </template>

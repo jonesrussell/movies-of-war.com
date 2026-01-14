@@ -13,6 +13,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,31 +23,44 @@ jobs:
         with:
           php-version: '8.4'
           tools: composer:v2
+          coverage: none
 
-      - name: Install Deployer
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+      - name: Install Deployer (cached)
+        id: deployer
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/dep
+          key: deployer-phar-v1
+      - name: Download Deployer if missing
+        if: steps.deployer.outputs.cache-hit != 'true'
         run: |
           curl -LO https://deployer.org/deployer.phar
           chmod +x deployer.phar
           sudo mv deployer.phar /usr/local/bin/dep
 
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Setup SSH
+      - name: Add Host Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H movies-of-war.com >> ~/.ssh/known_hosts
-          cat <<EOF > ~/.ssh/config
-          Host movies-of-war.com
-            User deployer
-            IdentityFile ~/.ssh/id_ed25519
-            StrictHostKeyChecking no
-          EOF
-          chmod 600 ~/.ssh/config
 
       - name: Deploy
-        run: dep deploy -vvv
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          DEPLOY_ENV: production
+        run: |
+          set -e
+          dep deploy -vvv

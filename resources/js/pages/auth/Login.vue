@@ -79,7 +79,10 @@ defineProps<{
                         autocomplete="current-password"
                         placeholder="Password"
                     />
-                    <InputError :message="errors.password" class="error-message" />
+                    <InputError
+                        :message="errors.password"
+                        class="error-message"
+                    />
                 </div>
 
                 <div class="flex items-center justify-between">

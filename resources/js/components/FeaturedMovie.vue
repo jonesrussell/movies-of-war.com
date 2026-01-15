@@ -18,7 +18,7 @@ const posterImage =
 <template>
     <div
         class="featured-movie relative overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50"
-        style="container-type: inline-size;"
+        style="container-type: inline-size"
     >
         <div class="absolute top-4 right-4 z-10">
             <span
@@ -32,9 +32,7 @@ const posterImage =
             <div
                 class="featured-movie-poster flex items-center justify-center border-b border-zinc-800 bg-zinc-950/20 p-6"
             >
-                <div
-                    class="aspect-[2/3] w-full max-w-[260px]"
-                >
+                <div class="aspect-[2/3] w-full max-w-[260px]">
                     <img
                         :src="posterImage"
                         :alt="movie.title"

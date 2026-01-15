@@ -88,8 +88,8 @@ const posterImage =
                 </div>
 
                 <div
-                    class="movie-detail-grid grid gap-8 grid-cols-1"
-                    style="container-type: inline-size;"
+                    class="movie-detail-grid grid grid-cols-1 gap-8"
+                    style="container-type: inline-size"
                 >
                     <div class="movie-detail-poster">
                         <img
@@ -142,7 +142,9 @@ const posterImage =
 
                             <h1
                                 class="mb-5 font-semibold tracking-tight text-balance text-white"
-                                style="font-size: clamp(2rem, 3.5vw + 1rem, 3rem);"
+                                style="
+                                    font-size: clamp(2rem, 3.5vw + 1rem, 3rem);
+                                "
                             >
                                 {{ movie.title }}
                             </h1>

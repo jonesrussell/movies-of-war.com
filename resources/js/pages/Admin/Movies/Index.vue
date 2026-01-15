@@ -5,8 +5,8 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
@@ -129,7 +129,9 @@ function unpublishMovie(movie: Movie) {
                             </div>
                             <div class="mt-1 text-sm text-zinc-400">
                                 {{ movie.release_year }}
-                                <span v-if="movie.country"> • {{ movie.country }}</span>
+                                <span v-if="movie.country">
+                                    • {{ movie.country }}</span
+                                >
                             </div>
                             <div
                                 v-if="movie.tags && movie.tags.length > 0"

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { User } from '@/types/models';
+
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -6,8 +8,6 @@ import QuickActionsSection from '@/components/QuickActionsSection.vue';
 import StatsGrid from '@/components/StatsGrid.vue';
 import TmdbImportsSummaryCard from '@/components/TmdbImportsSummaryCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
-
-import type { User } from '@/types/models';
 
 interface Props {
     stats: {

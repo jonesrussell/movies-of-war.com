@@ -191,6 +191,18 @@
 
     @container (min-width: 48rem) {
         .movie-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    @container (min-width: 64rem) {
+        .movie-grid {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+    }
+
+    @container (min-width: 80rem) {
+        .movie-grid {
             grid-template-columns: repeat(6, minmax(0, 1fr));
         }
     }
@@ -222,7 +234,8 @@
         grid-template-columns: 1fr;
     }
 
-    @container (min-width: 32rem) {
+    /* Horizontal layout on desktop - trigger at smaller container width for better responsiveness */
+    @container (min-width: 28rem) {
         .featured-movie-grid {
             grid-template-columns: repeat(12, minmax(0, 1fr));
         }
@@ -316,12 +329,16 @@
 
     /* Override max-width utilities to use container sizes instead of spacing (Tailwind v4 bug workaround) */
     /* See: https://github.com/tailwindlabs/tailwindcss/discussions/17777 */
-    .max-w-2xl {
-        max-width: var(--container-2xl, 42rem);
+    /* Using higher specificity to override Tailwind's generated classes */
+    .max-w-2xl,
+    .max-w-2xl\:max-w-2xl {
+        max-width: 42rem !important;
     }
 
-    .max-w-3xl {
-        max-width: var(--container-3xl, 48rem);
+    .max-w-3xl,
+    .max-w-3xl\:max-w-3xl,
+    .xl\:max-w-3xl {
+        max-width: 48rem !important;
     }
 }
 

@@ -66,7 +66,10 @@ import { store } from '@/routes/register';
                         name="password"
                         placeholder="Password"
                     />
-                    <InputError :message="errors.password" class="error-message" />
+                    <InputError
+                        :message="errors.password"
+                        class="error-message"
+                    />
                 </div>
 
                 <div class="form-group grid gap-2">
@@ -80,7 +83,10 @@ import { store } from '@/routes/register';
                         name="password_confirmation"
                         placeholder="Confirm password"
                     />
-                    <InputError :message="errors.password_confirmation" class="error-message" />
+                    <InputError
+                        :message="errors.password_confirmation"
+                        class="error-message"
+                    />
                 </div>
 
                 <Button

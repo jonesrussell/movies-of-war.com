@@ -31,7 +31,7 @@ defineEmits<{
             'filters-panel grid gap-4 rounded-2xl bg-zinc-950 p-4 ring-1 ring-zinc-800/70',
             $props.class,
         ]"
-        style="container-type: inline-size;"
+        style="container-type: inline-size"
     >
         <div class="flex flex-col gap-2">
             <label class="text-xs font-semibold tracking-wide text-zinc-300">

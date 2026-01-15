@@ -21,7 +21,7 @@ withDefaults(defineProps<Props>(), {
                 $props.class,
             )
         "
-        style="container-type: inline-size;"
+        style="container-type: inline-size"
     >
         <slot />
     </div>

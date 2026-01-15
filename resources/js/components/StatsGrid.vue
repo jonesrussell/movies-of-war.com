@@ -15,8 +15,8 @@ defineProps<Props>();
 
 <template>
     <div
-        class="stats-grid grid gap-6 grid-cols-1"
-        style="container-type: inline-size;"
+        class="stats-grid grid grid-cols-1 gap-6"
+        style="container-type: inline-size"
     >
         <StatsCard
             v-for="stat in stats"

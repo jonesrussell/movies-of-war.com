@@ -235,7 +235,7 @@
     }
 
     /* Horizontal layout on desktop - trigger at smaller container width for better responsiveness */
-    @container (min-width: 28rem) {
+    @container (min-width: 20rem) {
         .featured-movie-grid {
             grid-template-columns: repeat(12, minmax(0, 1fr));
         }
@@ -252,6 +252,12 @@
             grid-column: span 8 / span 8;
         }
 
+        .featured-movie-poster > div {
+            max-width: 180px;
+        }
+    }
+
+    @container (min-width: 32rem) {
         .featured-movie-poster > div {
             max-width: 220px;
         }

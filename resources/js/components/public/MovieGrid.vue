@@ -16,7 +16,7 @@ withDefaults(defineProps<Props>(), {
     <div
         :class="
             cn(
-                'movie-grid grid grid-cols-2',
+                'movie-grid grid grid-cols-3',
                 dense ? 'gap-4' : 'gap-6',
                 $props.class,
             )

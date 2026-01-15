@@ -175,35 +175,32 @@
     /* Container query-based movie grid */
     .movie-grid {
         container-type: inline-size;
+        /* Ensure container queries override Tailwind utilities */
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
 
-    @container (min-width: 20rem) {
-        .movie-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-    }
-
+    /* 3 columns at 20rem+ (default set above) */
     @container (min-width: 32rem) {
         .movie-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
         }
     }
 
     @container (min-width: 48rem) {
         .movie-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
         }
     }
 
     @container (min-width: 64rem) {
         .movie-grid {
-            grid-template-columns: repeat(5, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
         }
     }
 
     @container (min-width: 80rem) {
         .movie-grid {
-            grid-template-columns: repeat(6, minmax(0, 1fr));
+            grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
         }
     }
 

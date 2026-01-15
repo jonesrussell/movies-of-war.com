@@ -84,7 +84,7 @@ const posterImage =
             </div>
 
             <div
-                class="featured-movie-poster order-2 flex items-center justify-center border-t border-zinc-800 bg-zinc-950/20 p-6 md:border-t-0 md:border-l md:col-span-4"
+                class="featured-movie-poster order-2 flex items-center justify-center border-t border-zinc-800 bg-zinc-950/20 p-6 md:col-span-4 md:border-t-0 md:border-l"
             >
                 <div class="aspect-[2/3] w-full max-w-[260px]">
                     <img

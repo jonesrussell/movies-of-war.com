@@ -7,6 +7,8 @@ import StatsGrid from '@/components/StatsGrid.vue';
 import TmdbImportsSummaryCard from '@/components/TmdbImportsSummaryCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
+import type { User } from '@/types/models';
+
 interface Props {
     stats: {
         movies: number;
@@ -16,11 +18,22 @@ interface Props {
     };
 }
 
-import type { User } from '@/types/models';
+interface PageProps {
+    auth: {
+        user?: User;
+    };
+    stats: {
+        movies: number;
+        tags: number;
+        activeFeatures: number;
+        tmdbDrafts: number;
+    };
+}
 
 const props = defineProps<Props>();
-const page = usePage();
-const auth = page.props.auth as { user?: User };
+const page = usePage<PageProps>();
+
+const auth = page.props.auth;
 
 const statsArray = computed(() => [
     { title: 'Published Movies', value: props.stats.movies },

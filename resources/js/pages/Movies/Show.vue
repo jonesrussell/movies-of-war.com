@@ -18,10 +18,18 @@ interface Props {
     relatedMovies: Movie[];
 }
 
-const props = defineProps<Props>();
-const page = usePage();
+interface PageProps {
+    auth: {
+        user?: User;
+    };
+    movie: Movie;
+    relatedMovies: Movie[];
+}
 
-const auth = page.props.auth as { user?: User };
+const props = defineProps<Props>();
+const page = usePage<PageProps>();
+
+const auth = page.props.auth;
 
 const toggleWatchlist = () => {
     if (!auth.user) {
@@ -130,7 +138,8 @@ const posterImage =
                             </div>
 
                             <h1
-                                class="mb-5 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl"
+                                class="mb-5 font-semibold tracking-tight text-balance text-white"
+                                style="font-size: clamp(2rem, 3.5vw + 1rem, 3rem);"
                             >
                                 {{ movie.title }}
                             </h1>

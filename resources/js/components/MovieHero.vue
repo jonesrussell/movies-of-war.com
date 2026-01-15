@@ -91,7 +91,8 @@ onMounted(() => {
                     </div>
 
                     <h1
-                        class="mb-4 text-4xl font-bold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
+                        class="mb-4 font-bold tracking-tight text-balance text-white"
+                        style="font-size: clamp(2rem, 4vw + 1rem, 3.75rem);"
                     >
                         {{ movie.title }}
                     </h1>

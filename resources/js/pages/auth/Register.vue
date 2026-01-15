@@ -95,8 +95,8 @@ import { store } from '@/routes/register';
                 </Button>
             </div>
 
-            <div class="text-center text-sm text-muted-foreground">
-                Already have an account?
+            <div class="space-x-1 text-center text-sm text-muted-foreground">
+                <span>Already have an account?</span>
                 <TextLink
                     :href="login()"
                     class="underline underline-offset-4"

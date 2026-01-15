@@ -160,7 +160,10 @@ function handleImport() {
                                         v-model:checked="form.upcoming"
                                         :disabled="form.processing"
                                     />
-                                    <Label for="upcoming" class="cursor-pointer">
+                                    <Label
+                                        for="upcoming"
+                                        class="cursor-pointer"
+                                    >
                                         Upcoming releases only
                                     </Label>
                                 </div>

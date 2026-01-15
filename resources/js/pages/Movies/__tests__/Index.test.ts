@@ -31,9 +31,13 @@ vi.mock('@inertiajs/vue3', () => ({
 }));
 
 // Mock VueUse
-vi.mock('@vueuse/core', () => ({
-    useDebounceFn: vi.fn((fn) => fn),
-}));
+vi.mock('@vueuse/core', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@vueuse/core')>();
+    return {
+        ...actual,
+        useDebounceFn: vi.fn((fn) => fn),
+    };
+});
 
 vi.mock('@/components/ui/button', () => ({
     Button: {

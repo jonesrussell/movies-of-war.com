@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AppPageProps } from '@/types';
 import type { Movie } from '@/types';
 import type { User } from '@/types/models';
 
@@ -10,6 +11,7 @@ import MovieFacts from '@/components/public/MovieFacts.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
+import SectionHeader from '@/components/public/SectionHeader.vue';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
@@ -18,10 +20,7 @@ interface Props {
     relatedMovies: Movie[];
 }
 
-interface PageProps {
-    auth: {
-        user?: User;
-    };
+interface PageProps extends AppPageProps {
     movie: Movie;
     relatedMovies: Movie[];
 }

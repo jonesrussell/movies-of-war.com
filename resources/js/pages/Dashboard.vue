@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AppPageProps } from '@/types';
 import type { User } from '@/types/models';
 
 import { Head, usePage } from '@inertiajs/vue3';
@@ -18,10 +19,7 @@ interface Props {
     };
 }
 
-interface PageProps {
-    auth: {
-        user?: User;
-    };
+interface PageProps extends AppPageProps {
     stats: {
         movies: number;
         tags: number;

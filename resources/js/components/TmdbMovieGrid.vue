@@ -17,7 +17,8 @@ const emit = defineEmits<{
 
 <template>
     <div
-        class="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
+        class="movie-grid grid grid-cols-2 gap-6"
+        style="container-type: inline-size"
     >
         <TmdbMovieCard
             v-for="movie in movies"

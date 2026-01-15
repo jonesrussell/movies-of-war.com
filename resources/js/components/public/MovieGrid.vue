@@ -16,11 +16,12 @@ withDefaults(defineProps<Props>(), {
     <div
         :class="
             cn(
-                'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6',
+                'movie-grid grid grid-cols-3',
                 dense ? 'gap-4' : 'gap-6',
                 $props.class,
             )
         "
+        style="container-type: inline-size"
     >
         <slot />
     </div>

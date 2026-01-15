@@ -15,6 +15,7 @@ import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     Sheet,
     SheetContent,
@@ -174,13 +175,13 @@ function removeChip(chip: Chip) {
                     >
                         <div class="relative w-full lg:flex-1">
                             <Search
-                                class="absolute top-1/2 left-3 size-5 -translate-y-1/2 text-zinc-500"
+                                class="pointer-events-none absolute top-1/2 left-3 z-10 size-5 -translate-y-1/2 text-zinc-500"
                             />
-                            <input
+                            <Input
                                 v-model="search"
                                 type="text"
                                 placeholder="Search movies..."
-                                class="w-full rounded-xl border border-zinc-800 bg-zinc-950 py-3 pr-4 pl-10 text-white placeholder-zinc-500 focus:border-red-600 focus:ring-2 focus:ring-red-600/40 focus:outline-none"
+                                class="w-full pl-10"
                             />
                         </div>
 

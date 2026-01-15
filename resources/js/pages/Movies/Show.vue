@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import type { AppPageProps } from '@/types';
 import type { Movie } from '@/types';
-import type { User } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Check, Play, Plus } from 'lucide-vue-next';
@@ -10,6 +10,7 @@ import MovieFacts from '@/components/public/MovieFacts.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
+import SectionHeader from '@/components/public/SectionHeader.vue';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
@@ -18,10 +19,15 @@ interface Props {
     relatedMovies: Movie[];
 }
 
-const props = defineProps<Props>();
-const page = usePage();
+interface PageProps extends AppPageProps {
+    movie: Movie;
+    relatedMovies: Movie[];
+}
 
-const auth = page.props.auth as { user?: User };
+const props = defineProps<Props>();
+const page = usePage<PageProps>();
+
+const auth = page.props.auth;
 
 const toggleWatchlist = () => {
     if (!auth.user) {
@@ -79,8 +85,11 @@ const posterImage =
                     </Link>
                 </div>
 
-                <div class="grid gap-8 lg:grid-cols-12">
-                    <div class="lg:col-span-4">
+                <div
+                    class="movie-detail-grid grid grid-cols-1 gap-8"
+                    style="container-type: inline-size"
+                >
+                    <div class="movie-detail-poster">
                         <img
                             :src="posterImage"
                             :alt="movie.title"
@@ -120,7 +129,7 @@ const posterImage =
                         </div>
                     </div>
 
-                    <div class="flex flex-col lg:col-span-8">
+                    <div class="movie-detail-content flex flex-col">
                         <div>
                             <div
                                 v-if="movie.is_upcoming"
@@ -130,7 +139,10 @@ const posterImage =
                             </div>
 
                             <h1
-                                class="mb-5 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl"
+                                class="mb-5 font-semibold tracking-tight text-balance text-white"
+                                style="
+                                    font-size: clamp(2rem, 3.5vw + 1rem, 3rem);
+                                "
                             >
                                 {{ movie.title }}
                             </h1>

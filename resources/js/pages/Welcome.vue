@@ -49,7 +49,8 @@ defineProps<Props>();
                         Curated war cinema
                     </p>
                     <h1
-                        class="mt-4 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl"
+                        class="mt-4 font-semibold tracking-tight text-balance text-white"
+                        style="font-size: clamp(2rem, 4vw + 1rem, 3.75rem)"
                     >
                         Movies of War
                     </h1>
@@ -121,7 +122,14 @@ defineProps<Props>();
                     />
                     <div class="relative">
                         <h2
-                            class="text-2xl font-semibold tracking-tight text-balance text-white sm:text-3xl"
+                            class="font-semibold tracking-tight text-balance text-white"
+                            style="
+                                font-size: clamp(
+                                    1.5rem,
+                                    2.5vw + 0.5rem,
+                                    1.875rem
+                                );
+                            "
                         >
                             Explore the curated collection
                         </h2>

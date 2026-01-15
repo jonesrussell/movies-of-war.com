@@ -336,6 +336,43 @@ Uses zinc color palette from Tailwind with red accents:
 - Text: `text-white`, `text-zinc-400`
 - Accents: `bg-red-600`, `text-red-500`
 
+### CSS Architecture & Modern Features
+
+**Main CSS File:** `resources/css/app.css`
+
+#### Tailwind CSS v4 Configuration
+
+The project uses Tailwind CSS v4 with CSS-first configuration via `@theme` directive in `app.css`:
+
+- **Container Variables:** Explicitly defined to prevent Tailwind v4 bug where `max-w-*` utilities incorrectly use `--spacing-*` instead of `--container-*` (see GitHub Discussion #17777)
+- **Container Sizes:** All container sizes (`--container-3xs` through `--container-7xl`) are defined in `@theme` block
+- **Max-Width Override:** Utilities layer includes `!important` overrides for `.max-w-2xl` and `.max-w-3xl` to ensure correct values (42rem and 48rem respectively)
+
+#### Container Queries
+
+Components use container queries instead of viewport-based breakpoints for better responsiveness:
+
+- **MovieGrid** (`movie-grid` class): Adapts columns based on container width (2 → 3 → 4 → 5 → 6 columns)
+- **FeaturedMovie** (`featured-movie` class): Switches from vertical to horizontal layout at `20rem` container width
+- **MoviesFiltersPanel** (`filters-panel` class): Responsive filter grid (1 → 2 → 4 columns)
+- **StatsGrid** (`stats-grid` class): Dashboard stats grid (1 → 2 → 3 columns)
+- **Movie Detail Page** (`movie-detail-grid` class): Two-column layout for movie details
+
+All container queries are defined in `@layer components` in `app.css`.
+
+#### Modern CSS Features
+
+- **Fluid Typography:** Uses `clamp()` for responsive headings (e.g., `font-size: clamp(2rem, 4vw + 1rem, 3.75rem)`)
+- **:has() Selector:** Used for form validation styling (`.form-group:has(.error-message)`)
+- **Logical Properties:** Uses Tailwind's logical property utilities where appropriate
+- **Cascade Layers:** Organized with `@layer base`, `@layer components`, and `@layer utilities`
+
+#### CSS Organization
+
+- **@layer base:** Base styles and compatibility fixes
+- **@layer components:** Container queries, form validation, component-specific styles
+- **@layer utilities:** Custom utilities, focus rings, font definitions
+
 ## Testing Strategy
 
 - **Feature tests** for all user-facing functionality

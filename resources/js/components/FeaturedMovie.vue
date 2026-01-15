@@ -17,7 +17,8 @@ const posterImage =
 
 <template>
     <div
-        class="relative overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50"
+        class="featured-movie relative overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50"
+        style="container-type: inline-size"
     >
         <div class="absolute top-4 right-4 z-10">
             <span
@@ -27,25 +28,9 @@ const posterImage =
             </span>
         </div>
 
-        <div class="grid md:grid-cols-12">
+        <div class="featured-movie-grid grid grid-cols-1 md:grid-cols-12">
             <div
-                class="flex items-center justify-center border-b border-zinc-800 bg-zinc-950/20 p-6 md:order-2 md:col-span-4 md:border-b-0 md:border-l"
-            >
-                <div
-                    class="aspect-[2/3] w-full max-w-[260px] md:max-w-[220px] lg:max-w-[260px]"
-                >
-                    <img
-                        :src="posterImage"
-                        :alt="movie.title"
-                        class="h-full w-full rounded-md object-contain"
-                        loading="lazy"
-                        decoding="async"
-                    />
-                </div>
-            </div>
-
-            <div
-                class="flex flex-col justify-center p-6 md:order-1 md:col-span-8"
+                class="featured-movie-content order-1 flex flex-col justify-center p-6 md:col-span-8"
             >
                 <h3 class="mb-2 text-2xl font-bold text-white">
                     {{ movie.title }}
@@ -95,6 +80,20 @@ const posterImage =
                         <Play class="size-4" />
                         Trailer
                     </a>
+                </div>
+            </div>
+
+            <div
+                class="featured-movie-poster order-2 flex items-center justify-center border-t border-zinc-800 bg-zinc-950/20 p-6 md:border-t-0 md:border-l md:col-span-4"
+            >
+                <div class="aspect-[2/3] w-full max-w-[260px]">
+                    <img
+                        :src="posterImage"
+                        :alt="movie.title"
+                        class="h-full w-full rounded-md object-contain"
+                        loading="lazy"
+                        decoding="async"
+                    />
                 </div>
             </div>
         </div>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AppPageProps } from '@/types';
+
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -16,11 +18,19 @@ interface Props {
     };
 }
 
-import type { User } from '@/types/models';
+interface PageProps extends AppPageProps {
+    stats: {
+        movies: number;
+        tags: number;
+        activeFeatures: number;
+        tmdbDrafts: number;
+    };
+}
 
 const props = defineProps<Props>();
-const page = usePage();
-const auth = page.props.auth as { user?: User };
+const page = usePage<PageProps>();
+
+const auth = page.props.auth;
 
 const statsArray = computed(() => [
     { title: 'Published Movies', value: props.stats.movies },

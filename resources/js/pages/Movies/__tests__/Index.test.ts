@@ -32,7 +32,7 @@ vi.mock('@inertiajs/vue3', () => ({
 
 // Mock VueUse
 vi.mock('@vueuse/core', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@vueuse/core')>();
+    const actual = (await importOriginal()) as Record<string, unknown>;
     return {
         ...actual,
         useDebounceFn: vi.fn((fn) => fn),

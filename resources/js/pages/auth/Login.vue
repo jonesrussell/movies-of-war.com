@@ -57,12 +57,12 @@ defineProps<{
                 </div>
 
                 <div class="grid gap-2">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
                         <Label for="password">Password</Label>
                         <TextLink
                             v-if="canResetPassword"
                             :href="request()"
-                            class="text-sm"
+                            class="shrink-0 whitespace-nowrap text-sm"
                             :tabindex="5"
                         >
                             Forgot password?
@@ -100,10 +100,10 @@ defineProps<{
             </div>
 
             <div
-                class="text-center text-sm text-muted-foreground"
+                class="space-x-1 text-center text-sm text-muted-foreground"
                 v-if="canRegister"
             >
-                Don't have an account?
+                <span>Don't have an account?</span>
                 <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
             </div>
         </Form>

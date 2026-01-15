@@ -120,6 +120,37 @@
     --ease-cinematic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --ease-smooth-out: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-dramatic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Container sizes - explicitly set to prevent Tailwind v4 bug where max-w-* uses --spacing-* instead of --container-* */
+    /* See: https://github.com/tailwindlabs/tailwindcss/discussions/17777 */
+    --container-3xs: 16rem;
+    --container-2xs: 18rem;
+    --container-xs: 20rem;
+    --container-sm: 24rem;
+    --container-md: 28rem;
+    --container-lg: 32rem;
+    --container-xl: 36rem;
+    --container-2xl: 42rem;
+    --container-3xl: 48rem;
+    --container-4xl: 56rem;
+    --container-5xl: 64rem;
+    --container-6xl: 72rem;
+    --container-7xl: 80rem;
+
+    /* Explicit max-width variables pointing to container sizes (workaround for Tailwind v4 bug) */
+    --max-width-3xs: var(--container-3xs);
+    --max-width-2xs: var(--container-2xs);
+    --max-width-xs: var(--container-xs);
+    --max-width-sm: var(--container-sm);
+    --max-width-md: var(--container-md);
+    --max-width-lg: var(--container-lg);
+    --max-width-xl: var(--container-xl);
+    --max-width-2xl: var(--container-2xl);
+    --max-width-3xl: var(--container-3xl);
+    --max-width-4xl: var(--container-4xl);
+    --max-width-5xl: var(--container-5xl);
+    --max-width-6xl: var(--container-6xl);
+    --max-width-7xl: var(--container-7xl);
 }
 
 /*
@@ -281,6 +312,16 @@
     /* Focus ring utility for consistent accessibility */
     .focus-ring {
         @apply outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950;
+    }
+
+    /* Override max-width utilities to use container sizes instead of spacing (Tailwind v4 bug workaround) */
+    /* See: https://github.com/tailwindlabs/tailwindcss/discussions/17777 */
+    .max-w-2xl {
+        max-width: var(--container-2xl, 42rem);
+    }
+
+    .max-w-3xl {
+        max-width: var(--container-3xl, 48rem);
     }
 }
 

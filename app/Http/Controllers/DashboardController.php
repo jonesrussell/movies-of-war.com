@@ -7,6 +7,7 @@ use App\Jobs\ImportTmdbMoviesJob;
 use App\Models\Movie;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -87,7 +88,18 @@ class DashboardController extends Controller
     public function importTmdbMovies(ImportTmdbMoviesRequest $request): RedirectResponse
     {
         $limit = $request->validated()['limit'] ?? 30;
-        $upcoming = $request->validated()['upcoming'] ?? false;
+        $upcoming = $request->boolean('upcoming');
+
+        if (app()->isLocal()) {
+            Log::info('TMDB import request received', [
+                'input' => $request->all(),
+                'validated' => $request->validated(),
+                'resolved' => [
+                    'limit' => $limit,
+                    'upcoming' => $upcoming,
+                ],
+            ]);
+        }
 
         ImportTmdbMoviesJob::dispatch($limit, $upcoming);
 

@@ -157,7 +157,15 @@ function handleImport() {
                                 <div class="flex items-center space-x-2">
                                     <Checkbox
                                         id="upcoming"
-                                        v-model:checked="form.upcoming"
+                                        :checked="form.upcoming"
+                                        @update:checked="
+                                            (value: unknown) =>
+                                                (form.upcoming = value === true)
+                                        "
+                                        @update:modelValue="
+                                            (value: unknown) =>
+                                                (form.upcoming = value === true)
+                                        "
                                         :disabled="form.processing"
                                     />
                                     <Label

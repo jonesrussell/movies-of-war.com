@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { AppPageProps } from '@/types';
-import type { User } from '@/types/models';
 
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';

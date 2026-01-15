@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { AppPageProps } from '@/types';
 import type { Movie } from '@/types';
-import type { User } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Check, Play, Plus } from 'lucide-vue-next';

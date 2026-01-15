@@ -15,9 +15,8 @@ withDefaults(defineProps<Props>(), {
 <template>
     <component
         :is="as"
-        :class="
-            cn('mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8', $props.class)
-        "
+        :class="cn('mx-auto w-full px-4 sm:px-6 lg:px-8', $props.class)"
+        style="max-width: min(1280px, 100vw - 2rem);"
     >
         <slot />
     </component>

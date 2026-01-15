@@ -87,8 +87,11 @@ const posterImage =
                     </Link>
                 </div>
 
-                <div class="grid gap-8 lg:grid-cols-12">
-                    <div class="lg:col-span-4">
+                <div
+                    class="movie-detail-grid grid gap-8 grid-cols-1"
+                    style="container-type: inline-size;"
+                >
+                    <div class="movie-detail-poster">
                         <img
                             :src="posterImage"
                             :alt="movie.title"
@@ -128,7 +131,7 @@ const posterImage =
                         </div>
                     </div>
 
-                    <div class="flex flex-col lg:col-span-8">
+                    <div class="movie-detail-content flex flex-col">
                         <div>
                             <div
                                 v-if="movie.is_upcoming"

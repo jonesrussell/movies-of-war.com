@@ -50,7 +50,7 @@ const user = page.props.auth.user;
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <div class="grid gap-2">
+                    <div class="form-group grid gap-2">
                         <Label for="name">Name</Label>
                         <Input
                             id="name"
@@ -61,10 +61,10 @@ const user = page.props.auth.user;
                             autocomplete="name"
                             placeholder="Full name"
                         />
-                        <InputError class="mt-2" :message="errors.name" />
+                        <InputError class="error-message mt-2" :message="errors.name" />
                     </div>
 
-                    <div class="grid gap-2">
+                    <div class="form-group grid gap-2">
                         <Label for="email">Email address</Label>
                         <Input
                             id="email"
@@ -76,7 +76,7 @@ const user = page.props.auth.user;
                             autocomplete="username"
                             placeholder="Email address"
                         />
-                        <InputError class="mt-2" :message="errors.email" />
+                        <InputError class="error-message mt-2" :message="errors.email" />
                     </div>
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">

@@ -41,7 +41,7 @@ defineProps<{
             class="flex flex-col gap-6"
         >
             <div class="grid gap-6">
-                <div class="grid gap-2">
+                <div class="form-group grid gap-2">
                     <Label for="email">Email address</Label>
                     <Input
                         id="email"
@@ -53,10 +53,10 @@ defineProps<{
                         autocomplete="email"
                         placeholder="email@example.com"
                     />
-                    <InputError :message="errors.email" />
+                    <InputError :message="errors.email" class="error-message" />
                 </div>
 
-                <div class="grid gap-2">
+                <div class="form-group grid gap-2">
                     <div
                         class="flex flex-wrap items-center justify-between gap-2"
                     >
@@ -79,7 +79,7 @@ defineProps<{
                         autocomplete="current-password"
                         placeholder="Password"
                     />
-                    <InputError :message="errors.password" />
+                    <InputError :message="errors.password" class="error-message" />
                 </div>
 
                 <div class="flex items-center justify-between">

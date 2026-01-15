@@ -26,7 +26,7 @@ import { store } from '@/routes/register';
             class="flex flex-col gap-6"
         >
             <div class="grid gap-6">
-                <div class="grid gap-2">
+                <div class="form-group grid gap-2">
                     <Label for="name">Name</Label>
                     <Input
                         id="name"
@@ -38,10 +38,10 @@ import { store } from '@/routes/register';
                         name="name"
                         placeholder="Full name"
                     />
-                    <InputError :message="errors.name" />
+                    <InputError :message="errors.name" class="error-message" />
                 </div>
 
-                <div class="grid gap-2">
+                <div class="form-group grid gap-2">
                     <Label for="email">Email address</Label>
                     <Input
                         id="email"
@@ -52,10 +52,10 @@ import { store } from '@/routes/register';
                         name="email"
                         placeholder="email@example.com"
                     />
-                    <InputError :message="errors.email" />
+                    <InputError :message="errors.email" class="error-message" />
                 </div>
 
-                <div class="grid gap-2">
+                <div class="form-group grid gap-2">
                     <Label for="password">Password</Label>
                     <Input
                         id="password"
@@ -66,10 +66,10 @@ import { store } from '@/routes/register';
                         name="password"
                         placeholder="Password"
                     />
-                    <InputError :message="errors.password" />
+                    <InputError :message="errors.password" class="error-message" />
                 </div>
 
-                <div class="grid gap-2">
+                <div class="form-group grid gap-2">
                     <Label for="password_confirmation">Confirm password</Label>
                     <Input
                         id="password_confirmation"
@@ -80,7 +80,7 @@ import { store } from '@/routes/register';
                         name="password_confirmation"
                         placeholder="Confirm password"
                     />
-                    <InputError :message="errors.password_confirmation" />
+                    <InputError :message="errors.password_confirmation" class="error-message" />
                 </div>
 
                 <Button

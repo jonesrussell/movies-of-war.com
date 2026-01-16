@@ -64,8 +64,20 @@ class XPostController extends Controller
         $validated = $request->validated();
 
         $validated['user_id'] = auth()->id();
+        $publishImmediately = $validated['publish_immediately'] ?? false;
+
+        // Remove publish_immediately from validated data before creating the post
+        unset($validated['publish_immediately']);
 
         $xPost = XPost::create($validated);
+
+        // If publish immediately is requested, dispatch the publish job
+        if ($publishImmediately) {
+            PublishXPost::dispatch($xPost);
+
+            return redirect()->route('admin.x-posts.index')
+                ->with('success', 'X post queued for immediate publishing.');
+        }
 
         $message = match ($xPost->status) {
             XPost::STATUS_SCHEDULED => 'X post scheduled for '.

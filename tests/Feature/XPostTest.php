@@ -182,6 +182,30 @@ test('scheduled post requires future scheduled_for date', function () {
     $response->assertSessionHasErrors('scheduled_for');
 });
 
+test('scheduled post requires scheduled_for at least 1 minute in future', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    // Test that 30 seconds in the future is rejected
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'Test',
+        'status' => 'scheduled',
+        'scheduled_for' => now()->addSeconds(30)->toDateTimeString(),
+    ]);
+
+    $response->assertSessionHasErrors('scheduled_for');
+
+    // Test that 2 minutes in the future is accepted
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'Test',
+        'status' => 'scheduled',
+        'scheduled_for' => now()->addMinutes(2)->toDateTimeString(),
+    ]);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('success');
+});
+
 test('thread parts cannot exceed 25 tweets', function () {
     $admin = User::factory()->create(['is_admin' => true]);
     $this->actingAs($admin);
@@ -217,7 +241,7 @@ test('admin can schedule a draft x-post', function () {
     $xPost = XPost::factory()->create(['status' => 'draft']);
     $this->actingAs($admin);
 
-    $scheduledFor = now()->addHours(3);
+    $scheduledFor = now()->addMinutes(2);
 
     $response = $this->post(route('admin.x-posts.schedule', $xPost), [
         'scheduled_for' => $scheduledFor->toDateTimeString(),
@@ -268,6 +292,30 @@ test('admin can publish a draft x-post immediately', function () {
 
     $response->assertRedirect(route('admin.x-posts.index'));
     $response->assertSessionHas('success');
+
+    Queue::assertPushed(PublishXPost::class, function ($job) use ($xPost) {
+        return $job->xPost->id === $xPost->id;
+    });
+});
+
+test('admin can create x-post with publish immediately', function () {
+    Queue::fake();
+
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $response = $this->post(route('admin.x-posts.store'), [
+        'content' => 'Publish immediately test',
+        'status' => 'draft',
+        'publish_immediately' => true,
+    ]);
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('success', 'X post queued for immediate publishing.');
+
+    $xPost = XPost::where('content', 'Publish immediately test')->first();
+    expect($xPost)->not->toBeNull();
+    expect($xPost->status)->toBe('draft');
 
     Queue::assertPushed(PublishXPost::class, function ($job) use ($xPost) {
         return $job->xPost->id === $xPost->id;

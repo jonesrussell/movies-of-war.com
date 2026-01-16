@@ -4,6 +4,7 @@ import { Plus, Trash2, X } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import DateTimePicker from '@/components/ui/DateTimePicker.vue';
 
 interface Props {
     maxTweetLength: number;
@@ -15,8 +16,9 @@ const form = useForm({
     content: '',
     thread_parts: [] as string[],
     media_urls: [] as string[],
-    status: 'draft' as 'draft' | 'scheduled',
+    status: 'draft' as 'draft' | 'scheduled' | 'publish_immediately',
     scheduled_for: '',
+    publish_immediately: false,
 });
 
 const characterCount = computed(() => props.maxTweetLength - (form.content?.length || 0));
@@ -25,6 +27,7 @@ const threadCharacterCounts = computed(() =>
 );
 
 const isScheduled = computed(() => form.status === 'scheduled');
+const isPublishImmediately = computed(() => form.status === 'publish_immediately');
 
 function addThreadPart() {
     if (form.thread_parts.length < 25) {
@@ -47,7 +50,13 @@ function removeMediaUrl(index: number) {
 }
 
 function submit() {
-    form.post('/x-posts', {
+    const formData = {
+        ...form.data(),
+        publish_immediately: form.status === 'publish_immediately',
+        status: form.status === 'publish_immediately' ? 'draft' : form.status,
+    };
+
+    form.transform(() => formData).post('/x-posts', {
         onSuccess: () => {
             router.visit('/x-posts');
         },
@@ -220,25 +229,34 @@ function submit() {
                                 />
                                 <span class="text-sm text-zinc-300">Scheduled</span>
                             </label>
+                            <label class="flex cursor-pointer items-center gap-2">
+                                <input
+                                    v-model="form.status"
+                                    type="radio"
+                                    value="publish_immediately"
+                                    class="text-red-600 focus:ring-red-500"
+                                />
+                                <span class="text-sm text-zinc-300">Publish Immediately</span>
+                            </label>
                         </div>
                     </div>
 
                     <!-- Scheduled For -->
-                    <div v-if="isScheduled">
+                    <div>
                         <label
                             for="scheduled_for"
                             class="block text-sm font-medium text-zinc-300"
                         >
                             Schedule For
-                            <span class="text-red-500">*</span>
+                            <span v-if="isScheduled" class="text-red-500">*</span>
                         </label>
-                        <input
-                            id="scheduled_for"
-                            v-model="form.scheduled_for"
-                            type="datetime-local"
-                            required
-                            class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white focus:border-red-500 focus:ring-red-500"
-                        />
+                        <div class="mt-1">
+                            <DateTimePicker
+                                id="scheduled_for"
+                                v-model="form.scheduled_for"
+                                :required="isScheduled"
+                            />
+                        </div>
                         <div
                             v-if="form.errors.scheduled_for"
                             class="mt-1 text-sm text-red-500"
@@ -263,9 +281,11 @@ function submit() {
                             {{
                                 form.processing
                                     ? 'Creating...'
-                                    : isScheduled
-                                      ? 'Schedule Post'
-                                      : 'Create Draft'
+                                    : isPublishImmediately
+                                      ? 'Publish Now'
+                                      : isScheduled
+                                        ? 'Schedule Post'
+                                        : 'Create Draft'
                             }}
                         </button>
                     </div>

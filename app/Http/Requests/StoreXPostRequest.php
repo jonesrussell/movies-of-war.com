@@ -45,8 +45,13 @@ class StoreXPostRequest extends FormRequest
                 'required_if:status,'.XPost::STATUS_SCHEDULED,
                 'nullable',
                 'date',
-                'after:now',
+                function ($attribute, $value, $fail) {
+                    if ($value && \Carbon\Carbon::parse($value)->lte(now()->addMinute())) {
+                        $fail('The scheduled time must be at least 1 minute in the future.');
+                    }
+                },
             ],
+            'publish_immediately' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -64,7 +69,7 @@ class StoreXPostRequest extends FormRequest
             'thread_parts.*.max' => 'Each tweet in the thread cannot exceed '.XPost::MAX_TWEET_LENGTH.' characters.',
             'media_urls.max' => 'You can attach a maximum of 4 media files per post.',
             'scheduled_for.required_if' => 'A scheduled post must have a publish time.',
-            'scheduled_for.after' => 'The scheduled time must be in the future.',
+            'scheduled_for.0' => 'The scheduled time must be at least 1 minute in the future.',
         ];
     }
 }

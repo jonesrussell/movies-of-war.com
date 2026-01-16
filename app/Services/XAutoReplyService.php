@@ -134,10 +134,6 @@ class XAutoReplyService
 
     /**
      * Test if a text matches a rule.
-     *
-     * @param  XAutoReplyRule  $rule
-     * @param  string  $text
-     * @return bool
      */
     public function testRule(XAutoReplyRule $rule, string $text): bool
     {

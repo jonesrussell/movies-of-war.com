@@ -123,7 +123,6 @@ class XContentDiscoveryService
      * Save a curated post.
      *
      * @param  array  $tweetData  Tweet data from API
-     * @return XCuratedPost
      */
     public function saveCuratedPost(array $tweetData): XCuratedPost
     {
@@ -141,7 +140,6 @@ class XContentDiscoveryService
     /**
      * Get curated feed.
      *
-     * @param  int  $limit
      * @param  array  $filters  Filters (featured, high_engagement, etc.)
      * @return Collection Curated posts
      */

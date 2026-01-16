@@ -95,8 +95,6 @@ class XAnalyticsService
     /**
      * Get performance report for a date range.
      *
-     * @param  Carbon|null  $startDate
-     * @param  Carbon|null  $endDate
      * @return array Performance metrics
      */
     public function getPerformanceReport(?Carbon $startDate = null, ?Carbon $endDate = null): array
@@ -131,7 +129,6 @@ class XAnalyticsService
     /**
      * Get top performing posts.
      *
-     * @param  int  $limit
      * @param  string  $metric  Sort by: impressions, likes, retweets, etc.
      * @return Collection Top performing posts with analytics
      */
@@ -151,7 +148,6 @@ class XAnalyticsService
     /**
      * Calculate engagement rate (likes + retweets + replies) / impressions.
      *
-     * @param  Collection  $analytics
      * @return float Engagement rate percentage
      */
     protected function calculateEngagementRate(Collection $analytics): float

@@ -18,7 +18,6 @@ class XTrendMonitoringService
     /**
      * Search for a specific keyword and store results.
      *
-     * @param  XTrendKeyword  $keyword
      * @param  int  $maxResults  Maximum results to fetch
      * @return int Number of results found
      *
@@ -113,7 +112,6 @@ class XTrendMonitoringService
     /**
      * Get recent trends.
      *
-     * @param  int  $limit
      * @return Collection Recent trend results
      */
     public function getRecentTrends(int $limit = 20): Collection
@@ -129,7 +127,6 @@ class XTrendMonitoringService
     /**
      * Build search query based on keyword type.
      *
-     * @param  XTrendKeyword  $keyword
      * @return string Search query
      */
     protected function buildSearchQuery(XTrendKeyword $keyword): string

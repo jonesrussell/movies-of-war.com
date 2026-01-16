@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
 
-const port = 5173;
+const port = 5175;
 const isDdev = !!process.env.DDEV_PRIMARY_URL;
 const ddevUrl = process.env.DDEV_PRIMARY_URL || '';
 const ddevHostname = isDdev ? new URL(ddevUrl).hostname : 'localhost';

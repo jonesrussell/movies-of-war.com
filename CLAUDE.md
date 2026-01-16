@@ -241,6 +241,85 @@ Movies have three statuses managed through `App\Models\Movie` constants:
 - `/x-posts/{id}/publish` - Publish immediately
 - `/x-posts/{id}/cancel` - Cancel a scheduled post
 
+### X API Advanced Features
+
+**X Analytics** (`/dashboard/x-analytics`)
+- View performance metrics (impressions, likes, retweets, engagement rate)
+- Top performing posts analysis
+- Date range filtering
+- Manual sync: `POST /x-analytics/sync` - Sync metrics for all published posts
+- Scheduled: `x:sync-analytics` runs every 15 minutes
+
+**Trend Monitoring** (`/dashboard/x-trends`)
+- Monitor keywords, hashtags, and phrases
+- View trending tweets matching monitored keywords
+- Manage active/inactive keywords
+- Search results stored in `x_trend_results` table
+- Scheduled: `x:monitor-trends` runs every 30 minutes
+
+**Auto-Replies** (`/dashboard/x-auto-replies`)
+- Configure rules for automatic replies to mentions
+- Trigger types: mention, hashtag, keyword
+- Priority-based rule matching
+- Reply templates with variable substitution
+- Scheduled: `x:process-auto-replies` runs every 10 minutes
+
+**Content Discovery** (`/dashboard/x-content-discovery`)
+- Discover and curate high-quality war movie content
+- Filter by engagement metrics (min likes, retweets)
+- Mark posts as featured
+- Add notes to curated posts
+- Scheduled: `x:discover-content` runs daily at 2 AM
+
+**Auto-Content Generation**
+- Generate "War Movie of the Day" posts automatically
+- Selects random published movie from database
+- Creates draft post with movie details and poster
+- Scheduled: `x:generate-content` runs daily at 8 AM
+
+**Website Integration**
+- Public API endpoint: `/api/x-feed` - Returns latest 5 published X posts
+- XFeedWidget component displays feed on homepage
+- Automatic updates via public API
+
+**Console Commands:**
+```bash
+# Sync analytics for published posts
+ddev artisan x:sync-analytics --limit=50
+
+# Monitor all active trend keywords
+ddev artisan x:monitor-trends
+
+# Process mentions and send auto-replies
+ddev artisan x:process-auto-replies --limit=10
+
+# Discover high-quality content
+ddev artisan x:discover-content --min-likes=10 --max-results=50
+
+# Generate "War Movie of the Day" post
+ddev artisan x:generate-content
+```
+
+**Database Tables:**
+- `x_analytics` - Historical tweet performance metrics
+- `x_trend_keywords` - Monitored keywords/hashtags
+- `x_trend_results` - Trending tweets found for keywords
+- `x_auto_reply_rules` - Auto-reply rule configurations
+- `x_curated_posts` - Curated content from discovery
+
+**Services:**
+- `XApiService` - Core X API wrapper (posting, searching, metrics, mentions)
+- `XAnalyticsService` - Analytics sync and reporting
+- `XTrendMonitoringService` - Keyword monitoring and trend tracking
+- `XAutoReplyService` - Auto-reply processing
+- `XContentDiscoveryService` - Content discovery and curation
+
+**Free Tier Limitations:**
+- ~500 posts/month
+- Limited API read requests
+- Some features (real-time filtered stream) require Pro tier
+- Rate limiting implemented to respect API limits
+
 ### Frontend Structure
 
 **Public Pages** (no auth required):
@@ -526,7 +605,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ## Test Enforcement
 
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `ddev artisan test --compact` with a specific filename or filter.
+- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
 
 === inertia-laravel/core rules ===
 
@@ -570,8 +649,8 @@ Route::get('/users', function () {
 
 ## Do Things the Laravel Way
 
-- Use `ddev artisan make:` commands to create new files (i.e. migrations, controllers, models, etc.). You can list available Artisan commands using the `list-artisan-commands` tool.
-- If you're creating a generic PHP class, use `ddev artisan make:class`.
+- Use `php artisan make:` commands to create new files (i.e. migrations, controllers, models, etc.). You can list available Artisan commands using the `list-artisan-commands` tool.
+- If you're creating a generic PHP class, use `php artisan make:class`.
 - Pass `--no-interaction` to all Artisan commands to ensure they work without user input. You should also pass the correct `--options` to ensure correct behavior.
 
 ### Database
@@ -582,7 +661,7 @@ Route::get('/users', function () {
 - Use Laravel's query builder for very complex database operations.
 
 ### Model Creation
-- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `list-artisan-commands` to check the available options to `ddev artisan make:model`.
+- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `list-artisan-commands` to check the available options to `php artisan make:model`.
 
 ### APIs & Eloquent Resources
 - For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.
@@ -606,7 +685,7 @@ Route::get('/users', function () {
 ### Testing
 - When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
 - Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
-- When creating tests, make use of `ddev artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
+- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
 
 ### Vite Error
 - If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
@@ -643,7 +722,7 @@ Wayfinder generates TypeScript functions and types for Laravel controllers and r
 - Always use the `search-docs` tool to check Wayfinder correct usage before implementing any features.
 - Always prefer named imports for tree-shaking (e.g., `import { show } from '@/actions/...'`).
 - Avoid default controller imports (prevents tree-shaking).
-- Run `ddev artisan wayfinder:generate` after route changes if Vite plugin isn't installed.
+- Run `php artisan wayfinder:generate` after route changes if Vite plugin isn't installed.
 
 ### Feature Overview
 - Form Support: Use `.form()` with `--with-form` flag for HTML form attributes — `<form {...store.form()}>` → `action="/posts" method="post"`.
@@ -689,8 +768,8 @@ If your application uses the `<Form>` component from Inertia, you can use Wayfin
 
 ## Laravel Pint Code Formatter
 
-- You must run `ddev exec vendor/bin/pint --dirty` before finalizing changes to ensure your code matches the project's expected style.
-- Do not run `vendor/bin/pint --test`, simply run `ddev exec vendor/bin/pint` to fix any formatting issues.
+- You must run `vendor/bin/pint --dirty` before finalizing changes to ensure your code matches the project's expected style.
+- Do not run `vendor/bin/pint --test`, simply run `vendor/bin/pint` to fix any formatting issues.
 
 === pest/core rules ===
 
@@ -699,7 +778,7 @@ If your application uses the `<Form>` component from Inertia, you can use Wayfin
 - If you need to verify a feature is working, write or update a Unit / Feature test.
 
 ### Pest Tests
-- All tests must be written using Pest. Use `ddev artisan make:test --pest {name}`.
+- All tests must be written using Pest. Use `php artisan make:test --pest {name}`.
 - You must not remove any tests or test files from the tests directory without approval. These are not temporary or helper files - these are core to the application.
 - Tests should test all of the happy paths, failure paths, and weird paths.
 - Tests live in the `tests/Feature` and `tests/Unit` directories.
@@ -712,9 +791,9 @@ it('is true', function () {
 
 ### Running Tests
 - Run the minimal number of tests using an appropriate filter before finalizing code edits.
-- To run all tests: `ddev artisan test --compact`.
-- To run all tests in a file: `ddev artisan test --compact tests/Feature/ExampleTest.php`.
-- To filter on a particular test name: `ddev artisan test --compact --filter=testName` (recommended after making a change to a related file).
+- To run all tests: `php artisan test --compact`.
+- To run all tests in a file: `php artisan test --compact tests/Feature/ExampleTest.php`.
+- To filter on a particular test name: `php artisan test --compact --filter=testName` (recommended after making a change to a related file).
 - When the tests relating to your changes are passing, ask the user if they would like to run the entire test suite to ensure everything is still passing.
 
 ### Pest Assertions

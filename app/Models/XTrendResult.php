@@ -19,7 +19,7 @@ class XTrendResult extends Model
         'like_count',
         'retweet_count',
         'reply_count',
-        'created_at',
+        'tweet_created_at',
         'url',
         'is_actioned',
         'actioned_at',
@@ -28,7 +28,7 @@ class XTrendResult extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'datetime',
+            'tweet_created_at' => 'datetime',
             'is_actioned' => 'boolean',
             'actioned_at' => 'datetime',
             'like_count' => 'integer',
@@ -54,7 +54,7 @@ class XTrendResult extends Model
 
     public function scopeRecent($query, int $days = 7)
     {
-        return $query->where('created_at', '>=', now()->subDays($days));
+        return $query->where('tweet_created_at', '>=', now()->subDays($days));
     }
 
     public function markAsActioned(): void

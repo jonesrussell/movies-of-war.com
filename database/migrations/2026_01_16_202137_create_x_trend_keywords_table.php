@@ -19,8 +19,6 @@ return new class extends Migration
             $table->timestamp('last_searched_at')->nullable();
             $table->unsignedInteger('match_count')->default(0);
             $table->timestamps();
-
-            $table->index('is_active');
         });
     }
 

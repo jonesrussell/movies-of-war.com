@@ -23,8 +23,6 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false)->index();
             $table->text('notes')->nullable();
             $table->timestamps();
-
-            $table->index('discovered_at');
         });
     }
 

@@ -56,7 +56,7 @@ class XTrendMonitoringService
                         'like_count' => $metrics['like_count'] ?? 0,
                         'retweet_count' => $metrics['retweet_count'] ?? 0,
                         'reply_count' => $metrics['reply_count'] ?? 0,
-                        'created_at' => isset($tweet['created_at']) ? Carbon::parse($tweet['created_at']) : now(),
+                        'tweet_created_at' => isset($tweet['created_at']) ? Carbon::parse($tweet['created_at']) : now(),
                         'url' => "https://x.com/{$author['username']}/status/{$tweet['id']}",
                     ]);
 

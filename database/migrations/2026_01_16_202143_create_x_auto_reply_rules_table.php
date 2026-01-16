@@ -20,8 +20,6 @@ return new class extends Migration
             $table->boolean('is_active')->default(true)->index();
             $table->unsignedInteger('priority')->default(0)->index();
             $table->timestamps();
-
-            $table->index('priority');
         });
     }
 

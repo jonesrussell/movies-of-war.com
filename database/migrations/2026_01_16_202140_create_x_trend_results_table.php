@@ -20,14 +20,13 @@ return new class extends Migration
             $table->unsignedInteger('like_count')->default(0);
             $table->unsignedInteger('retweet_count')->default(0);
             $table->unsignedInteger('reply_count')->default(0);
-            $table->timestamp('created_at')->nullable()->comment('Tweet creation time');
+            $table->timestamp('tweet_created_at')->nullable()->comment('Tweet creation time');
             $table->string('url')->nullable();
             $table->boolean('is_actioned')->default(false)->index();
             $table->timestamp('actioned_at')->nullable();
             $table->timestamps();
 
-            $table->index(['trend_keyword_id', 'created_at']);
-            $table->index('is_actioned');
+            $table->index(['trend_keyword_id', 'tweet_created_at']);
         });
     }
 

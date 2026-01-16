@@ -71,7 +71,7 @@ function unpublishMovie(movie: Movie) {
     <AppSidebarLayout>
         <Head title="Manage Movies - Admin" />
 
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8 flex items-center justify-between">
                 <div>

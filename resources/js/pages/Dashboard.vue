@@ -68,7 +68,7 @@ const statsArray = computed(() => {
     <Head title="Dashboard - Movies of War" />
 
     <AppSidebarLayout>
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <!-- Stats Grid -->
             <StatsGrid :stats="statsArray" class="mb-8" />
 

@@ -3,13 +3,18 @@ import type { User } from '@/types/models';
 
 import { Link, usePage } from '@inertiajs/vue3';
 import {
+    BarChart3,
     Bookmark,
     BookOpen,
     Database,
     Film,
     Folder,
     LayoutGrid,
+    MessageSquare,
+    Reply,
+    Search,
     Star,
+    TrendingUp,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 
@@ -65,6 +70,31 @@ const mainNavItems = computed<NavItem[]>(() => [
                   title: 'Featured Slots',
                   href: '/dashboard/featured-slots',
                   icon: Star,
+              },
+              {
+                  title: 'X Posts',
+                  href: '/x-posts',
+                  icon: MessageSquare,
+              },
+              {
+                  title: 'X Analytics',
+                  href: '/dashboard/x-analytics',
+                  icon: BarChart3,
+              },
+              {
+                  title: 'X Trends',
+                  href: '/dashboard/x-trends',
+                  icon: TrendingUp,
+              },
+              {
+                  title: 'X Auto-Replies',
+                  href: '/dashboard/x-auto-replies',
+                  icon: Reply,
+              },
+              {
+                  title: 'X Content Discovery',
+                  href: '/dashboard/x-content-discovery',
+                  icon: Search,
               },
           ]
         : []),

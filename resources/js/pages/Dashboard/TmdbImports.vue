@@ -108,7 +108,7 @@ function handleImport() {
     <Head title="TMDB Imports - Dashboard" />
 
     <AppSidebarLayout>
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8">
                 <div class="mb-6 flex items-center justify-between">
                     <div>

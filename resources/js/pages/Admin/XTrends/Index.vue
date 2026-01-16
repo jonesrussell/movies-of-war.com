@@ -37,7 +37,7 @@ function deleteKeyword(keyword: XTrendKeyword) {
     <AppSidebarLayout>
         <Head title="Trend Monitoring - Admin" />
 
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-white">Trend Monitoring</h1>
                 <p class="mt-2 text-zinc-400">Monitor keywords and hashtags on X</p>

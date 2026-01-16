@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ImportTmdbMoviesRequest;
 use App\Jobs\ImportTmdbMoviesJob;
 use App\Models\Movie;
+use App\Models\XPost;
+use App\Models\XTrendKeyword;
+use App\Services\XAnalyticsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -13,6 +16,10 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        protected XAnalyticsService $analyticsService
+    ) {}
+
     public function index(Request $request): Response
     {
         $user = auth()->user();
@@ -23,6 +30,17 @@ class DashboardController extends Controller
             'activeFeatures' => \App\Models\FeaturedSlot::active()->count(),
             'tmdbDrafts' => $user->is_admin ? Movie::draft()->count() : 0,
         ];
+
+        // Add X API stats for admins
+        if ($user->is_admin) {
+            $xPerformanceReport = $this->analyticsService->getPerformanceReport(now()->subDays(30), now());
+
+            $stats['x_published_posts'] = XPost::published()->count();
+            $stats['x_scheduled_posts'] = XPost::scheduled()->count();
+            $stats['x_failed_posts'] = XPost::failed()->count();
+            $stats['x_total_impressions'] = $xPerformanceReport['total_impressions'] ?? 0;
+            $stats['x_active_keywords'] = XTrendKeyword::active()->count();
+        }
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,

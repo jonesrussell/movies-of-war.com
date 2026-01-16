@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class XPost extends Model
 {
@@ -48,6 +49,16 @@ class XPost extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function analytics(): HasMany
+    {
+        return $this->hasMany(XAnalytics::class);
+    }
+
+    public function latestAnalytics()
+    {
+        return $this->hasOne(XAnalytics::class)->latest('recorded_at');
     }
 
     public function scopeDraft($query)

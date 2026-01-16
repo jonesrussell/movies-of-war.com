@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\XPost;
+use App\Services\XApiService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -109,41 +110,23 @@ class PublishXPost implements ShouldQueue
     protected function uploadMedia(): array
     {
         $mediaIds = [];
+        $xApiService = new XApiService;
 
-        // TODO: Implement with atymic/twitter package
-        // Example approach:
-        //
-        // use Atymic\Twitter\Facade\Twitter;
-        //
-        // foreach ($this->xPost->media_urls as $mediaPath) {
-        //     // Determine if it's a local file or URL
-        //     if (filter_var($mediaPath, FILTER_VALIDATE_URL)) {
-        //         // Download remote image first
-        //         $fileContent = file_get_contents($mediaPath);
-        //         $tempPath = tempnam(sys_get_temp_dir(), 'xpost_');
-        //         file_put_contents($tempPath, $fileContent);
-        //         $mediaPath = $tempPath;
-        //     } elseif (! file_exists($mediaPath)) {
-        //         // Check storage path
-        //         $mediaPath = storage_path('app/public/' . $mediaPath);
-        //     }
-        //
-        //     if (! file_exists($mediaPath)) {
-        //         throw new Exception("Media file not found: {$mediaPath}");
-        //     }
-        //
-        //     // Upload using Twitter facade (v1.1 media endpoint)
-        //     $upload = Twitter::uploadMedia(['media' => $mediaPath]);
-        //
-        //     if (isset($upload->media_id_string)) {
-        //         $mediaIds[] = $upload->media_id_string;
-        //     }
-        //
-        //     // Clean up temp file if created
-        //     if (isset($tempPath) && file_exists($tempPath)) {
-        //         unlink($tempPath);
-        //     }
-        // }
+        foreach ($this->xPost->media_urls as $mediaPath) {
+            try {
+                $mediaId = $xApiService->uploadMedia($mediaPath);
+                $mediaIds[] = $mediaId;
+            } catch (Exception $e) {
+                Log::warning('Failed to upload media for XPost', [
+                    'x_post_id' => $this->xPost->id,
+                    'media_path' => $mediaPath,
+                    'error' => $e->getMessage(),
+                ]);
+
+                // Continue with other media files, but log the error
+                // If all media fails, this will be caught by the outer try-catch
+            }
+        }
 
         return $mediaIds;
     }
@@ -167,50 +150,29 @@ class PublishXPost implements ShouldQueue
     {
         $firstTweetId = null;
         $previousTweetId = null;
+        $xApiService = new XApiService;
 
-        // TODO: Implement with atymic/twitter package
-        // Example approach:
-        //
-        // use Atymic\Twitter\Facade\Twitter;
-        //
-        // foreach ($threadContent as $index => $content) {
-        //     $params = ['text' => $content];
-        //
-        //     // Attach media to first tweet only
-        //     if ($index === 0 && ! empty($mediaIds)) {
-        //         $params['media'] = ['media_ids' => $mediaIds];
-        //     }
-        //
-        //     // For thread replies, reference previous tweet
-        //     if ($previousTweetId !== null) {
-        //         $params['reply'] = ['in_reply_to_tweet_id' => $previousTweetId];
-        //     }
-        //
-        //     // Post tweet using API v2
-        //     $response = Twitter::forApiV2()->tweet()->performRequest('POST', $params);
-        //
-        //     if (! isset($response['data']['id'])) {
-        //         throw new Exception('Failed to get tweet ID from X API response');
-        //     }
-        //
-        //     $tweetId = $response['data']['id'];
-        //
-        //     // Store the first tweet ID to return
-        //     if ($firstTweetId === null) {
-        //         $firstTweetId = $tweetId;
-        //     }
-        //
-        //     $previousTweetId = $tweetId;
-        //
-        //     // Rate limiting: avoid hitting API limits
-        //     if (count($threadContent) > 1 && $index < count($threadContent) - 1) {
-        //         sleep(1); // Brief pause between thread tweets
-        //     }
-        // }
+        foreach ($threadContent as $index => $content) {
+            // Attach media to first tweet only
+            $tweetMediaIds = ($index === 0 && ! empty($mediaIds)) ? $mediaIds : null;
 
-        // TEMPORARY: For development, return a fake tweet ID
-        // Remove this when implementing actual API calls
-        $firstTweetId = 'fake_'.time();
+            // Post tweet (will include reply info if previousTweetId is set)
+            $tweetData = $xApiService->postTweet($content, $tweetMediaIds, $previousTweetId);
+            $tweetId = $tweetData['id'];
+
+            // Store the first tweet ID to return
+            if ($firstTweetId === null) {
+                $firstTweetId = $tweetId;
+            }
+
+            $previousTweetId = $tweetId;
+
+            // Rate limiting: avoid hitting API limits
+            // Brief pause between thread tweets to respect rate limits
+            if (count($threadContent) > 1 && $index < count($threadContent) - 1) {
+                sleep(1);
+            }
+        }
 
         return $firstTweetId;
     }

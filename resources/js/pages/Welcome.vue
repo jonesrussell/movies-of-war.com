@@ -10,6 +10,7 @@ import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
+import XFeedWidget from '@/components/public/XFeedWidget.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {
@@ -108,6 +109,10 @@ defineProps<Props>();
                             :movie="movie"
                         />
                     </MovieGrid>
+                </div>
+
+                <div class="mx-auto w-full max-w-3xl">
+                    <XFeedWidget />
                 </div>
             </PublicContainer>
         </PublicSection>

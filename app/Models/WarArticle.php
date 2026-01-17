@@ -33,11 +33,23 @@ class WarArticle extends BaseArticle
     ];
 
     /**
+     * Override tags relationship to use article_tag table.
+     */
+    public function tags(): BelongsToMany
+    {
+        $tagModel = config('redis-articles.models.tag');
+
+        return $this->belongsToMany($tagModel, 'article_tag', 'article_id', 'tag_id')
+            ->withTimestamps()
+            ->withPivot('confidence');
+    }
+
+    /**
      * Many-to-many relationship with movies.
      */
     public function movies(): BelongsToMany
     {
-        return $this->belongsToMany(Movie::class, 'article_movie')
+        return $this->belongsToMany(Movie::class, 'article_movie', 'article_id', 'movie_id')
             ->withTimestamps()
             ->withPivot('confidence');
     }

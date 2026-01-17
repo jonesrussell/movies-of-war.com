@@ -53,10 +53,10 @@ class XContentDiscoveryController extends Controller
         try {
             $discovered = $this->discoveryService->discoverContent($filters);
 
-            return redirect()->route('admin.x-content-discovery.index')
+            return redirect()->route('dashboard.x-content-discovery')
                 ->with('success', "Discovered {$discovered} new posts.");
         } catch (\Exception $e) {
-            return redirect()->route('admin.x-content-discovery.index')
+            return redirect()->route('dashboard.x-content-discovery')
                 ->with('error', 'Failed to discover content: '.$e->getMessage());
         }
     }
@@ -78,7 +78,7 @@ class XContentDiscoveryController extends Controller
 
         $this->discoveryService->saveCuratedPost($validated);
 
-        return redirect()->route('admin.x-content-discovery.index')
+        return redirect()->route('dashboard.x-content-discovery')
             ->with('success', 'Curated post added.');
     }
 
@@ -94,7 +94,7 @@ class XContentDiscoveryController extends Controller
 
         $post->update($validated);
 
-        return redirect()->route('admin.x-content-discovery.index')
+        return redirect()->route('dashboard.x-content-discovery')
             ->with('success', 'Curated post updated.');
     }
 
@@ -105,7 +105,7 @@ class XContentDiscoveryController extends Controller
     {
         $post->delete();
 
-        return redirect()->route('admin.x-content-discovery.index')
+        return redirect()->route('dashboard.x-content-discovery')
             ->with('success', 'Curated post removed.');
     }
 }

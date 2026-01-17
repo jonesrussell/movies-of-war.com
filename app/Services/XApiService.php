@@ -144,14 +144,13 @@ class XApiService
     {
         try {
             $params = array_merge([
-                'query' => $query,
                 'max_results' => $options['max_results'] ?? 10,
                 'tweet.fields' => 'created_at,author_id,public_metrics,text',
                 'expansions' => 'author_id',
                 'user.fields' => 'username,name',
             ], $options);
 
-            $response = Twitter::forApiV2()->tweet()->searchRecent($params);
+            $response = Twitter::forApiV2()->searchRecent($query, $params);
 
             return $response;
         } catch (Exception $e) {
@@ -180,7 +179,7 @@ class XApiService
                 'tweet.fields' => 'public_metrics,created_at',
             ];
 
-            $response = Twitter::forApiV2()->tweet()->findById($tweetId, $params);
+            $response = Twitter::forApiV2()->findById($tweetId, $params);
 
             if (! isset($response['data'])) {
                 throw new Exception('Failed to get tweet metrics from X API response');

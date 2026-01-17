@@ -44,21 +44,21 @@ class LinkArticlesToMovies
             }
         }
 
-        if (!empty($movieData)) {
+        if (! empty($movieData)) {
             $article->movies()->sync($movieData);
         }
     }
 
     protected function extractKeywords($article): array
     {
-        $text = $article->title . ' ' . $article->content;
+        $text = $article->title.' '.$article->content;
 
         // Remove common words and extract meaningful keywords (3+ chars)
         $words = str_word_count(strtolower($text), 1);
         $stopWords = ['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use'];
 
         return array_values(array_filter($words, function ($word) use ($stopWords) {
-            return strlen($word) >= 3 && !in_array($word, $stopWords);
+            return strlen($word) >= 3 && ! in_array($word, $stopWords);
         }));
     }
 

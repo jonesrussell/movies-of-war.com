@@ -4,7 +4,7 @@ import type { Movie } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-import { GradientOverlay, Poster } from '@/components/primitives';
+import { Poster } from '@/components/primitives';
 
 interface Props {
     movie: Movie;
@@ -41,9 +41,7 @@ const displayedTags = computed(() => props.movie.tags?.slice(0, 3) ?? []);
 
             <!-- Movie details - always visible -->
             <div class="px-1">
-                <h3
-                    class="mb-1 truncate text-sm font-semibold text-white"
-                >
+                <h3 class="mb-1 truncate text-sm font-semibold text-white">
                     <Link
                         :href="`/movies/${movie.slug}`"
                         class="transition-colors hover:text-red-500"
@@ -52,9 +50,7 @@ const displayedTags = computed(() => props.movie.tags?.slice(0, 3) ?? []);
                     </Link>
                 </h3>
 
-                <div
-                    class="flex items-center gap-2 text-xs text-zinc-400"
-                >
+                <div class="flex items-center gap-2 text-xs text-zinc-400">
                     <span>{{ movie.release_year }}</span>
                     <template v-if="movie.runtime">
                         <span class="text-zinc-600">•</span>

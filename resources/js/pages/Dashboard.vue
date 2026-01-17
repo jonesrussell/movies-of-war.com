@@ -2,9 +2,8 @@
 import type { AppPageProps } from '@/types';
 
 import { Head, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
-
 import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 import QuickActionsSection from '@/components/QuickActionsSection.vue';
 import StatsGrid from '@/components/StatsGrid.vue';
@@ -54,9 +53,18 @@ const statsArray = computed(() => {
     // Add X API stats for admins
     if (auth.user?.is_admin && props.stats.x_published_posts !== undefined) {
         base.push(
-            { title: 'X Published Posts', value: props.stats.x_published_posts },
-            { title: 'X Scheduled Posts', value: props.stats.x_scheduled_posts ?? 0 },
-            { title: 'X Total Impressions', value: props.stats.x_total_impressions?.toLocaleString() ?? '0' },
+            {
+                title: 'X Published Posts',
+                value: props.stats.x_published_posts,
+            },
+            {
+                title: 'X Scheduled Posts',
+                value: props.stats.x_scheduled_posts ?? 0,
+            },
+            {
+                title: 'X Total Impressions',
+                value: props.stats.x_total_impressions ?? 0,
+            },
         );
     }
 
@@ -80,13 +88,17 @@ const statsArray = computed(() => {
             <!-- Admin X API Quick Links -->
             <div v-if="auth.user?.is_admin" class="mb-8">
                 <div class="rounded-lg bg-zinc-900 p-6">
-                    <h2 class="mb-4 text-xl font-bold text-white">X API Management</h2>
+                    <h2 class="mb-4 text-xl font-bold text-white">
+                        X API Management
+                    </h2>
                     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         <Link
                             href="/x-posts"
                             class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
                         >
-                            <div class="text-sm text-zinc-400">Manage Posts</div>
+                            <div class="text-sm text-zinc-400">
+                                Manage Posts
+                            </div>
                             <div class="mt-1 text-lg font-semibold text-white">
                                 {{ stats.x_published_posts ?? 0 }} Published
                             </div>
@@ -95,9 +107,14 @@ const statsArray = computed(() => {
                             href="/dashboard/x-analytics"
                             class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
                         >
-                            <div class="text-sm text-zinc-400">View Analytics</div>
+                            <div class="text-sm text-zinc-400">
+                                View Analytics
+                            </div>
                             <div class="mt-1 text-lg font-semibold text-white">
-                                {{ stats.x_total_impressions?.toLocaleString() ?? '0' }}
+                                {{
+                                    stats.x_total_impressions?.toLocaleString() ??
+                                    '0'
+                                }}
                                 Impressions
                             </div>
                         </Link>
@@ -105,7 +122,9 @@ const statsArray = computed(() => {
                             href="/dashboard/x-trends"
                             class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
                         >
-                            <div class="text-sm text-zinc-400">Monitor Trends</div>
+                            <div class="text-sm text-zinc-400">
+                                Monitor Trends
+                            </div>
                             <div class="mt-1 text-lg font-semibold text-white">
                                 {{ stats.x_active_keywords ?? 0 }} Keywords
                             </div>
@@ -114,7 +133,9 @@ const statsArray = computed(() => {
                             href="/dashboard/x-auto-replies"
                             class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
                         >
-                            <div class="text-sm text-zinc-400">Auto Replies</div>
+                            <div class="text-sm text-zinc-400">
+                                Auto Replies
+                            </div>
                             <div class="mt-1 text-lg font-semibold text-white">
                                 Manage Rules
                             </div>
@@ -123,7 +144,9 @@ const statsArray = computed(() => {
                             href="/dashboard/x-content-discovery"
                             class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
                         >
-                            <div class="text-sm text-zinc-400">Content Discovery</div>
+                            <div class="text-sm text-zinc-400">
+                                Content Discovery
+                            </div>
                             <div class="mt-1 text-lg font-semibold text-white">
                                 Curated Feed
                             </div>

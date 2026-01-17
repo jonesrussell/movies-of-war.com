@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PaginatedXCuratedPosts } from '@/types/models';
 
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
@@ -14,17 +14,23 @@ interface Props {
     };
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 function discover() {
     if (confirm('Run content discovery scan?')) {
-        router.post('/x-content-discovery/discover', {}, { preserveScroll: true });
+        router.post(
+            '/x-content-discovery/discover',
+            {},
+            { preserveScroll: true },
+        );
     }
 }
 
 function deletePost(post: any) {
     if (confirm('Remove this curated post?')) {
-        router.delete(`/x-content-discovery/${post.id}`, { preserveScroll: true });
+        router.delete(`/x-content-discovery/${post.id}`, {
+            preserveScroll: true,
+        });
     }
 }
 </script>
@@ -36,8 +42,12 @@ function deletePost(post: any) {
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-white">Content Discovery</h1>
-                    <p class="mt-2 text-zinc-400">Curated high-quality war movie content</p>
+                    <h1 class="text-3xl font-bold text-white">
+                        Content Discovery
+                    </h1>
+                    <p class="mt-2 text-zinc-400">
+                        Curated high-quality war movie content
+                    </p>
                 </div>
                 <button
                     @click="discover"
@@ -48,7 +58,10 @@ function deletePost(post: any) {
             </div>
 
             <div class="rounded-lg bg-zinc-900 p-6">
-                <div v-if="posts.data.length === 0" class="text-center text-zinc-400">
+                <div
+                    v-if="posts.data.length === 0"
+                    class="text-center text-zinc-400"
+                >
                     No curated posts yet. Run a discovery scan to find content.
                 </div>
                 <div v-else class="space-y-4">
@@ -61,10 +74,14 @@ function deletePost(post: any) {
                             <div class="flex-1">
                                 <div class="text-white">{{ post.content }}</div>
                                 <div class="mt-2 text-sm text-zinc-400">
-                                    @{{ post.author_username }} | Likes: {{ post.like_count }} |
-                                    Retweets: {{ post.retweet_count }}
+                                    @{{ post.author_username }} | Likes:
+                                    {{ post.like_count }} | Retweets:
+                                    {{ post.retweet_count }}
                                 </div>
-                                <div v-if="post.notes" class="mt-2 text-sm text-zinc-300">
+                                <div
+                                    v-if="post.notes"
+                                    class="mt-2 text-sm text-zinc-300"
+                                >
                                     Notes: {{ post.notes }}
                                 </div>
                             </div>

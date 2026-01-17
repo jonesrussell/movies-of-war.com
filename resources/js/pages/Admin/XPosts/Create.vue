@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { Plus, Trash2, X } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import DateTimePicker from '@/components/ui/DateTimePicker.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
     maxTweetLength: number;
@@ -21,13 +21,17 @@ const form = useForm({
     publish_immediately: false,
 });
 
-const characterCount = computed(() => props.maxTweetLength - (form.content?.length || 0));
+const characterCount = computed(
+    () => props.maxTweetLength - (form.content?.length || 0),
+);
 const threadCharacterCounts = computed(() =>
     form.thread_parts.map((part) => props.maxTweetLength - part.length),
 );
 
 const isScheduled = computed(() => form.status === 'scheduled');
-const isPublishImmediately = computed(() => form.status === 'publish_immediately');
+const isPublishImmediately = computed(
+    () => form.status === 'publish_immediately',
+);
 
 function addThreadPart() {
     if (form.thread_parts.length < 25) {
@@ -85,7 +89,9 @@ function submit() {
                             class="block text-sm font-medium text-zinc-300"
                         >
                             Tweet Content
-                            <span class="text-zinc-500">({{ characterCount }} remaining)</span>
+                            <span class="text-zinc-500"
+                                >({{ characterCount }} remaining)</span
+                            >
                         </label>
                         <textarea
                             id="content"
@@ -106,7 +112,9 @@ function submit() {
                     <!-- Thread Parts -->
                     <div>
                         <div class="mb-2 flex items-center justify-between">
-                            <label class="block text-sm font-medium text-zinc-300">
+                            <label
+                                class="block text-sm font-medium text-zinc-300"
+                            >
                                 Thread Parts
                                 <span class="text-zinc-500"
                                     >({{ form.thread_parts.length }}/25)</span
@@ -122,7 +130,10 @@ function submit() {
                                 Add Thread
                             </button>
                         </div>
-                        <div v-if="form.thread_parts.length > 0" class="space-y-3">
+                        <div
+                            v-if="form.thread_parts.length > 0"
+                            class="space-y-3"
+                        >
                             <div
                                 v-for="(part, index) in form.thread_parts"
                                 :key="index"
@@ -137,7 +148,8 @@ function submit() {
                                         class="w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-red-500 focus:ring-red-500"
                                     />
                                     <div class="mt-1 text-xs text-zinc-500">
-                                        {{ threadCharacterCounts[index] }} remaining
+                                        {{ threadCharacterCounts[index] }}
+                                        remaining
                                     </div>
                                 </div>
                                 <button
@@ -160,7 +172,9 @@ function submit() {
                     <!-- Media URLs -->
                     <div>
                         <div class="mb-2 flex items-center justify-between">
-                            <label class="block text-sm font-medium text-zinc-300">
+                            <label
+                                class="block text-sm font-medium text-zinc-300"
+                            >
                                 Media URLs
                                 <span class="text-zinc-500"
                                     >({{ form.media_urls.length }}/4)</span
@@ -176,7 +190,10 @@ function submit() {
                                 Add Media
                             </button>
                         </div>
-                        <div v-if="form.media_urls.length > 0" class="space-y-2">
+                        <div
+                            v-if="form.media_urls.length > 0"
+                            class="space-y-2"
+                        >
                             <div
                                 v-for="(url, index) in form.media_urls"
                                 :key="index"
@@ -211,7 +228,9 @@ function submit() {
                             Status
                         </label>
                         <div class="mt-2 flex gap-4">
-                            <label class="flex cursor-pointer items-center gap-2">
+                            <label
+                                class="flex cursor-pointer items-center gap-2"
+                            >
                                 <input
                                     v-model="form.status"
                                     type="radio"
@@ -220,23 +239,31 @@ function submit() {
                                 />
                                 <span class="text-sm text-zinc-300">Draft</span>
                             </label>
-                            <label class="flex cursor-pointer items-center gap-2">
+                            <label
+                                class="flex cursor-pointer items-center gap-2"
+                            >
                                 <input
                                     v-model="form.status"
                                     type="radio"
                                     value="scheduled"
                                     class="text-red-600 focus:ring-red-500"
                                 />
-                                <span class="text-sm text-zinc-300">Scheduled</span>
+                                <span class="text-sm text-zinc-300"
+                                    >Scheduled</span
+                                >
                             </label>
-                            <label class="flex cursor-pointer items-center gap-2">
+                            <label
+                                class="flex cursor-pointer items-center gap-2"
+                            >
                                 <input
                                     v-model="form.status"
                                     type="radio"
                                     value="publish_immediately"
                                     class="text-red-600 focus:ring-red-500"
                                 />
-                                <span class="text-sm text-zinc-300">Publish Immediately</span>
+                                <span class="text-sm text-zinc-300"
+                                    >Publish Immediately</span
+                                >
                             </label>
                         </div>
                     </div>
@@ -248,7 +275,9 @@ function submit() {
                             class="block text-sm font-medium text-zinc-300"
                         >
                             Schedule For
-                            <span v-if="isScheduled" class="text-red-500">*</span>
+                            <span v-if="isScheduled" class="text-red-500"
+                                >*</span
+                            >
                         </label>
                         <div class="mt-1">
                             <DateTimePicker

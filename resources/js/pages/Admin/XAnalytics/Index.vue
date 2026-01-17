@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { AppPageProps } from '@/types';
-
 import { Head, Link } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 
@@ -22,7 +20,7 @@ interface Props {
     };
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 function sync() {
     if (confirm('Sync analytics for all published posts?')) {
@@ -39,7 +37,9 @@ function sync() {
             <div class="mb-8 flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-white">X Analytics</h1>
-                    <p class="mt-2 text-zinc-400">Performance metrics for X posts</p>
+                    <p class="mt-2 text-zinc-400">
+                        Performance metrics for X posts
+                    </p>
                 </div>
                 <button
                     @click="sync"
@@ -54,7 +54,9 @@ function sync() {
                 <div class="rounded-lg bg-zinc-900 p-6">
                     <div class="text-sm text-zinc-400">Total Impressions</div>
                     <div class="mt-2 text-2xl font-bold text-white">
-                        {{ performanceReport.total_impressions.toLocaleString() }}
+                        {{
+                            performanceReport.total_impressions.toLocaleString()
+                        }}
                     </div>
                 </div>
                 <div class="rounded-lg bg-zinc-900 p-6">
@@ -79,8 +81,13 @@ function sync() {
 
             <!-- Top Performers -->
             <div class="rounded-lg bg-zinc-900 p-6">
-                <h2 class="mb-4 text-xl font-bold text-white">Top Performing Posts</h2>
-                <div v-if="topPerformers.length === 0" class="text-center text-zinc-400">
+                <h2 class="mb-4 text-xl font-bold text-white">
+                    Top Performing Posts
+                </h2>
+                <div
+                    v-if="topPerformers.length === 0"
+                    class="text-center text-zinc-400"
+                >
                     No analytics data available yet.
                 </div>
                 <div v-else class="space-y-4">
@@ -92,11 +99,14 @@ function sync() {
                         <div class="flex items-center justify-between">
                             <div>
                                 <div class="font-medium text-white">
-                                    #{{ index + 1 }} - Tweet ID: {{ analytics.tweet_id }}
+                                    #{{ index + 1 }} - Tweet ID:
+                                    {{ analytics.tweet_id }}
                                 </div>
                                 <div class="mt-1 text-sm text-zinc-400">
-                                    Impressions: {{ analytics.impressions.toLocaleString() }} | Likes:
-                                    {{ analytics.likes }} | Retweets: {{ analytics.retweets }}
+                                    Impressions:
+                                    {{ analytics.impressions.toLocaleString() }}
+                                    | Likes: {{ analytics.likes }} | Retweets:
+                                    {{ analytics.retweets }}
                                 </div>
                             </div>
                             <Link

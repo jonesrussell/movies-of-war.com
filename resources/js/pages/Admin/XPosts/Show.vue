@@ -9,7 +9,7 @@ interface Props {
     xPost: XPost;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 function formatDate(dateString: string | null): string {
     if (!dateString) {
@@ -42,7 +42,9 @@ function getXPostUrl(tweetId: string): string {
                     >
                         ← Back to Posts
                     </Link>
-                    <h1 class="text-3xl font-bold text-white">X Post Details</h1>
+                    <h1 class="text-3xl font-bold text-white">
+                        X Post Details
+                    </h1>
                 </div>
 
                 <div class="space-y-6 rounded-lg bg-zinc-900 p-6">
@@ -62,18 +64,29 @@ function getXPostUrl(tweetId: string): string {
                                           : 'bg-zinc-800 text-zinc-400',
                             ]"
                         >
-                            {{ xPost.status.charAt(0).toUpperCase() + xPost.status.slice(1) }}
+                            {{
+                                xPost.status.charAt(0).toUpperCase() +
+                                xPost.status.slice(1)
+                            }}
                         </span>
                     </div>
 
                     <!-- Content -->
                     <div>
-                        <h3 class="mb-2 text-sm font-medium text-zinc-400">Content</h3>
-                        <p class="whitespace-pre-wrap text-white">{{ xPost.content || '(No content)' }}</p>
+                        <h3 class="mb-2 text-sm font-medium text-zinc-400">
+                            Content
+                        </h3>
+                        <p class="whitespace-pre-wrap text-white">
+                            {{ xPost.content || '(No content)' }}
+                        </p>
                     </div>
 
                     <!-- Thread Parts -->
-                    <div v-if="xPost.thread_parts && xPost.thread_parts.length > 0">
+                    <div
+                        v-if="
+                            xPost.thread_parts && xPost.thread_parts.length > 0
+                        "
+                    >
                         <h3 class="mb-2 text-sm font-medium text-zinc-400">
                             Thread Parts ({{ xPost.thread_parts.length }})
                         </h3>
@@ -83,8 +96,12 @@ function getXPostUrl(tweetId: string): string {
                                 :key="index"
                                 class="rounded-lg bg-zinc-800 p-4"
                             >
-                                <div class="mb-1 text-xs text-zinc-500">Part {{ index + 1 }}</div>
-                                <p class="whitespace-pre-wrap text-white">{{ part }}</p>
+                                <div class="mb-1 text-xs text-zinc-500">
+                                    Part {{ index + 1 }}
+                                </div>
+                                <p class="whitespace-pre-wrap text-white">
+                                    {{ part }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -114,27 +131,41 @@ function getXPostUrl(tweetId: string): string {
                             <h3 class="mb-1 text-sm font-medium text-zinc-400">
                                 Scheduled For
                             </h3>
-                            <p class="text-white">{{ formatDate(xPost.scheduled_for) }}</p>
+                            <p class="text-white">
+                                {{ formatDate(xPost.scheduled_for) }}
+                            </p>
                         </div>
                         <div v-if="xPost.published_at">
                             <h3 class="mb-1 text-sm font-medium text-zinc-400">
                                 Published At
                             </h3>
-                            <p class="text-white">{{ formatDate(xPost.published_at) }}</p>
+                            <p class="text-white">
+                                {{ formatDate(xPost.published_at) }}
+                            </p>
                         </div>
                         <div>
-                            <h3 class="mb-1 text-sm font-medium text-zinc-400">Created At</h3>
-                            <p class="text-white">{{ formatDate(xPost.created_at) }}</p>
+                            <h3 class="mb-1 text-sm font-medium text-zinc-400">
+                                Created At
+                            </h3>
+                            <p class="text-white">
+                                {{ formatDate(xPost.created_at) }}
+                            </p>
                         </div>
                         <div>
-                            <h3 class="mb-1 text-sm font-medium text-zinc-400">Updated At</h3>
-                            <p class="text-white">{{ formatDate(xPost.updated_at) }}</p>
+                            <h3 class="mb-1 text-sm font-medium text-zinc-400">
+                                Updated At
+                            </h3>
+                            <p class="text-white">
+                                {{ formatDate(xPost.updated_at) }}
+                            </p>
                         </div>
                     </div>
 
                     <!-- X Post Link -->
                     <div v-if="xPost.x_post_id">
-                        <h3 class="mb-2 text-sm font-medium text-zinc-400">X Post ID</h3>
+                        <h3 class="mb-2 text-sm font-medium text-zinc-400">
+                            X Post ID
+                        </h3>
                         <a
                             :href="getXPostUrl(xPost.x_post_id)"
                             target="_blank"
@@ -147,15 +178,21 @@ function getXPostUrl(tweetId: string): string {
 
                     <!-- Error Message -->
                     <div v-if="xPost.error_message">
-                        <h3 class="mb-2 text-sm font-medium text-red-400">Error Message</h3>
-                        <p class="rounded-lg bg-red-900/50 p-4 text-sm text-red-300">
+                        <h3 class="mb-2 text-sm font-medium text-red-400">
+                            Error Message
+                        </h3>
+                        <p
+                            class="rounded-lg bg-red-900/50 p-4 text-sm text-red-300"
+                        >
                             {{ xPost.error_message }}
                         </p>
                     </div>
 
                     <!-- Author -->
                     <div v-if="xPost.user">
-                        <h3 class="mb-1 text-sm font-medium text-zinc-400">Author</h3>
+                        <h3 class="mb-1 text-sm font-medium text-zinc-400">
+                            Author
+                        </h3>
                         <p class="text-white">{{ xPost.user.name }}</p>
                     </div>
                 </div>

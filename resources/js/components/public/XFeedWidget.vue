@@ -40,7 +40,13 @@ function getXPostUrl(tweetId: string): string {
                 <div class="text-sm text-zinc-300">{{ post.content }}</div>
                 <div class="mt-2 flex items-center justify-between">
                     <span class="text-xs text-zinc-500">
-                        {{ post.published_at ? new Date(post.published_at).toLocaleDateString() : '' }}
+                        {{
+                            post.published_at
+                                ? new Date(
+                                      post.published_at,
+                                  ).toLocaleDateString()
+                                : ''
+                        }}
                     </span>
                     <a
                         v-if="post.x_post_id"

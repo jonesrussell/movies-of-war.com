@@ -150,7 +150,7 @@ class PublishXPost implements ShouldQueue
     {
         $firstTweetId = null;
         $previousTweetId = null;
-        $xApiService = new XApiService;
+        $xApiService = app(XApiService::class);
 
         foreach ($threadContent as $index => $content) {
             // Attach media to first tweet only

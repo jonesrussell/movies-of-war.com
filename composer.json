@@ -10,7 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "atymic/twitter": "^3.4",
+        "atymic/twitter": "^3.0",
         "guzzlehttp/guzzle": "^7.10",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/fortify": "^1.30",

@@ -19,7 +19,13 @@ describe('MovieCard', () => {
         vi.clearAllMocks();
     });
 
-    const defaultMovie = createMockMovie();
+    const defaultMovie = createMockMovie({
+        tags: [
+            createMockTag({ id: 1, name: 'Action' }),
+            createMockTag({ id: 2, name: 'Drama' }),
+            createMockTag({ id: 3, name: 'War' }),
+        ],
+    });
 
     function mountMovieCard(props = {}) {
         return mount(MovieCard, {
@@ -76,9 +82,10 @@ describe('MovieCard', () => {
             expect(wrapper.text()).toContain(defaultMovie.country);
         });
 
-        it('renders synopsis when provided', () => {
+        it('renders tags when provided', () => {
             const wrapper = mountMovieCard();
-            expect(wrapper.text()).toContain(defaultMovie.synopsis);
+            // Should show first 3 tags
+            expect(wrapper.text()).toContain(defaultMovie.tags![0].name);
         });
 
         it('links to movie detail page', () => {

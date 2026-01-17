@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Listeners\LinkArticlesToMovies;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use JonesRussell\LaravelRedisArticles\Events\ArticleProcessed;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(
+            ArticleProcessed::class,
+            LinkArticlesToMovies::class
+        );
     }
 }

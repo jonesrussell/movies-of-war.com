@@ -20,6 +20,11 @@ web_extra_exposed_ports:
     http_port: 5174
     https_port: 5175
 
+web_extra_daemons:
+  - name: articles-subscribe
+    command: "php /var/www/html/artisan articles:subscribe articles:war"
+    directory: /var/www/html
+
 # Key features of DDEV's config.yaml:
 
 # name: <projectname> # Name of the project, automatically provides

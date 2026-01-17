@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PaginatedXAutoReplyRules } from '@/types/models';
 
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
@@ -9,10 +9,14 @@ interface Props {
     rules: PaginatedXAutoReplyRules;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 function toggleActive(rule: any) {
-    router.post(`/x-auto-replies/${rule.id}/toggle`, {}, { preserveScroll: true });
+    router.post(
+        `/x-auto-replies/${rule.id}/toggle`,
+        {},
+        { preserveScroll: true },
+    );
 }
 
 function deleteRule(rule: any) {
@@ -29,8 +33,12 @@ function deleteRule(rule: any) {
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-white">Auto-Reply Rules</h1>
-                    <p class="mt-2 text-zinc-400">Manage automatic replies to mentions</p>
+                    <h1 class="text-3xl font-bold text-white">
+                        Auto-Reply Rules
+                    </h1>
+                    <p class="mt-2 text-zinc-400">
+                        Manage automatic replies to mentions
+                    </p>
                 </div>
                 <button
                     class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
@@ -40,7 +48,10 @@ function deleteRule(rule: any) {
             </div>
 
             <div class="rounded-lg bg-zinc-900 p-6">
-                <div v-if="rules.data.length === 0" class="text-center text-zinc-400">
+                <div
+                    v-if="rules.data.length === 0"
+                    class="text-center text-zinc-400"
+                >
                     No auto-reply rules configured yet.
                 </div>
                 <div v-else class="space-y-4">
@@ -51,17 +62,25 @@ function deleteRule(rule: any) {
                     >
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <div class="font-medium text-white">{{ rule.name }}</div>
+                                <div class="font-medium text-white">
+                                    {{ rule.name }}
+                                </div>
                                 <div class="mt-1 text-sm text-zinc-400">
                                     Trigger: {{ rule.trigger_type }} | Keywords:
                                     {{ rule.trigger_keywords?.join(', ') }}
                                 </div>
-                                <div class="mt-2 text-sm text-white">{{ rule.reply_template }}</div>
+                                <div class="mt-2 text-sm text-white">
+                                    {{ rule.reply_template }}
+                                </div>
                             </div>
                             <div class="ml-4 flex gap-2">
                                 <button
                                     @click="toggleActive(rule)"
-                                    :class="rule.is_active ? 'text-green-500' : 'text-zinc-500'"
+                                    :class="
+                                        rule.is_active
+                                            ? 'text-green-500'
+                                            : 'text-zinc-500'
+                                    "
                                 >
                                     {{ rule.is_active ? 'Active' : 'Inactive' }}
                                 </button>

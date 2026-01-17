@@ -4,7 +4,6 @@ import type { User } from '@/types/models';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     BarChart3,
-    Bookmark,
     BookOpen,
     Database,
     Film,
@@ -52,15 +51,6 @@ const mainNavItems = computed<NavItem[]>(() => [
                   href: '/dashboard/movies',
                   icon: Film,
               },
-          ]
-        : []),
-    {
-        title: 'Watchlist',
-        href: '/watchlist',
-        icon: Bookmark,
-    },
-    ...(auth?.user?.is_admin
-        ? [
               {
                   title: 'TMDB',
                   href: '/dashboard/tmdb-imports',
@@ -72,29 +62,35 @@ const mainNavItems = computed<NavItem[]>(() => [
                   icon: Star,
               },
               {
-                  title: 'X Posts',
-                  href: '/x-posts',
+                  title: 'X',
                   icon: MessageSquare,
-              },
-              {
-                  title: 'X Analytics',
-                  href: '/dashboard/x-analytics',
-                  icon: BarChart3,
-              },
-              {
-                  title: 'X Trends',
-                  href: '/dashboard/x-trends',
-                  icon: TrendingUp,
-              },
-              {
-                  title: 'X Auto-Replies',
-                  href: '/dashboard/x-auto-replies',
-                  icon: Reply,
-              },
-              {
-                  title: 'X Content Discovery',
-                  href: '/dashboard/x-content-discovery',
-                  icon: Search,
+                  items: [
+                      {
+                          title: 'Posts',
+                          href: '/x-posts',
+                          icon: MessageSquare,
+                      },
+                      {
+                          title: 'Analytics',
+                          href: '/dashboard/x-analytics',
+                          icon: BarChart3,
+                      },
+                      {
+                          title: 'Trends',
+                          href: '/dashboard/x-trends',
+                          icon: TrendingUp,
+                      },
+                      {
+                          title: 'Auto-Replies',
+                          href: '/dashboard/x-auto-replies',
+                          icon: Reply,
+                      },
+                      {
+                          title: 'Content Discovery',
+                          href: '/dashboard/x-content-discovery',
+                          icon: Search,
+                      },
+                  ],
               },
           ]
         : []),

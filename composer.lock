@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2ec5ae9bd23fbbb7fab93adc1932ef6c",
+    "content-hash": "c2828a75b95eff3b5d82728d68bdc78e",
     "packages": [
         {
             "name": "atymic/twitter",
@@ -1505,6 +1505,59 @@
                 "source": "https://github.com/inertiajs/inertia-laravel/tree/v2.0.18"
             },
             "time": "2025-12-31T16:10:57+00:00"
+        },
+        {
+            "name": "jonesrussell/laravel-redis-articles",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/laravel-redis-articles",
+                "reference": "a4490041a426a5148502c22b1e1649fa958824ff"
+            },
+            "require": {
+                "illuminate/console": "^12.0",
+                "illuminate/database": "^12.0",
+                "illuminate/redis": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JonesRussell\\LaravelRedisArticles\\LaravelRedisArticlesServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JonesRussell\\LaravelRedisArticles\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "JonesRussell\\LaravelRedisArticles\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Russell Jones",
+                    "email": "jones@russell.com"
+                }
+            ],
+            "description": "Laravel package for ingesting articles from Redis pub/sub channels with deduplication, source tracking, and tag management",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "kamermans/guzzle-oauth2-subscriber",
@@ -11018,7 +11071,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "jonesrussell/laravel-redis-articles": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

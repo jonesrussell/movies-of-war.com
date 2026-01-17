@@ -69,6 +69,13 @@ class Movie extends Model
         return $this->belongsToMany(User::class, 'watchlists')->withTimestamps();
     }
 
+    public function articles(): BelongsToMany
+    {
+        return $this->belongsToMany(WarArticle::class, 'article_movie')
+            ->withTimestamps()
+            ->withPivot('confidence');
+    }
+
     public function scopeDraft($query)
     {
         return $query->where('status', self::STATUS_DRAFT);

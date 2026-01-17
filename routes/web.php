@@ -64,6 +64,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard/featured-slots', [App\Http\Controllers\Admin\FeaturedSlotController::class, 'index'])->name('dashboard.featured-slots');
         Route::resource('featured-slots', App\Http\Controllers\Admin\FeaturedSlotController::class)->except(['index']);
 
+        // X OAuth 2.0
+        Route::get('/x-oauth2/redirect', [App\Http\Controllers\Admin\XOAuth2Controller::class, 'redirect'])->name('admin.x-oauth2.redirect');
+        Route::get('/x-oauth2/callback', [App\Http\Controllers\Admin\XOAuth2Controller::class, 'callback'])->name('admin.x-oauth2.callback');
+
         // X Post Management
         Route::prefix('x-posts')->name('admin.x-posts.')->group(function () {
             Route::post('/{xPost}/schedule', [App\Http\Controllers\Admin\XPostController::class, 'schedule'])->name('schedule');

@@ -4,12 +4,14 @@ namespace App\Services;
 
 use Atymic\Twitter\Facade\Twitter;
 use Exception;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\RequestOptions;
 use Illuminate\Support\Facades\Log;
 
 class XApiService
 {
     /**
-     * Post a tweet using X API v2.
+     * Post a tweet using X API v2 (OAuth 2.0 User Context required).
      *
      * @param  string  $text  The tweet content (max 280 characters)
      * @param  array|null  $mediaIds  Optional array of media IDs to attach
@@ -21,23 +23,30 @@ class XApiService
     public function postTweet(string $text, ?array $mediaIds = null, ?string $replyToTweetId = null): array
     {
         try {
-            $params = ['text' => $text];
-
-            if (! empty($mediaIds)) {
-                $params['media'] = ['media_ids' => $mediaIds];
+            // Ensure text is not empty
+            if (empty($text)) {
+                throw new Exception('Tweet text cannot be empty');
             }
 
-            if ($replyToTweetId !== null) {
-                $params['reply'] = ['in_reply_to_tweet_id' => $replyToTweetId];
+            // Try OAuth 2.0 User Context Bearer token from database first (from OAuth 2.0 flow)
+            $oauth2Token = \Illuminate\Support\Facades\DB::table('x_oauth2_tokens')
+                ->where('expires_at', '>', now())
+                ->orWhereNull('expires_at')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($oauth2Token && $oauth2Token->access_token) {
+                return $this->postTweetWithOAuth2($text, $mediaIds, $replyToTweetId, $oauth2Token->access_token);
             }
 
-            $response = Twitter::forApiV2()->tweet()->performRequest('POST', $params);
-
-            if (! isset($response['data']['id'])) {
-                throw new Exception('Failed to get tweet ID from X API response: '.json_encode($response));
+            // Fallback to explicit config token (not TWITTER_BEARER_TOKEN which is app-only)
+            $oauth2AccessToken = config('twitter.oauth2_access_token');
+            if ($oauth2AccessToken && $oauth2AccessToken !== config('services.twitter.bearer_token')) {
+                return $this->postTweetWithOAuth2($text, $mediaIds, $replyToTweetId, $oauth2AccessToken);
             }
 
-            return $response['data'];
+            // OAuth 1.0a is deprecated and cannot be used for posting
+            throw new Exception('OAuth 2.0 User Context access token required for posting tweets. Please complete the OAuth 2.0 flow at /x-oauth2/redirect');
         } catch (Exception $e) {
             Log::error('X API: Failed to post tweet', [
                 'error' => $e->getMessage(),
@@ -51,7 +60,10 @@ class XApiService
     }
 
     /**
-     * Upload media file to X API v1.1.
+     * Upload media file to X API.
+     * Note: Currently uses v1.1 endpoint (https://upload.twitter.com/1.1/media/upload.json) for simplicity.
+     * X API v2 supports chunked uploads via /2/media/upload/* endpoints, but v1.1 works for images < 5MB.
+     * Both endpoints require OAuth 2.0 User Context authentication.
      *
      * @param  string  $mediaPath  Local file path or URL
      * @return string Media ID string
@@ -61,6 +73,22 @@ class XApiService
     public function uploadMedia(string $mediaPath): string
     {
         try {
+            // Get OAuth 2.0 access token (required for media upload in 2026)
+            $oauth2Token = \Illuminate\Support\Facades\DB::table('x_oauth2_tokens')
+                ->where('expires_at', '>', now())
+                ->orWhereNull('expires_at')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            $oauth2AccessToken = $oauth2Token?->access_token
+                ?? (config('twitter.oauth2_access_token') !== config('services.twitter.bearer_token')
+                    ? config('twitter.oauth2_access_token')
+                    : null);
+
+            if (! $oauth2AccessToken) {
+                throw new Exception('OAuth 2.0 User Context access token required for media upload. Please complete the OAuth 2.0 flow at /x-oauth2/redirect');
+            }
+
             // Handle remote URLs
             if (filter_var($mediaPath, FILTER_VALIDATE_URL)) {
                 $fileContent = file_get_contents($mediaPath);
@@ -84,19 +112,15 @@ class XApiService
                 throw new Exception("Media file not found: {$mediaPath}");
             }
 
-            // Upload using Twitter facade (v1.1 media endpoint)
-            $upload = Twitter::uploadMedia(['media' => $mediaPath]);
+            // Upload using OAuth 2.0 Bearer token (X API v1.1 endpoint, works with v2 tweets)
+            $upload = $this->uploadMediaWithOAuth2($mediaPath, $oauth2AccessToken);
 
             // Clean up temp file if created
             if (isset($isTempFile) && $isTempFile && file_exists($mediaPath)) {
                 @unlink($mediaPath);
             }
 
-            if (! isset($upload->media_id_string)) {
-                throw new Exception('Failed to get media ID from X API response');
-            }
-
-            return $upload->media_id_string;
+            return $upload;
         } catch (Exception $e) {
             Log::error('X API: Failed to upload media', [
                 'error' => $e->getMessage(),
@@ -248,5 +272,104 @@ class XApiService
         // Rate limits are typically returned in response headers
         // For now, return empty array - can be enhanced with actual tracking
         return [];
+    }
+
+    /**
+     * Post a tweet using OAuth 2.0 Bearer token authentication.
+     *
+     * @param  string  $text  The tweet content
+     * @param  array|null  $mediaIds  Optional array of media IDs
+     * @param  string|null  $replyToTweetId  Optional tweet ID to reply to
+     * @param  string  $accessToken  OAuth 2.0 access token
+     * @return array Response data with tweet ID
+     *
+     * @throws Exception
+     */
+    protected function postTweetWithOAuth2(
+        string $text,
+        ?array $mediaIds,
+        ?string $replyToTweetId,
+        string $accessToken
+    ): array {
+        $client = new GuzzleClient([
+            'base_uri' => 'https://api.twitter.com/2/',
+        ]);
+
+        $payload = ['text' => $text];
+
+        if (! empty($mediaIds)) {
+            $mediaIds = array_filter($mediaIds, fn ($id) => $id !== null);
+            if (! empty($mediaIds)) {
+                $payload['media'] = ['media_ids' => array_values($mediaIds)];
+            }
+        }
+
+        if ($replyToTweetId !== null && $replyToTweetId !== '') {
+            $payload['reply'] = ['in_reply_to_tweet_id' => $replyToTweetId];
+        }
+
+        $response = $client->post('tweets', [
+            RequestOptions::HEADERS => [
+                'Authorization' => 'Bearer '.$accessToken,
+                'Content-Type' => 'application/json',
+            ],
+            RequestOptions::JSON => $payload,
+        ]);
+
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        if (! isset($data['data']['id'])) {
+            throw new Exception('Failed to get tweet ID from X API response: '.json_encode($data));
+        }
+
+        return $data['data'];
+    }
+
+    /**
+     * Upload media using OAuth 2.0 Bearer token.
+     * Uses X API v1.1 media endpoint (compatible with v2 tweets).
+     * For larger files or v2 chunked uploads, see /2/media/upload/* endpoints.
+     *
+     * @param  string  $mediaPath  Local file path
+     * @param  string  $accessToken  OAuth 2.0 User Context access token
+     * @return string Media ID string
+     *
+     * @throws Exception
+     */
+    protected function uploadMediaWithOAuth2(string $mediaPath, string $accessToken): string
+    {
+        $client = new GuzzleClient([
+            'base_uri' => 'https://upload.twitter.com/1.1/',
+        ]);
+
+        // Read file contents
+        $fileContents = file_get_contents($mediaPath);
+        $mimeType = mime_content_type($mediaPath) ?: 'image/jpeg';
+
+        $response = $client->post('media/upload.json', [
+            RequestOptions::HEADERS => [
+                'Authorization' => 'Bearer '.$accessToken,
+            ],
+            RequestOptions::MULTIPART => [
+                [
+                    'name' => 'media',
+                    'contents' => $fileContents,
+                    'filename' => basename($mediaPath),
+                    'headers' => [
+                        'Content-Type' => $mimeType,
+                    ],
+                ],
+            ],
+        ]);
+
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        $mediaIdString = $data['media_id_string'] ?? $data['media_id'] ?? null;
+
+        if (! $mediaIdString) {
+            throw new Exception('Failed to get media ID from X API response: '.json_encode($data));
+        }
+
+        return (string) $mediaIdString;
     }
 }

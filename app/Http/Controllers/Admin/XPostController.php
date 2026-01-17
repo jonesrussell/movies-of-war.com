@@ -73,10 +73,11 @@ class XPostController extends Controller
 
         // If publish immediately is requested, dispatch the publish job
         if ($publishImmediately) {
-            PublishXPost::dispatch($xPost);
+            // Use dispatchSync for immediate publishing to avoid queue worker dependency
+            PublishXPost::dispatchSync($xPost);
 
             return redirect()->route('admin.x-posts.index')
-                ->with('success', 'X post queued for immediate publishing.');
+                ->with('success', 'X post published successfully.');
         }
 
         $message = match ($xPost->status) {

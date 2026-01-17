@@ -50,13 +50,13 @@ function removeMediaUrl(index: number) {
 }
 
 function submit() {
-    const formData = {
-        ...form.data(),
-        publish_immediately: form.status === 'publish_immediately',
-        status: form.status === 'publish_immediately' ? 'draft' : form.status,
-    };
+    const publishImmediately = form.status === 'publish_immediately';
 
-    form.transform(() => formData).post('/x-posts', {
+    form.transform(() => ({
+        ...form.data(),
+        publish_immediately: publishImmediately,
+        status: publishImmediately ? 'draft' : form.status,
+    })).post('/x-posts', {
         onSuccess: () => {
             router.visit('/x-posts');
         },

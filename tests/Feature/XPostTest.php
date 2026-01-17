@@ -299,7 +299,11 @@ test('admin can publish a draft x-post immediately', function () {
 });
 
 test('admin can create x-post with publish immediately', function () {
-    Queue::fake();
+    // Mock XApiService to avoid actual API calls
+    $mockXApiService = \Mockery::mock(\App\Services\XApiService::class);
+    $mockXApiService->shouldReceive('postTweet')
+        ->andReturn(['id' => '123456789']);
+    $this->app->instance(\App\Services\XApiService::class, $mockXApiService);
 
     $admin = User::factory()->create(['is_admin' => true]);
     $this->actingAs($admin);
@@ -311,15 +315,12 @@ test('admin can create x-post with publish immediately', function () {
     ]);
 
     $response->assertRedirect(route('admin.x-posts.index'));
-    $response->assertSessionHas('success', 'X post queued for immediate publishing.');
+    $response->assertSessionHas('success', 'X post published successfully.');
 
     $xPost = XPost::where('content', 'Publish immediately test')->first();
     expect($xPost)->not->toBeNull();
-    expect($xPost->status)->toBe('draft');
-
-    Queue::assertPushed(PublishXPost::class, function ($job) use ($xPost) {
-        return $job->xPost->id === $xPost->id;
-    });
+    expect($xPost->status)->toBe('published');
+    expect($xPost->x_post_id)->toBe('123456789');
 });
 
 test('scheduled posts ready for publishing are dispatched by scheduler', function () {

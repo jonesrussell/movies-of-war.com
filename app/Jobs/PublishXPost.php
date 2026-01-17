@@ -110,7 +110,7 @@ class PublishXPost implements ShouldQueue
     protected function uploadMedia(): array
     {
         $mediaIds = [];
-        $xApiService = new XApiService;
+        $xApiService = app(XApiService::class);
 
         foreach ($this->xPost->media_urls as $mediaPath) {
             try {
@@ -180,7 +180,7 @@ class PublishXPost implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(Exception $exception): void
+    public function failed(\Throwable $exception): void
     {
         Log::error('XPost job failed after all retries', [
             'x_post_id' => $this->xPost->id,

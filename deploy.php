@@ -51,5 +51,6 @@ task('artisan:queue:restart', function () {
 
 after('deploy:update_code', 'deploy:npm');
 after('deploy:vendors', 'deploy:build');
+before('deploy:symlink', 'artisan:migrate');
 after('deploy:symlink', 'artisan:queue:restart');
 after('deploy:failed', 'deploy:unlock');

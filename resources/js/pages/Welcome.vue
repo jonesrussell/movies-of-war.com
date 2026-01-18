@@ -17,6 +17,7 @@ interface Props {
     heroMovie?: Movie;
     pickOfWeekMovie?: Movie;
     latestMovies: Movie[];
+    upcomingMovies: Movie[];
 }
 
 defineProps<Props>();
@@ -105,6 +106,33 @@ defineProps<Props>();
                     <MovieGrid>
                         <MovieCard
                             v-for="movie in latestMovies"
+                            :key="movie.id"
+                            :movie="movie"
+                        />
+                    </MovieGrid>
+                </div>
+
+                <div
+                    v-if="upcomingMovies.length > 0"
+                    class="flex flex-col gap-6"
+                >
+                    <SectionHeader
+                        title="Upcoming"
+                        description="War films on the horizon—announced, in production, or releasing soon."
+                    >
+                        <template #action>
+                            <Link
+                                href="/movies?upcoming=1"
+                                class="text-sm font-semibold text-red-500 transition-colors hover:text-red-400"
+                            >
+                                View all →
+                            </Link>
+                        </template>
+                    </SectionHeader>
+
+                    <MovieGrid>
+                        <MovieCard
+                            v-for="movie in upcomingMovies"
                             :key="movie.id"
                             :movie="movie"
                         />

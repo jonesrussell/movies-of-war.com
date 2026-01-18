@@ -19,8 +19,17 @@ Route::get('/', function () {
 
     $latestMovies = \App\Models\Movie::query()
         ->published()
+        ->released()
         ->with('tags')
         ->latest('release_date')
+        ->limit(12)
+        ->get();
+
+    $upcomingMovies = \App\Models\Movie::query()
+        ->published()
+        ->upcoming()
+        ->with('tags')
+        ->oldest('release_date')
         ->limit(12)
         ->get();
 
@@ -29,6 +38,7 @@ Route::get('/', function () {
         'heroMovie' => $heroSlot?->movie,
         'pickOfWeekMovie' => $pickOfWeekSlot?->movie,
         'latestMovies' => $latestMovies,
+        'upcomingMovies' => $upcomingMovies,
     ]);
 })->name('home');
 

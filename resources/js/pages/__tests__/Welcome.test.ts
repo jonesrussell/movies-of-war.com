@@ -66,6 +66,7 @@ describe('Welcome', () => {
         return mount(Welcome, {
             props: {
                 latestMovies: [],
+                upcomingMovies: [],
                 ...props,
             },
             global: {
@@ -151,6 +152,32 @@ describe('Welcome', () => {
 
             const movieCards = wrapper.findAll('[data-testid="movie-card"]');
             expect(movieCards.length).toBe(0);
+        });
+    });
+
+    describe('upcoming movies section', () => {
+        it('renders upcoming movies grid when movies are provided', () => {
+            const upcomingMovies = createMockMovies(4);
+            const wrapper = mountWelcome({ upcomingMovies });
+
+            expect(wrapper.text()).toContain('Upcoming');
+            expect(wrapper.text()).toContain('War films on the horizon');
+        });
+
+        it('does not render upcoming section when no upcoming movies', () => {
+            const wrapper = mountWelcome({ upcomingMovies: [] });
+
+            expect(wrapper.text()).not.toContain('War films on the horizon');
+        });
+
+        it('renders View All link for upcoming movies', () => {
+            const upcomingMovies = createMockMovies(3);
+            const wrapper = mountWelcome({ upcomingMovies });
+
+            const viewAllLinks = wrapper
+                .findAll('a')
+                .filter((a) => a.attributes('href') === '/movies?upcoming=1');
+            expect(viewAllLinks.length).toBeGreaterThan(0);
         });
     });
 

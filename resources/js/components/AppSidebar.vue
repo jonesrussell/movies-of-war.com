@@ -6,6 +6,7 @@ import {
     BarChart3,
     BookOpen,
     Database,
+    Download,
     Film,
     Folder,
     LayoutGrid,
@@ -53,8 +54,19 @@ const mainNavItems = computed<NavItem[]>(() => [
               },
               {
                   title: 'TMDB',
-                  href: '/dashboard/tmdb-imports',
                   icon: Database,
+                  items: [
+                      {
+                          title: 'Imports',
+                          href: '/dashboard/tmdb/imports',
+                          icon: Download,
+                      },
+                      {
+                          title: 'Search',
+                          href: '/dashboard/tmdb/search',
+                          icon: Search,
+                      },
+                  ],
               },
               {
                   title: 'Featured Slots',

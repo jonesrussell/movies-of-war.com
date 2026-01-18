@@ -51,7 +51,7 @@ const form = useForm({
 function handleSearchUpdate(value: string) {
     search.value = value;
     router.get(
-        '/dashboard/tmdb-imports',
+        '/dashboard/tmdb/imports',
         {
             search: value || undefined,
         },

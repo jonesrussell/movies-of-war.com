@@ -85,7 +85,9 @@ describe('MovieCard', () => {
         it('renders tags when provided', () => {
             const wrapper = mountMovieCard();
             // Should show first 3 tags
-            expect(wrapper.text()).toContain(defaultMovie.tags![0].name);
+            const firstTag = defaultMovie.tags?.[0];
+            expect(firstTag).toBeDefined();
+            expect(wrapper.text()).toContain(firstTag?.name);
         });
 
         it('links to movie detail page', () => {

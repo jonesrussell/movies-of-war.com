@@ -112,37 +112,45 @@ const rightNavItems: NavItem[] = [
                                 class="flex h-full flex-1 flex-col justify-between space-y-4 py-6"
                             >
                                 <nav class="-mx-3 space-y-1">
-                                    <Link
+                                    <template
                                         v-for="item in mainNavItems"
                                         :key="item.title"
-                                        :href="item.href"
-                                        class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
-                                        :class="activeItemStyles(item.href)"
                                     >
-                                        <component
-                                            v-if="item.icon"
-                                            :is="item.icon"
-                                            class="h-5 w-5"
-                                        />
-                                        {{ item.title }}
-                                    </Link>
+                                        <Link
+                                            v-if="item.href"
+                                            :href="item.href"
+                                            class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
+                                            :class="activeItemStyles(item.href)"
+                                        >
+                                            <component
+                                                v-if="item.icon"
+                                                :is="item.icon"
+                                                class="h-5 w-5"
+                                            />
+                                            {{ item.title }}
+                                        </Link>
+                                    </template>
                                 </nav>
                                 <div class="flex flex-col space-y-4">
-                                    <a
+                                    <template
                                         v-for="item in rightNavItems"
                                         :key="item.title"
-                                        :href="toUrl(item.href)"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="flex items-center space-x-2 text-sm font-medium"
                                     >
-                                        <component
-                                            v-if="item.icon"
-                                            :is="item.icon"
-                                            class="h-5 w-5"
-                                        />
-                                        <span>{{ item.title }}</span>
-                                    </a>
+                                        <a
+                                            v-if="item.href"
+                                            :href="toUrl(item.href)"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="flex items-center space-x-2 text-sm font-medium"
+                                        >
+                                            <component
+                                                v-if="item.icon"
+                                                :is="item.icon"
+                                                class="h-5 w-5"
+                                            />
+                                            <span>{{ item.title }}</span>
+                                        </a>
+                                    </template>
                                 </div>
                             </div>
                         </SheetContent>
@@ -159,31 +167,35 @@ const rightNavItems: NavItem[] = [
                         <NavigationMenuList
                             class="flex h-full items-stretch space-x-2"
                         >
-                            <NavigationMenuItem
+                            <template
                                 v-for="(item, index) in mainNavItems"
                                 :key="index"
-                                class="relative flex h-full items-center"
                             >
-                                <Link
-                                    :class="[
-                                        navigationMenuTriggerStyle(),
-                                        activeItemStyles(item.href),
-                                        'h-9 cursor-pointer px-3',
-                                    ]"
-                                    :href="item.href"
+                                <NavigationMenuItem
+                                    v-if="item.href"
+                                    class="relative flex h-full items-center"
                                 >
-                                    <component
-                                        v-if="item.icon"
-                                        :is="item.icon"
-                                        class="mr-2 h-4 w-4"
-                                    />
-                                    {{ item.title }}
-                                </Link>
-                                <div
-                                    v-if="urlIsActive(item.href)"
-                                    class="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"
-                                ></div>
-                            </NavigationMenuItem>
+                                    <Link
+                                        :class="[
+                                            navigationMenuTriggerStyle(),
+                                            activeItemStyles(item.href),
+                                            'h-9 cursor-pointer px-3',
+                                        ]"
+                                        :href="item.href"
+                                    >
+                                        <component
+                                            v-if="item.icon"
+                                            :is="item.icon"
+                                            class="mr-2 h-4 w-4"
+                                        />
+                                        {{ item.title }}
+                                    </Link>
+                                    <div
+                                        v-if="urlIsActive(item.href)"
+                                        class="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"
+                                    ></div>
+                                </NavigationMenuItem>
+                            </template>
                         </NavigationMenuList>
                     </NavigationMenu>
                 </div>
@@ -215,6 +227,7 @@ const rightNavItems: NavItem[] = [
                                                 class="group h-9 w-9 cursor-pointer"
                                             >
                                                 <a
+                                                    v-if="item.href"
                                                     :href="toUrl(item.href)"
                                                     target="_blank"
                                                     rel="noopener noreferrer"

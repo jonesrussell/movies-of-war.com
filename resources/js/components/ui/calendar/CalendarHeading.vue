@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import type { CalendarHeadingProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
+import { computed } from "vue"
 import { reactiveOmit } from "@vueuse/core"
 import { CalendarHeading, useForwardProps } from "reka-ui"
-import { cn } from "@/lib/utils"
+import { cn, filterUndefinedProps } from "@/lib/utils"
 
 const props = defineProps<CalendarHeadingProps & { class?: HTMLAttributes["class"] }>()
 
@@ -13,7 +14,9 @@ defineSlots<{
 
 const delegatedProps = reactiveOmit(props, "class")
 
-const forwardedProps = useForwardProps(delegatedProps)
+const forwardedPropsRaw = useForwardProps(delegatedProps)
+
+const forwardedProps = computed(() => filterUndefinedProps(forwardedPropsRaw.value as Record<string, unknown>))
 </script>
 
 <template>

@@ -62,8 +62,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin-only TMDB movie management
     Route::middleware('admin')->group(function () {
-        Route::get('/dashboard/tmdb-imports', [App\Http\Controllers\DashboardController::class, 'tmdbImports'])->name('dashboard.tmdb-imports');
+        Route::get('/dashboard/tmdb/imports', [App\Http\Controllers\DashboardController::class, 'tmdbImports'])->name('dashboard.tmdb.imports');
+        Route::get('/dashboard/tmdb/search', [App\Http\Controllers\DashboardController::class, 'tmdbSearch'])->name('dashboard.tmdb.search');
+        Route::post('/tmdb/search', [App\Http\Controllers\DashboardController::class, 'performTmdbSearch'])->name('tmdb.search');
         Route::post('/tmdb/import', [App\Http\Controllers\DashboardController::class, 'importTmdbMovies'])->name('tmdb.import');
+        Route::post('/tmdb/import-single', [App\Http\Controllers\DashboardController::class, 'importSingleTmdbMovie'])->name('tmdb.import-single');
         Route::post('/movies/{movie}/publish', [App\Http\Controllers\DashboardController::class, 'publishMovie'])->name('tmdb.movies.publish');
         Route::post('/movies/{movie}/archive', [App\Http\Controllers\DashboardController::class, 'archiveMovie'])->name('tmdb.movies.archive');
 

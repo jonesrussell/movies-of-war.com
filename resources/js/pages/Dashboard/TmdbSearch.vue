@@ -1,0 +1,234 @@
+<script setup lang="ts">
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
+import { CheckCircle, Download, Search } from 'lucide-vue-next';
+import { computed, ref, toRef } from 'vue';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+interface TmdbMovie {
+    id: number;
+    title: string;
+    overview: string;
+    poster_path: string | null;
+    release_date: string;
+    vote_average: number;
+    already_imported: boolean;
+}
+
+interface Props {
+    searchResults: TmdbMovie[];
+    query: string;
+}
+
+const props = defineProps<Props>();
+
+const page = usePage();
+const flash = computed(
+    () => page.props.flash as { success?: string; error?: string },
+);
+
+const queryRef = toRef(props, 'query');
+const searchQuery = ref(queryRef.value);
+const isSearching = ref(false);
+
+const importForm = useForm({
+    tmdb_id: 0,
+});
+
+function handleSearch() {
+    if (!searchQuery.value.trim()) {
+        return;
+    }
+    isSearching.value = true;
+    router.post(
+        '/tmdb/search',
+        { query: searchQuery.value },
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                isSearching.value = false;
+            },
+        },
+    );
+}
+
+function handleImport(movie: TmdbMovie) {
+    importForm.tmdb_id = movie.id;
+    importForm.post('/tmdb/import-single', {
+        preserveScroll: true,
+    });
+}
+
+function getPosterUrl(posterPath: string | null): string {
+    if (!posterPath) {
+        return '/images/placeholders/poster-placeholder.png';
+    }
+    return `https://image.tmdb.org/t/p/w500${posterPath}`;
+}
+</script>
+
+<template>
+    <Head title="TMDB Search - Dashboard" />
+
+    <AppSidebarLayout>
+        <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
+            <div class="mb-8">
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold">TMDB Search</h1>
+                    <p class="mt-1 text-sm text-muted-foreground">
+                        Search The Movie Database for war movies to import
+                    </p>
+                </div>
+
+                <!-- Flash messages -->
+                <div
+                    v-if="flash?.success"
+                    class="mb-6 rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-green-500"
+                >
+                    {{ flash.success }}
+                </div>
+                <div
+                    v-if="flash?.error"
+                    class="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-500"
+                >
+                    {{ flash.error }}
+                </div>
+
+                <!-- Search Form -->
+                <form @submit.prevent="handleSearch" class="mb-8">
+                    <div class="flex gap-3">
+                        <div class="relative flex-1">
+                            <Search
+                                class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                            />
+                            <Input
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Search for movies on TMDB..."
+                                class="pl-10"
+                                :disabled="isSearching"
+                            />
+                        </div>
+                        <Button
+                            type="submit"
+                            :disabled="isSearching || !searchQuery.trim()"
+                        >
+                            <Search class="size-4" />
+                            {{ isSearching ? 'Searching...' : 'Search' }}
+                        </Button>
+                    </div>
+                </form>
+
+                <!-- Search Results -->
+                <div
+                    v-if="props.searchResults.length > 0"
+                    class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+                >
+                    <div
+                        v-for="movie in props.searchResults"
+                        :key="movie.id"
+                        class="group relative overflow-hidden rounded-lg border bg-card"
+                    >
+                        <div class="aspect-[2/3]">
+                            <img
+                                :src="getPosterUrl(movie.poster_path)"
+                                :alt="movie.title"
+                                class="h-full w-full object-cover"
+                            />
+                            <!-- Already imported overlay -->
+                            <div
+                                v-if="movie.already_imported"
+                                class="absolute inset-0 flex items-center justify-center bg-black/70"
+                            >
+                                <div class="text-center">
+                                    <CheckCircle
+                                        class="mx-auto size-8 text-green-500"
+                                    />
+                                    <span
+                                        class="mt-2 block text-sm font-medium text-white"
+                                        >Already Imported</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-3">
+                            <h3 class="mb-1 truncate text-sm font-semibold">
+                                {{ movie.title }}
+                            </h3>
+                            <p class="mb-3 text-xs text-muted-foreground">
+                                {{
+                                    movie.release_date
+                                        ? movie.release_date.substring(0, 4)
+                                        : 'Unknown'
+                                }}
+                                <span
+                                    v-if="movie.vote_average"
+                                    class="ml-2 text-yellow-500"
+                                >
+                                    {{ movie.vote_average.toFixed(1) }}
+                                </span>
+                            </p>
+
+                            <Button
+                                v-if="!movie.already_imported"
+                                @click="handleImport(movie)"
+                                variant="default"
+                                size="sm"
+                                class="flex w-full items-center justify-center gap-1"
+                                :disabled="importForm.processing"
+                            >
+                                <Download class="size-3" />
+                                {{
+                                    importForm.processing &&
+                                    importForm.tmdb_id === movie.id
+                                        ? 'Importing...'
+                                        : 'Import'
+                                }}
+                            </Button>
+                            <Button
+                                v-else
+                                variant="outline"
+                                size="sm"
+                                class="w-full"
+                                disabled
+                            >
+                                <CheckCircle class="size-3" />
+                                Imported
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No results -->
+                <div
+                    v-else-if="props.query && props.searchResults.length === 0"
+                    class="rounded-lg border border-border bg-card py-16 text-center"
+                >
+                    <p class="text-muted-foreground">
+                        No movies found for "{{ props.query }}"
+                    </p>
+                    <p class="mt-2 text-sm text-muted-foreground">
+                        Try a different search term
+                    </p>
+                </div>
+
+                <!-- Initial state -->
+                <div
+                    v-else
+                    class="rounded-lg border border-border bg-card py-16 text-center"
+                >
+                    <Search class="mx-auto size-12 text-muted-foreground/50" />
+                    <p class="mt-4 text-muted-foreground">
+                        Search for movies to import from TMDB
+                    </p>
+                    <p class="mt-2 text-sm text-muted-foreground">
+                        Enter a movie title above to get started
+                    </p>
+                </div>
+            </div>
+        </div>
+    </AppSidebarLayout>
+</template>

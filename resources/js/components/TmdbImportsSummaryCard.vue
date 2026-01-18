@@ -18,7 +18,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <Link href="/dashboard/tmdb-imports" class="group block">
+    <Link href="/dashboard/tmdb/imports" class="group block">
         <Card class="transition-colors hover:bg-accent">
             <CardHeader>
                 <CardTitle class="flex items-center gap-2">

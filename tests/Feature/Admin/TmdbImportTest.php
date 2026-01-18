@@ -14,7 +14,7 @@ test('admin users can queue an upcoming-only TMDB import', function () {
         'upcoming' => true,
     ]);
 
-    $response->assertRedirect(route('dashboard.tmdb-imports'));
+    $response->assertRedirect(route('dashboard.tmdb.imports'));
 
     Queue::assertPushed(ImportTmdbMoviesJob::class, function (ImportTmdbMoviesJob $job) {
         return $job->limit === 10

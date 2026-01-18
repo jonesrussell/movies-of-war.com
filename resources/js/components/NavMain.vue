@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { ChevronRight } from 'lucide-vue-next';
-import { computed } from 'vue';
 
 import {
     Collapsible,

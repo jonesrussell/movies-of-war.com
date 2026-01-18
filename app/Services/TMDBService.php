@@ -82,10 +82,15 @@ class TMDBService
         $filename = 'posters/'.basename($posterPath);
 
         try {
-            $imageContent = file_get_contents($imageUrl);
-            Storage::disk('public')->put($filename, $imageContent);
+            $response = Http::timeout(30)->get($imageUrl);
 
-            return $filename;
+            if ($response->successful()) {
+                Storage::disk('public')->put($filename, $response->body());
+
+                return $filename;
+            }
+
+            return null;
         } catch (\Exception $e) {
             return null;
         }

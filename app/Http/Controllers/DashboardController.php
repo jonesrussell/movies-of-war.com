@@ -5,19 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ImportTmdbMoviesRequest;
 use App\Jobs\ImportTmdbMoviesJob;
 use App\Models\Movie;
+use App\Models\Tag;
 use App\Models\XPost;
 use App\Models\XTrendKeyword;
+use App\Services\TMDBService;
 use App\Services\XAnalyticsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
     public function __construct(
-        protected XAnalyticsService $analyticsService
+        protected XAnalyticsService $analyticsService,
+        protected TMDBService $tmdbService
     ) {}
 
     public function index(Request $request): Response
@@ -67,6 +71,133 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function tmdbSearch(): Response
+    {
+        if (! auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        return Inertia::render('Dashboard/TmdbSearch', [
+            'searchResults' => [],
+            'query' => '',
+        ]);
+    }
+
+    public function performTmdbSearch(Request $request): Response
+    {
+        if (! auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $query = $request->input('query', '');
+        $results = [];
+
+        if (! empty($query)) {
+            $results = $this->tmdbService->searchMovies($query);
+
+            // Check which movies are already imported
+            $tmdbIds = collect($results)->pluck('id')->toArray();
+            $existingMovies = Movie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id')->toArray();
+
+            $results = collect($results)->map(function ($movie) use ($existingMovies) {
+                $movie['already_imported'] = in_array($movie['id'], $existingMovies);
+
+                return $movie;
+            })->toArray();
+        }
+
+        return Inertia::render('Dashboard/TmdbSearch', [
+            'searchResults' => $results,
+            'query' => $query,
+        ]);
+    }
+
+    public function importSingleTmdbMovie(Request $request): RedirectResponse
+    {
+        if (! auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        $request->validate([
+            'tmdb_id' => 'required|integer',
+        ]);
+
+        $tmdbId = $request->input('tmdb_id');
+
+        // Check if already imported
+        if (Movie::where('tmdb_id', $tmdbId)->exists()) {
+            return redirect()->route('dashboard.tmdb.search')->with('error', 'This movie has already been imported.');
+        }
+
+        // Get movie details from TMDB
+        $movieData = $this->tmdbService->getMovieDetails($tmdbId);
+
+        if (! $movieData) {
+            return redirect()->route('dashboard.tmdb.search')->with('error', 'Could not fetch movie details from TMDB.');
+        }
+
+        // Download poster and get URLs
+        $posterPath = null;
+        $posterUrl = null;
+
+        if (! empty($movieData['poster_path'])) {
+            $posterPath = $this->tmdbService->downloadPoster($movieData['poster_path']);
+            $posterUrl = $this->tmdbService->getPosterUrl($movieData['poster_path']);
+        }
+
+        // Get trailer URL
+        $trailerUrl = $this->tmdbService->getYoutubeTrailerUrl($movieData['videos'] ?? null);
+
+        // Determine if upcoming
+        $releaseDate = $movieData['release_date'] ?? null;
+        $isUpcoming = $releaseDate && now()->lt($releaseDate);
+
+        // Generate unique slug
+        $baseSlug = Str::slug($movieData['title']);
+        $slug = $baseSlug;
+        $releaseYear = $releaseDate ? (int) substr($releaseDate, 0, 4) : null;
+
+        // If slug exists, append year to make it unique
+        if (Movie::where('slug', $slug)->exists()) {
+            $slug = $releaseYear ? "{$baseSlug}-{$releaseYear}" : "{$baseSlug}-{$movieData['id']}";
+
+            // If still not unique, append TMDB ID
+            if (Movie::where('slug', $slug)->exists()) {
+                $slug = "{$baseSlug}-{$movieData['id']}";
+            }
+        }
+
+        // Create movie
+        $movie = Movie::create([
+            'tmdb_id' => $movieData['id'],
+            'title' => $movieData['title'],
+            'slug' => $slug,
+            'release_year' => $releaseDate ? (int) substr($releaseDate, 0, 4) : null,
+            'release_date' => $releaseDate,
+            'synopsis' => $movieData['overview'] ?? null,
+            'runtime' => $movieData['runtime'] ?? null,
+            'poster_path' => $posterPath,
+            'poster_url' => $posterUrl,
+            'trailer_url' => $trailerUrl,
+            'imdb_id' => $movieData['imdb_id'] ?? null,
+            'is_upcoming' => $isUpcoming,
+            'status' => Movie::STATUS_DRAFT,
+        ]);
+
+        // Attach genre tags
+        if (! empty($movieData['genres'])) {
+            foreach ($movieData['genres'] as $genre) {
+                $tag = Tag::firstOrCreate(
+                    ['name' => $genre['name'], 'type' => 'genre'],
+                    ['name' => $genre['name'], 'type' => 'genre']
+                );
+                $movie->tags()->attach($tag);
+            }
+        }
+
+        return redirect()->route('dashboard.tmdb.search')->with('success', "'{$movie->title}' has been imported as a draft.");
+    }
+
     public function publishMovie(Movie $movie): RedirectResponse
     {
         if (! auth()->user()->is_admin) {
@@ -76,7 +207,7 @@ class DashboardController extends Controller
         $movie->status = Movie::STATUS_PUBLISHED;
         $movie->save();
 
-        return redirect()->route('dashboard.tmdb-imports')->with('success', 'Movie published successfully.');
+        return redirect()->route('dashboard.tmdb.imports')->with('success', 'Movie published successfully.');
     }
 
     public function archiveMovie(Movie $movie): RedirectResponse
@@ -88,7 +219,7 @@ class DashboardController extends Controller
         $movie->status = Movie::STATUS_ARCHIVED;
         $movie->save();
 
-        return redirect()->route('dashboard.tmdb-imports')->with('success', 'Movie archived successfully.');
+        return redirect()->route('dashboard.tmdb.imports')->with('success', 'Movie archived successfully.');
     }
 
     public function unpublishMovie(Movie $movie): RedirectResponse
@@ -121,6 +252,6 @@ class DashboardController extends Controller
 
         ImportTmdbMoviesJob::dispatch($limit, $upcoming);
 
-        return redirect()->route('dashboard.tmdb-imports')->with('success', "TMDB import job queued. Importing up to {$limit} movies...");
+        return redirect()->route('dashboard.tmdb.imports')->with('success', "TMDB import job queued. Importing up to {$limit} movies...");
     }
 }

@@ -3,6 +3,7 @@ import type { User } from '@/types/models';
 
 import { Link, usePage } from '@inertiajs/vue3';
 import {
+    Archive,
     BarChart3,
     BookOpen,
     Database,
@@ -49,8 +50,19 @@ const mainNavItems = computed<NavItem[]>(() => [
         ? [
               {
                   title: 'Movies',
-                  href: '/dashboard/movies',
                   icon: Film,
+                  items: [
+                      {
+                          title: 'Manage',
+                          href: '/dashboard/movies',
+                          icon: Film,
+                      },
+                      {
+                          title: 'Archived',
+                          href: '/dashboard/movies/archived',
+                          icon: Archive,
+                      },
+                  ],
               },
               {
                   title: 'Featured Slots',

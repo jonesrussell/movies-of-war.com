@@ -2,7 +2,7 @@
 import type { Movie } from '@/types/models';
 
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Archive, CheckCircle, Edit, Play, XCircle } from 'lucide-vue-next';
+import { Archive, CheckCircle, Edit, Play, Trash2, XCircle } from 'lucide-vue-next';
 
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,22 @@ function unpublishMovie() {
 
 function archiveMovie() {
     if (confirm(`Are you sure you want to archive "${props.movie.title}"?`)) {
+        router.post(
+            `/movies/${props.movie.id}/archive`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+}
+
+function deleteMovie() {
+    if (
+        confirm(
+            `Are you sure you want to permanently delete "${props.movie.title}"? This action cannot be undone.`,
+        )
+    ) {
         router.delete(`/movies/${props.movie.id}`, {
             preserveScroll: true,
         });
@@ -97,6 +113,14 @@ const posterImage =
                         title="Archive movie"
                     >
                         <Archive class="size-5" />
+                    </Button>
+                    <Button
+                        @click="deleteMovie"
+                        variant="outline"
+                        class="border-red-600 p-2 text-red-500 hover:bg-red-900/20"
+                        title="Delete movie"
+                    >
+                        <Trash2 class="size-5" />
                     </Button>
                 </div>
             </div>

@@ -14,7 +14,7 @@ class MovieController extends Controller
 {
     public function index(Request $request): Response
     {
-        $query = Movie::query()->with('tags');
+        $query = Movie::query()->with('tags')->where('status', '!=', Movie::STATUS_ARCHIVED);
 
         if ($search = $request->get('search')) {
             $query->where('title', 'like', "%{$search}%");
@@ -23,6 +23,22 @@ class MovieController extends Controller
         $movies = $query->latest()->paginate(20);
 
         return Inertia::render('Admin/Movies/Index', [
+            'movies' => $movies,
+            'queryParams' => $request->only(['search']),
+        ]);
+    }
+
+    public function archived(Request $request): Response
+    {
+        $query = Movie::query()->with('tags')->archived();
+
+        if ($search = $request->get('search')) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        $movies = $query->latest()->paginate(20);
+
+        return Inertia::render('Admin/Movies/Archived', [
             'movies' => $movies,
             'queryParams' => $request->only(['search']),
         ]);
@@ -117,11 +133,10 @@ class MovieController extends Controller
 
     public function destroy(Movie $movie): RedirectResponse
     {
-        $movie->status = Movie::STATUS_ARCHIVED;
-        $movie->save();
+        $movie->delete();
 
-        return redirect()->route('dashboard.movies')
-            ->with('success', 'Movie archived successfully.');
+        return redirect()->back()
+            ->with('success', 'Movie deleted successfully.');
     }
 
     public function publish(Movie $movie): RedirectResponse
@@ -140,5 +155,14 @@ class MovieController extends Controller
 
         return redirect()->back()
             ->with('success', 'Movie unpublished successfully.');
+    }
+
+    public function archive(Movie $movie): RedirectResponse
+    {
+        $movie->status = Movie::STATUS_ARCHIVED;
+        $movie->save();
+
+        return redirect()->back()
+            ->with('success', 'Movie archived successfully.');
     }
 }

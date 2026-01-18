@@ -2,7 +2,7 @@
 import type { Movie, PaginatedMovies } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { Archive, CheckCircle, Edit, Trash2, XCircle } from 'lucide-vue-next';
+import { Edit, Trash2 } from 'lucide-vue-next';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
@@ -24,7 +24,7 @@ const search = ref(queryParams.value?.search || '');
 
 const debouncedSearch = useDebounceFn((searchValue: string) => {
     router.get(
-        '/dashboard/movies',
+        '/dashboard/movies/archived',
         {
             search: searchValue || undefined,
         },
@@ -39,18 +39,6 @@ watch(search, (value) => {
     void debouncedSearch(value);
 });
 
-function archiveMovie(movie: Movie) {
-    if (confirm(`Are you sure you want to archive "${movie.title}"?`)) {
-        router.post(
-            `/movies/${movie.id}/archive`,
-            {},
-            {
-                preserveScroll: true,
-            },
-        );
-    }
-}
-
 function deleteMovie(movie: Movie) {
     if (
         confirm(
@@ -62,47 +50,19 @@ function deleteMovie(movie: Movie) {
         });
     }
 }
-
-function publishMovie(movie: Movie) {
-    router.post(
-        `/movies/${movie.id}/publish`,
-        {},
-        {
-            preserveScroll: true,
-        },
-    );
-}
-
-function unpublishMovie(movie: Movie) {
-    router.post(
-        `/movies/${movie.id}/unpublish`,
-        {},
-        {
-            preserveScroll: true,
-        },
-    );
-}
 </script>
 
 <template>
     <AppSidebarLayout>
-        <Head title="Manage Movies - Admin" />
+        <Head title="Archived Movies - Admin" />
 
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <!-- Header -->
-            <div class="mb-8 flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-white">Manage Movies</h1>
-                    <p class="mt-2 text-zinc-400">
-                        {{ movies?.meta?.total ?? 0 }} total movies
-                    </p>
-                </div>
-                <Link
-                    :href="'/movies/create'"
-                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-                >
-                    Add New Movie
-                </Link>
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-white">Archived Movies</h1>
+                <p class="mt-2 text-zinc-400">
+                    {{ movies?.meta?.total ?? 0 }} archived movies
+                </p>
             </div>
 
             <!-- Search -->
@@ -110,7 +70,7 @@ function unpublishMovie(movie: Movie) {
                 <Input
                     v-model="search"
                     type="text"
-                    placeholder="Search movies..."
+                    placeholder="Search archived movies..."
                     class="w-full"
                 />
             </div>
@@ -121,7 +81,7 @@ function unpublishMovie(movie: Movie) {
                     v-if="movies?.data?.length === 0"
                     class="rounded-lg bg-zinc-900 p-8 text-center text-zinc-400"
                 >
-                    No movies found.
+                    No archived movies found.
                 </div>
                 <div
                     v-for="movie in movies?.data"
@@ -170,26 +130,6 @@ function unpublishMovie(movie: Movie) {
                                     +{{ movie.tags.length - 3 }}
                                 </span>
                             </div>
-                            <div class="mt-3 flex items-center gap-2">
-                                <span
-                                    :class="[
-                                        'inline-flex rounded-full px-2 py-1 text-xs font-semibold',
-                                        movie.status === 'published'
-                                            ? 'bg-green-900/50 text-green-300'
-                                            : movie.status === 'draft'
-                                              ? 'bg-yellow-900/50 text-yellow-300'
-                                              : 'bg-zinc-800 text-zinc-400',
-                                    ]"
-                                >
-                                    {{
-                                        movie.status === 'published'
-                                            ? 'Published'
-                                            : movie.status === 'draft'
-                                              ? 'Draft'
-                                              : 'Archived'
-                                    }}
-                                </span>
-                            </div>
                             <div class="mt-3 flex flex-wrap gap-2">
                                 <Link
                                     :href="`/movies/${movie.id}/edit`"
@@ -198,30 +138,6 @@ function unpublishMovie(movie: Movie) {
                                 >
                                     <Edit class="size-4" />
                                 </Link>
-                                <button
-                                    v-if="movie.status !== 'published'"
-                                    @click="publishMovie(movie)"
-                                    class="inline-flex items-center justify-center rounded-lg bg-green-600/20 p-2 text-green-500 transition-colors hover:bg-green-600/30"
-                                    title="Publish"
-                                >
-                                    <CheckCircle class="size-4" />
-                                </button>
-                                <button
-                                    v-if="movie.status === 'published'"
-                                    @click="unpublishMovie(movie)"
-                                    class="inline-flex items-center justify-center rounded-lg bg-yellow-600/20 p-2 text-yellow-500 transition-colors hover:bg-yellow-600/30"
-                                    title="Unpublish"
-                                >
-                                    <XCircle class="size-4" />
-                                </button>
-                                <button
-                                    v-if="movie.status !== 'archived'"
-                                    @click="archiveMovie(movie)"
-                                    class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
-                                    title="Archive"
-                                >
-                                    <Archive class="size-4" />
-                                </button>
                                 <button
                                     @click="deleteMovie(movie)"
                                     class="inline-flex items-center justify-center rounded-lg bg-red-600/20 p-2 text-red-500 transition-colors hover:bg-red-600/30"
@@ -256,11 +172,6 @@ function unpublishMovie(movie: Movie) {
                                 Tags
                             </th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
-                            >
-                                Status
-                            </th>
-                            <th
                                 class="px-6 py-3 text-right text-xs font-medium tracking-wider text-zinc-400 uppercase"
                             >
                                 Actions
@@ -273,10 +184,10 @@ function unpublishMovie(movie: Movie) {
                             class="hover:bg-zinc-800/50"
                         >
                             <td
-                                colspan="5"
+                                colspan="4"
                                 class="px-6 py-12 text-center text-zinc-400"
                             >
-                                No movies found.
+                                No archived movies found.
                             </td>
                         </tr>
                         <tr
@@ -331,26 +242,6 @@ function unpublishMovie(movie: Movie) {
                                     </span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <span
-                                    :class="[
-                                        'inline-flex rounded-full px-2 py-1 text-xs font-semibold',
-                                        movie.status === 'published'
-                                            ? 'bg-green-900/50 text-green-300'
-                                            : movie.status === 'draft'
-                                              ? 'bg-yellow-900/50 text-yellow-300'
-                                              : 'bg-zinc-800 text-zinc-400',
-                                    ]"
-                                >
-                                    {{
-                                        movie.status === 'published'
-                                            ? 'Published'
-                                            : movie.status === 'draft'
-                                              ? 'Draft'
-                                              : 'Archived'
-                                    }}
-                                </span>
-                            </td>
                             <td class="px-6 py-4 text-right text-sm">
                                 <div
                                     class="flex items-center justify-end gap-2"
@@ -362,30 +253,6 @@ function unpublishMovie(movie: Movie) {
                                     >
                                         <Edit class="size-4" />
                                     </Link>
-                                    <button
-                                        v-if="movie.status !== 'published'"
-                                        @click="publishMovie(movie)"
-                                        class="inline-flex items-center justify-center rounded-lg bg-green-600/20 p-2 text-green-500 transition-colors hover:bg-green-600/30"
-                                        title="Publish"
-                                    >
-                                        <CheckCircle class="size-4" />
-                                    </button>
-                                    <button
-                                        v-if="movie.status === 'published'"
-                                        @click="unpublishMovie(movie)"
-                                        class="inline-flex items-center justify-center rounded-lg bg-yellow-600/20 p-2 text-yellow-500 transition-colors hover:bg-yellow-600/30"
-                                        title="Unpublish"
-                                    >
-                                        <XCircle class="size-4" />
-                                    </button>
-                                    <button
-                                        v-if="movie.status !== 'archived'"
-                                        @click="archiveMovie(movie)"
-                                        class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
-                                        title="Archive"
-                                    >
-                                        <Archive class="size-4" />
-                                    </button>
                                     <button
                                         @click="deleteMovie(movie)"
                                         class="inline-flex items-center justify-center rounded-lg bg-red-600/20 p-2 text-red-500 transition-colors hover:bg-red-600/30"

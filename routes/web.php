@@ -71,9 +71,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/movies/{movie}/archive', [App\Http\Controllers\DashboardController::class, 'archiveMovie'])->name('tmdb.movies.archive');
 
         Route::get('/dashboard/movies', [App\Http\Controllers\Admin\MovieController::class, 'index'])->name('dashboard.movies');
+        Route::get('/dashboard/movies/archived', [App\Http\Controllers\Admin\MovieController::class, 'archived'])->name('dashboard.movies.archived');
         Route::get('/dashboard/movies/{movie}', [App\Http\Controllers\Admin\MovieController::class, 'show'])->name('dashboard.movies.show');
         Route::post('/movies/{movie}/publish', [App\Http\Controllers\Admin\MovieController::class, 'publish'])->name('admin.movies.publish');
         Route::post('/movies/{movie}/unpublish', [App\Http\Controllers\Admin\MovieController::class, 'unpublish'])->name('admin.movies.unpublish');
+        Route::post('/movies/{movie}/archive', [App\Http\Controllers\Admin\MovieController::class, 'archive'])->name('admin.movies.archive');
         Route::resource('movies', App\Http\Controllers\Admin\MovieController::class)->except(['index', 'show']);
         Route::get('/dashboard/featured-slots', [App\Http\Controllers\Admin\FeaturedSlotController::class, 'index'])->name('dashboard.featured-slots');
         Route::resource('featured-slots', App\Http\Controllers\Admin\FeaturedSlotController::class)->except(['index']);

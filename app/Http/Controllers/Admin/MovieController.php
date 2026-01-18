@@ -1,8 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\MovieStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreMovieRequest;
+use App\Http\Requests\Admin\UpdateMovieRequest;
 use App\Models\Movie;
 use App\Models\Tag;
 use Illuminate\Http\RedirectResponse;
@@ -10,11 +15,15 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class MovieController extends Controller
+final class MovieController extends Controller
 {
     public function index(Request $request): Response
     {
-        $query = Movie::query()->with('tags')->where('status', '!=', Movie::STATUS_ARCHIVED);
+        $this->authorize('viewAny', Movie::class);
+
+        $query = Movie::query()
+            ->with('tags')
+            ->whereNot('status', MovieStatus::Archived);
 
         if ($search = $request->get('search')) {
             $query->where('title', 'like', "%{$search}%");
@@ -30,6 +39,8 @@ class MovieController extends Controller
 
     public function archived(Request $request): Response
     {
+        $this->authorize('viewAny', Movie::class);
+
         $query = Movie::query()->with('tags')->archived();
 
         if ($search = $request->get('search')) {
@@ -46,6 +57,8 @@ class MovieController extends Controller
 
     public function show(Movie $movie): Response
     {
+        $this->authorize('view', $movie);
+
         $movie->load('tags');
 
         return Inertia::render('Admin/Movies/Show', [
@@ -55,6 +68,8 @@ class MovieController extends Controller
 
     public function create(): Response
     {
+        $this->authorize('create', Movie::class);
+
         $tags = Tag::orderBy('name')->get();
 
         return Inertia::render('Admin/Movies/Create', [
@@ -62,38 +77,27 @@ class MovieController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreMovieRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'release_year' => 'required|integer|min:1900|max:2100',
-            'release_date' => 'nullable|date',
-            'synopsis' => 'required|string',
-            'runtime' => 'nullable|integer|min:1',
-            'country' => 'nullable|string|max:255',
-            'conflict' => 'nullable|string|max:255',
-            'poster_url' => 'nullable|url',
-            'trailer_url' => 'nullable|url',
-            'imdb_id' => 'nullable|string|max:20',
-            'is_upcoming' => 'boolean',
-            'tags' => 'array',
-            'tags.*' => 'exists:tags,id',
-        ]);
-
-        $validated['status'] = $validated['status'] ?? Movie::STATUS_DRAFT;
+        $validated = $request->validatedWithDefaults();
+        $tags = $validated['tags'] ?? [];
+        unset($validated['tags']);
 
         $movie = Movie::create($validated);
 
-        if (isset($validated['tags'])) {
-            $movie->tags()->sync($validated['tags']);
+        if ($tags) {
+            $movie->tags()->sync($tags);
         }
 
-        return redirect()->route('dashboard.movies')
+        return redirect()
+            ->route('dashboard.movies')
             ->with('success', 'Movie created successfully.');
     }
 
     public function edit(Movie $movie): Response
     {
+        $this->authorize('update', $movie);
+
         $movie->load('tags');
         $tags = Tag::orderBy('name')->get();
 
@@ -103,66 +107,64 @@ class MovieController extends Controller
         ]);
     }
 
-    public function update(Request $request, Movie $movie): RedirectResponse
+    public function update(UpdateMovieRequest $request, Movie $movie): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'release_year' => 'required|integer|min:1900|max:2100',
-            'release_date' => 'nullable|date',
-            'synopsis' => 'required|string',
-            'runtime' => 'nullable|integer|min:1',
-            'country' => 'nullable|string|max:255',
-            'conflict' => 'nullable|string|max:255',
-            'poster_url' => 'nullable|url',
-            'trailer_url' => 'nullable|url',
-            'imdb_id' => 'nullable|string|max:20',
-            'is_upcoming' => 'boolean',
-            'tags' => 'array',
-            'tags.*' => 'exists:tags,id',
-        ]);
+        $validated = $request->validated();
+        $tags = $validated['tags'] ?? [];
+        unset($validated['tags']);
 
         $movie->update($validated);
 
-        if (isset($validated['tags'])) {
-            $movie->tags()->sync($validated['tags']);
+        if (isset($request->validated()['tags'])) {
+            $movie->tags()->sync($tags);
         }
 
-        return redirect()->route('dashboard.movies')
+        return redirect()
+            ->route('dashboard.movies')
             ->with('success', 'Movie updated successfully.');
     }
 
     public function destroy(Movie $movie): RedirectResponse
     {
+        $this->authorize('delete', $movie);
+
         $movie->delete();
 
-        return redirect()->back()
+        return redirect()
+            ->back()
             ->with('success', 'Movie deleted successfully.');
     }
 
     public function publish(Movie $movie): RedirectResponse
     {
-        $movie->status = Movie::STATUS_PUBLISHED;
-        $movie->save();
+        $this->authorize('publish', $movie);
 
-        return redirect()->back()
+        $movie->publish();
+
+        return redirect()
+            ->back()
             ->with('success', 'Movie published successfully.');
     }
 
     public function unpublish(Movie $movie): RedirectResponse
     {
-        $movie->status = Movie::STATUS_DRAFT;
-        $movie->save();
+        $this->authorize('unpublish', $movie);
 
-        return redirect()->back()
+        $movie->unpublish();
+
+        return redirect()
+            ->back()
             ->with('success', 'Movie unpublished successfully.');
     }
 
     public function archive(Movie $movie): RedirectResponse
     {
-        $movie->status = Movie::STATUS_ARCHIVED;
-        $movie->save();
+        $this->authorize('archive', $movie);
 
-        return redirect()->back()
+        $movie->archive();
+
+        return redirect()
+            ->back()
             ->with('success', 'Movie archived successfully.');
     }
 }

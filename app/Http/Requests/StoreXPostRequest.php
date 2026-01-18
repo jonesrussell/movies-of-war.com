@@ -1,19 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests;
 
+use App\Enums\XPostStatus;
 use App\Models\XPost;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreXPostRequest extends FormRequest
+final class StoreXPostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->user()?->is_admin ?? false;
+        return $this->user()->can('create', XPost::class);
     }
 
     /**
@@ -36,20 +39,16 @@ class StoreXPostRequest extends FormRequest
             'media_urls.*' => ['required', 'string'],
             'status' => [
                 'sometimes',
-                Rule::in([
-                    XPost::STATUS_DRAFT,
-                    XPost::STATUS_SCHEDULED,
+                Rule::enum(XPostStatus::class)->only([
+                    XPostStatus::Draft,
+                    XPostStatus::Scheduled,
                 ]),
             ],
             'scheduled_for' => [
-                'required_if:status,'.XPost::STATUS_SCHEDULED,
+                'required_if:status,'.XPostStatus::Scheduled->value,
                 'nullable',
                 'date',
-                function ($attribute, $value, $fail) {
-                    if ($value && \Carbon\Carbon::parse($value)->lte(now()->addMinute())) {
-                        $fail('The scheduled time must be at least 1 minute in the future.');
-                    }
-                },
+                'after:+1 minute',
             ],
             'publish_immediately' => ['sometimes', 'boolean'],
         ];
@@ -69,7 +68,17 @@ class StoreXPostRequest extends FormRequest
             'thread_parts.*.max' => 'Each tweet in the thread cannot exceed '.XPost::MAX_TWEET_LENGTH.' characters.',
             'media_urls.max' => 'You can attach a maximum of 4 media files per post.',
             'scheduled_for.required_if' => 'A scheduled post must have a publish time.',
-            'scheduled_for.0' => 'The scheduled time must be at least 1 minute in the future.',
+            'scheduled_for.after' => 'The scheduled time must be in the future.',
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'publish_immediately' => $this->boolean('publish_immediately'),
+        ]);
     }
 }

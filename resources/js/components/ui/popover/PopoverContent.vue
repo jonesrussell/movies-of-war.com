@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { PopoverContentEmits, PopoverContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
+import { computed } from "vue"
 import { reactiveOmit } from "@vueuse/core"
 import {
   PopoverContent,
   PopoverPortal,
   useForwardPropsEmits,
 } from "reka-ui"
-import { cn } from "@/lib/utils"
+import { cn, filterUndefinedProps } from "@/lib/utils"
 
 defineOptions({
   inheritAttrs: false,
@@ -24,7 +25,9 @@ const emits = defineEmits<PopoverContentEmits>()
 
 const delegatedProps = reactiveOmit(props, "class")
 
-const forwarded = useForwardPropsEmits(delegatedProps, emits)
+const forwardedRaw = useForwardPropsEmits(delegatedProps, emits)
+
+const forwarded = computed(() => filterUndefinedProps(forwardedRaw.value as Record<string, unknown>))
 </script>
 
 <template>

@@ -37,7 +37,7 @@ const parseDateTime = (value: string | undefined): { date: DateValue | null; tim
         return { date: null, time: '00:00' };
     }
 
-    const date = fromDate(dateTime, getLocalTimeZone());
+    const date = fromDate(dateTime, getLocalTimeZone()) as DateValue;
     const hours = dateTime.getHours().toString().padStart(2, '0');
     const minutes = dateTime.getMinutes().toString().padStart(2, '0');
     const time = `${hours}:${minutes}`;
@@ -49,7 +49,7 @@ const parsedDateTime = computed(() => {
     return parseDateTime(props.modelValue);
 });
 
-const dateModel = ref<DateValue | null>(parsedDateTime.value.date);
+const dateModel = ref<DateValue | null>(parsedDateTime.value.date as DateValue | null);
 const timeModel = ref<string>(parsedDateTime.value.time);
 
 // Watch for external changes
@@ -57,7 +57,7 @@ watch(
     () => props.modelValue,
     (newValue) => {
         const parsed = parseDateTime(newValue);
-        dateModel.value = parsed.date;
+        dateModel.value = parsed.date as DateValue | null;
         timeModel.value = parsed.time;
     },
     { immediate: true },
@@ -90,7 +90,7 @@ const combineDateTime = (selectedDate: DateValue | null, selectedTime: string): 
 // Watch for changes and emit
 watch([dateModel, timeModel], ([newDate, newTime]) => {
     if (newDate) {
-        const combined = combineDateTime(newDate, newTime);
+        const combined = combineDateTime(newDate as DateValue, newTime);
         if (combined) {
             emits('update:modelValue', combined);
         }
@@ -110,6 +110,13 @@ const displayValue = computed(() => {
     });
 
     return `${dateStr} at ${timeModel.value}`;
+});
+
+const calendarModelValue = computed<DateValue | undefined>(() => {
+    if (dateModel.value === null) {
+        return undefined;
+    }
+    return dateModel.value as DateValue;
 });
 </script>
 
@@ -136,7 +143,7 @@ const displayValue = computed(() => {
                 </PopoverTrigger>
                 <PopoverContent class="w-auto p-0" align="start">
                     <Calendar
-                        :model-value="dateModel ?? undefined"
+                        :model-value="calendarModelValue"
                         layout="month-and-year"
                         :default-placeholder="today(getLocalTimeZone())"
                         @update:model-value="

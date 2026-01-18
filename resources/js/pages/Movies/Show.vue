@@ -173,7 +173,7 @@ const ogDescription = computed(() => {
                 >
                     <!-- Poster with entrance animation and hover effects -->
                     <div
-                        class="movie-detail-poster transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
+                        class="movie-detail-poster w-full transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                         :class="
                             isVisible
                                 ? 'translate-y-0 opacity-100'
@@ -186,7 +186,7 @@ const ogDescription = computed(() => {
                             <img
                                 :src="posterImage"
                                 :alt="movie.title"
-                                class="aspect-[2/3] w-full object-cover shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:scale-[1.02] hover:ring-white/20"
+                                class="aspect-[2/3] h-auto max-w-full object-cover shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:scale-[1.02] hover:ring-white/20"
                                 fetchpriority="high"
                                 decoding="async"
                             />

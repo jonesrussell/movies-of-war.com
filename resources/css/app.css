@@ -287,18 +287,20 @@
         }
     }
 
-    /* Container query-based movie detail page */
+    /* Movie detail page layout */
     .movie-detail-grid {
         container-type: inline-size;
     }
 
-    @container (min-width: 48rem) {
+    /* Use media query for desktop two-column layout */
+    @media (min-width: 768px) {
         .movie-detail-grid {
-            grid-template-columns: repeat(12, minmax(0, 1fr));
+            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
         }
 
         .movie-detail-poster {
             grid-column: span 4 / span 4;
+            max-width: 100%;
         }
 
         .movie-detail-content {

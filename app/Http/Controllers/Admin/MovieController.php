@@ -28,6 +28,15 @@ class MovieController extends Controller
         ]);
     }
 
+    public function show(Movie $movie): Response
+    {
+        $movie->load('tags');
+
+        return Inertia::render('Admin/Movies/Show', [
+            'movie' => $movie,
+        ]);
+    }
+
     public function create(): Response
     {
         $tags = Tag::orderBy('name')->get();
@@ -120,7 +129,7 @@ class MovieController extends Controller
         $movie->status = Movie::STATUS_PUBLISHED;
         $movie->save();
 
-        return redirect()->route('dashboard.movies')
+        return redirect()->back()
             ->with('success', 'Movie published successfully.');
     }
 
@@ -129,7 +138,7 @@ class MovieController extends Controller
         $movie->status = Movie::STATUS_DRAFT;
         $movie->save();
 
-        return redirect()->route('dashboard.movies')
+        return redirect()->back()
             ->with('success', 'Movie unpublished successfully.');
     }
 }

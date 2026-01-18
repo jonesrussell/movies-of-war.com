@@ -40,6 +40,7 @@ export function createMockTag(overrides: Partial<Tag> = {}): Tag {
 export function createMockMovie(overrides: Partial<Movie> = {}): Movie {
     return {
         id: 1,
+        tmdb_id: null,
         title: 'Test Movie',
         slug: 'test-movie',
         release_year: 2024,

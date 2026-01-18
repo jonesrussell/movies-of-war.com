@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/movies/{movie}/archive', [App\Http\Controllers\DashboardController::class, 'archiveMovie'])->name('tmdb.movies.archive');
 
         Route::get('/dashboard/movies', [App\Http\Controllers\Admin\MovieController::class, 'index'])->name('dashboard.movies');
+        Route::get('/dashboard/movies/{movie}', [App\Http\Controllers\Admin\MovieController::class, 'show'])->name('dashboard.movies.show');
         Route::post('/movies/{movie}/publish', [App\Http\Controllers\Admin\MovieController::class, 'publish'])->name('admin.movies.publish');
         Route::post('/movies/{movie}/unpublish', [App\Http\Controllers\Admin\MovieController::class, 'unpublish'])->name('admin.movies.unpublish');
         Route::resource('movies', App\Http\Controllers\Admin\MovieController::class)->except(['index', 'show']);

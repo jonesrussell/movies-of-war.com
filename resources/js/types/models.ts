@@ -1,5 +1,6 @@
 export interface Movie {
     id: number;
+    tmdb_id: number | null;
     title: string;
     slug: string;
     release_year: number;

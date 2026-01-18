@@ -123,9 +123,12 @@ function unpublishMovie(movie: Movie) {
                             class="h-16 w-11 flex-shrink-0 rounded bg-zinc-800"
                         />
                         <div class="min-w-0 flex-1">
-                            <div class="font-medium text-white">
+                            <Link
+                                :href="`/dashboard/movies/${movie.id}`"
+                                class="font-medium text-white transition-colors hover:text-red-500"
+                            >
                                 {{ movie.title }}
-                            </div>
+                            </Link>
                             <div class="mt-1 text-sm text-zinc-400">
                                 {{ movie.release_year }}
                                 <span v-if="movie.country">
@@ -266,9 +269,12 @@ function unpublishMovie(movie: Movie) {
                                         class="h-12 w-8 rounded bg-zinc-800"
                                     />
                                     <div>
-                                        <div class="font-medium text-white">
+                                        <Link
+                                            :href="`/dashboard/movies/${movie.id}`"
+                                            class="font-medium text-white transition-colors hover:text-red-500"
+                                        >
                                             {{ movie.title }}
-                                        </div>
+                                        </Link>
                                         <div class="text-sm text-zinc-400">
                                             {{ movie.country }}
                                         </div>

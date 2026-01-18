@@ -2,8 +2,8 @@
 import type { Movie, PaginatedMovies } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { Edit, Trash2 } from 'lucide-vue-next';
 import { useDebounceFn } from '@vueuse/core';
+import { Edit, Trash2 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 import { Input } from '@/components/ui/input';

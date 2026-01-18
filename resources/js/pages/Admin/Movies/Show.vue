@@ -2,7 +2,14 @@
 import type { Movie } from '@/types/models';
 
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Archive, CheckCircle, Edit, Play, Trash2, XCircle } from 'lucide-vue-next';
+import {
+    Archive,
+    CheckCircle,
+    Edit,
+    Play,
+    Trash2,
+    XCircle,
+} from 'lucide-vue-next';
 
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import { Button } from '@/components/ui/button';

@@ -3,7 +3,7 @@ import type { AppPageProps, Movie } from '@/types';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, Check, Play, Plus } from 'lucide-vue-next';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';
 import MovieFacts from '@/components/public/MovieFacts.vue';
@@ -32,7 +32,7 @@ const auth = page.props.auth;
 // Entrance animation state
 const isVisible = ref(false);
 const relatedVisible = ref(false);
-const relatedSection = ref<HTMLElement | null>(null);
+const relatedSection = ref<InstanceType<typeof PublicSection> | null>(null);
 let observer: IntersectionObserver | null = null;
 
 onMounted(() => {
@@ -42,19 +42,24 @@ onMounted(() => {
     });
 
     // Set up Intersection Observer for related films section
-    if (relatedSection.value) {
-        observer = new IntersectionObserver(
-            (entries) => {
-                const entry = entries[0];
-                if (entry?.isIntersecting) {
-                    relatedVisible.value = true;
-                    observer?.disconnect();
-                }
-            },
-            { threshold: 0.1 },
-        );
-        observer.observe(relatedSection.value);
-    }
+    // Wait for nextTick to ensure component is fully mounted
+    void nextTick(() => {
+        const element =
+            (relatedSection.value?.$el as HTMLElement | undefined) ?? null;
+        if (element) {
+            observer = new IntersectionObserver(
+                (entries) => {
+                    const entry = entries[0];
+                    if (entry?.isIntersecting) {
+                        relatedVisible.value = true;
+                        observer?.disconnect();
+                    }
+                },
+                { threshold: 0.1 },
+            );
+            observer.observe(element);
+        }
+    });
 });
 
 onUnmounted(() => {
@@ -181,7 +186,7 @@ const ogDescription = computed(() => {
                             <img
                                 :src="posterImage"
                                 :alt="movie.title"
-                                class="w-full shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:scale-[1.02] hover:ring-white/20"
+                                class="aspect-[2/3] w-full object-cover shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:scale-[1.02] hover:ring-white/20"
                                 fetchpriority="high"
                                 decoding="async"
                             />

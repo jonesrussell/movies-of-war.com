@@ -35,7 +35,7 @@ task('deploy:npm', function () {
 
 task('deploy:build', function () {
     cd('{{release_path}}');
-    run('npm run build');
+    run('npm run build:ssr');
 });
 
 /**

@@ -2,6 +2,7 @@
 import type { Movie, PaginatedMovies } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Archive, CheckCircle, Edit, XCircle } from 'lucide-vue-next';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
@@ -176,30 +177,34 @@ function unpublishMovie(movie: Movie) {
                             <div class="mt-3 flex flex-wrap gap-2">
                                 <Link
                                     :href="`/movies/${movie.id}/edit`"
-                                    class="text-sm text-red-500 hover:text-red-400"
+                                    class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-red-500 transition-colors hover:bg-zinc-700 hover:text-red-400"
+                                    title="Edit"
                                 >
-                                    Edit
+                                    <Edit class="size-4" />
                                 </Link>
                                 <button
                                     v-if="movie.status !== 'published'"
                                     @click="publishMovie(movie)"
-                                    class="text-sm text-green-500 hover:text-green-400"
+                                    class="inline-flex items-center justify-center rounded-lg bg-green-600/20 p-2 text-green-500 transition-colors hover:bg-green-600/30"
+                                    title="Publish"
                                 >
-                                    Publish
+                                    <CheckCircle class="size-4" />
                                 </button>
                                 <button
                                     v-if="movie.status === 'published'"
                                     @click="unpublishMovie(movie)"
-                                    class="text-sm text-yellow-500 hover:text-yellow-400"
+                                    class="inline-flex items-center justify-center rounded-lg bg-yellow-600/20 p-2 text-yellow-500 transition-colors hover:bg-yellow-600/30"
+                                    title="Unpublish"
                                 >
-                                    Unpublish
+                                    <XCircle class="size-4" />
                                 </button>
                                 <button
                                     v-if="movie.status !== 'archived'"
                                     @click="archiveMovie(movie)"
-                                    class="text-sm text-zinc-400 hover:text-white"
+                                    class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
+                                    title="Archive"
                                 >
-                                    Archive
+                                    <Archive class="size-4" />
                                 </button>
                             </div>
                         </div>
@@ -329,30 +334,34 @@ function unpublishMovie(movie: Movie) {
                                 >
                                     <Link
                                         :href="`/movies/${movie.id}/edit`"
-                                        class="text-red-500 hover:text-red-400"
+                                        class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-red-500 transition-colors hover:bg-zinc-700 hover:text-red-400"
+                                        title="Edit"
                                     >
-                                        Edit
+                                        <Edit class="size-4" />
                                     </Link>
                                     <button
                                         v-if="movie.status !== 'published'"
                                         @click="publishMovie(movie)"
-                                        class="text-green-500 hover:text-green-400"
+                                        class="inline-flex items-center justify-center rounded-lg bg-green-600/20 p-2 text-green-500 transition-colors hover:bg-green-600/30"
+                                        title="Publish"
                                     >
-                                        Publish
+                                        <CheckCircle class="size-4" />
                                     </button>
                                     <button
                                         v-if="movie.status === 'published'"
                                         @click="unpublishMovie(movie)"
-                                        class="text-yellow-500 hover:text-yellow-400"
+                                        class="inline-flex items-center justify-center rounded-lg bg-yellow-600/20 p-2 text-yellow-500 transition-colors hover:bg-yellow-600/30"
+                                        title="Unpublish"
                                     >
-                                        Unpublish
+                                        <XCircle class="size-4" />
                                     </button>
                                     <button
                                         v-if="movie.status !== 'archived'"
                                         @click="archiveMovie(movie)"
-                                        class="text-zinc-400 hover:text-white"
+                                        class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
+                                        title="Archive"
                                     >
-                                        Archive
+                                        <Archive class="size-4" />
                                     </button>
                                 </div>
                             </td>

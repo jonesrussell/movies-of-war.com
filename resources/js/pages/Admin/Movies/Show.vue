@@ -2,7 +2,7 @@
 import type { Movie } from '@/types/models';
 
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Archive, Edit, Play } from 'lucide-vue-next';
+import { Archive, CheckCircle, Edit, Play, XCircle } from 'lucide-vue-next';
 
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import { Button } from '@/components/ui/button';
@@ -67,34 +67,36 @@ const posterImage =
                 <div class="flex items-center gap-2">
                     <Link
                         :href="`/movies/${movie.id}/edit`"
-                        class="inline-flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+                        class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-white transition-colors hover:bg-zinc-700"
+                        title="Edit movie"
                     >
-                        <Edit class="size-4" />
-                        Edit
+                        <Edit class="size-5" />
                     </Link>
                     <Button
                         v-if="movie.status !== 'published'"
                         @click="publishMovie"
-                        class="bg-green-600 hover:bg-green-700"
+                        class="bg-green-600 p-2 hover:bg-green-700"
+                        title="Publish movie"
                     >
-                        Publish
+                        <CheckCircle class="size-5" />
                     </Button>
                     <Button
                         v-if="movie.status === 'published'"
                         @click="unpublishMovie"
                         variant="outline"
-                        class="border-yellow-600 text-yellow-500 hover:bg-yellow-900/20"
+                        class="border-yellow-600 p-2 text-yellow-500 hover:bg-yellow-900/20"
+                        title="Unpublish movie"
                     >
-                        Unpublish
+                        <XCircle class="size-5" />
                     </Button>
                     <Button
                         v-if="movie.status !== 'archived'"
                         @click="archiveMovie"
                         variant="outline"
-                        class="border-zinc-600 text-zinc-400 hover:bg-zinc-800"
+                        class="border-zinc-600 p-2 text-zinc-400 hover:bg-zinc-800"
+                        title="Archive movie"
                     >
-                        <Archive class="size-4" />
-                        Archive
+                        <Archive class="size-5" />
                     </Button>
                 </div>
             </div>

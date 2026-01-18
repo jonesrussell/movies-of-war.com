@@ -53,6 +53,11 @@ const mainNavItems = computed<NavItem[]>(() => [
                   icon: Film,
               },
               {
+                  title: 'Featured Slots',
+                  href: '/dashboard/featured-slots',
+                  icon: Star,
+              },
+              {
                   title: 'TMDB',
                   icon: Database,
                   items: [
@@ -67,11 +72,6 @@ const mainNavItems = computed<NavItem[]>(() => [
                           icon: Search,
                       },
                   ],
-              },
-              {
-                  title: 'Featured Slots',
-                  href: '/dashboard/featured-slots',
-                  icon: Star,
               },
               {
                   title: 'X',

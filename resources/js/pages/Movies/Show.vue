@@ -4,6 +4,7 @@ import type { Movie } from '@/types';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Check, Play, Plus } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';
 import MovieFacts from '@/components/public/MovieFacts.vue';
@@ -50,13 +51,48 @@ const toggleWatchlist = () => {
     }
 };
 
-const posterImage =
-    props.movie.poster_url || '/images/placeholders/poster-placeholder.png';
+const siteUrl = 'https://movies-of-war.com';
+
+const posterImage = computed(
+    () =>
+        props.movie.poster_url || '/images/placeholders/poster-placeholder.png',
+);
+
+const pageUrl = computed(() => `${siteUrl}/movies/${props.movie.slug}`);
+
+const ogImage = computed(() =>
+    props.movie.poster_url?.startsWith('http')
+        ? props.movie.poster_url
+        : `${siteUrl}${props.movie.poster_url || '/images/placeholders/poster-placeholder.png'}`,
+);
+
+const ogDescription = computed(() => {
+    const synopsis = props.movie.synopsis || '';
+    return synopsis.length > 200 ? synopsis.slice(0, 200) + '...' : synopsis;
+});
 </script>
 
 <template>
     <PublicLayout>
-        <Head :title="`${movie.title} - Movies of War`" />
+        <Head :title="`${movie.title} (${movie.release_year}) - Movies of War`">
+            <meta name="description" :content="ogDescription" />
+            <meta property="og:type" content="video.movie" />
+            <meta
+                property="og:title"
+                :content="`${movie.title} (${movie.release_year})`"
+            />
+            <meta property="og:description" :content="ogDescription" />
+            <meta property="og:image" :content="ogImage" />
+            <meta property="og:url" :content="pageUrl" />
+            <meta property="og:site_name" content="Movies of War" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta
+                name="twitter:title"
+                :content="`${movie.title} (${movie.release_year})`"
+            />
+            <meta name="twitter:description" :content="ogDescription" />
+            <meta name="twitter:image" :content="ogImage" />
+        </Head>
 
         <div class="relative overflow-hidden bg-zinc-950">
             <div class="absolute inset-0">

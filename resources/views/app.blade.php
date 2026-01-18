@@ -42,6 +42,43 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        {{-- Open Graph / Social Media Meta Tags --}}
+        @if(isset($page['component']) && $page['component'] === 'Movies/Show' && isset($page['props']['movie']))
+            @php
+                $movie = $page['props']['movie'];
+                $ogTitle = $movie['title'] . ' (' . $movie['release_year'] . ')';
+                $ogDescription = Str::limit($movie['synopsis'] ?? '', 200);
+                $ogImage = str_starts_with($movie['poster_url'] ?? '', 'http')
+                    ? $movie['poster_url']
+                    : url($movie['poster_url'] ?? '/images/placeholders/poster-placeholder.png');
+                $ogUrl = url('/movies/' . $movie['slug']);
+            @endphp
+            <meta property="og:type" content="video.movie">
+            <meta property="og:title" content="{{ $ogTitle }}">
+            <meta property="og:description" content="{{ $ogDescription }}">
+            <meta property="og:image" content="{{ $ogImage }}">
+            <meta property="og:url" content="{{ $ogUrl }}">
+            <meta property="og:site_name" content="Movies of War">
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:title" content="{{ $ogTitle }}">
+            <meta name="twitter:description" content="{{ $ogDescription }}">
+            <meta name="twitter:image" content="{{ $ogImage }}">
+            <meta name="description" content="{{ $ogDescription }}">
+        @else
+            {{-- Default OG tags for other pages --}}
+            <meta property="og:type" content="website">
+            <meta property="og:title" content="Movies of War - Curated War Films Database">
+            <meta property="og:description" content="Discover and explore a curated collection of war films from throughout cinema history.">
+            <meta property="og:image" content="{{ url('/images/branding/hero-bg.png') }}">
+            <meta property="og:url" content="{{ url()->current() }}">
+            <meta property="og:site_name" content="Movies of War">
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:title" content="Movies of War - Curated War Films Database">
+            <meta name="twitter:description" content="Discover and explore a curated collection of war films from throughout cinema history.">
+            <meta name="twitter:image" content="{{ url('/images/branding/hero-bg.png') }}">
+            <meta name="description" content="Discover and explore a curated collection of war films from throughout cinema history.">
+        @endif
+
         <link rel="icon" href="/favicon.ico" sizes="32x32">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">

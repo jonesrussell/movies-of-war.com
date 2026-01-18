@@ -47,10 +47,19 @@ task('artisan:queue:restart', function () {
     run('{{bin/php}} {{release_path}}/artisan queue:restart');
 });
 
+/**
+ * Restart SSR server gracefully.
+ * This stops the existing SSR server, forcing Supervisor to restart it with the new code.
+ */
+task('artisan:ssr:restart', function () {
+    run('{{bin/php}} {{release_path}}/artisan inertia:stop-ssr');
+});
+
 // Hooks
 
 after('deploy:update_code', 'deploy:npm');
 after('deploy:vendors', 'deploy:build');
 before('deploy:symlink', 'artisan:migrate');
 after('deploy:symlink', 'artisan:queue:restart');
+after('deploy:symlink', 'artisan:ssr:restart');
 after('deploy:failed', 'deploy:unlock');

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\XPostStatus;
 use App\Jobs\PublishXPost;
 use App\Models\User;
 use App\Models\XPost;
@@ -92,7 +93,7 @@ test('admin can create x-post with thread', function () {
 
 test('admin can update a draft x-post', function () {
     $admin = User::factory()->create(['is_admin' => true]);
-    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
     $this->actingAs($admin);
 
     $response = $this->put(route('admin.x-posts.update', $xPost), [
@@ -123,7 +124,7 @@ test('admin cannot update a published x-post', function () {
 
 test('admin can delete a draft x-post', function () {
     $admin = User::factory()->create(['is_admin' => true]);
-    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
     $this->actingAs($admin);
 
     $response = $this->delete(route('admin.x-posts.destroy', $xPost));
@@ -238,7 +239,7 @@ test('media urls cannot exceed 4 attachments', function () {
 
 test('admin can schedule a draft x-post', function () {
     $admin = User::factory()->create(['is_admin' => true]);
-    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
     $this->actingAs($admin);
 
     $scheduledFor = now()->addMinutes(2);
@@ -251,7 +252,7 @@ test('admin can schedule a draft x-post', function () {
     $response->assertSessionHas('success');
 
     $xPost->refresh();
-    expect($xPost->status)->toBe('scheduled');
+    expect($xPost->status)->toBe(XPostStatus::Scheduled);
     expect($xPost->scheduled_for)->not->toBeNull();
 });
 
@@ -265,12 +266,12 @@ test('admin can cancel a scheduled x-post', function () {
     $response->assertRedirect(route('admin.x-posts.index'));
 
     $xPost->refresh();
-    expect($xPost->status)->toBe('cancelled');
+    expect($xPost->status)->toBe(XPostStatus::Cancelled);
 });
 
 test('admin cannot cancel a non-scheduled x-post', function () {
     $admin = User::factory()->create(['is_admin' => true]);
-    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
     $this->actingAs($admin);
 
     $response = $this->post(route('admin.x-posts.cancel', $xPost));
@@ -285,7 +286,7 @@ test('admin can publish a draft x-post immediately', function () {
     Queue::fake();
 
     $admin = User::factory()->create(['is_admin' => true]);
-    $xPost = XPost::factory()->create(['status' => 'draft']);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
     $this->actingAs($admin);
 
     $response = $this->post(route('admin.x-posts.publish', $xPost));
@@ -319,7 +320,7 @@ test('admin can create x-post with publish immediately', function () {
 
     $xPost = XPost::where('content', 'Publish immediately test')->first();
     expect($xPost)->not->toBeNull();
-    expect($xPost->status)->toBe('published');
+    expect($xPost->status)->toBe(XPostStatus::Published);
     expect($xPost->x_post_id)->toBe('123456789');
 });
 
@@ -379,7 +380,7 @@ test('x-post scope ready to publish returns correct posts', function () {
     $ready1 = XPost::factory()->readyToPublish()->create();
     $ready2 = XPost::factory()->readyToPublish()->create();
     $future = XPost::factory()->scheduled()->create();
-    $draft = XPost::factory()->create(['status' => 'draft']);
+    $draft = XPost::factory()->create(['status' => XPostStatus::Draft]);
 
     $readyPosts = XPost::query()->readyToPublish()->get();
 

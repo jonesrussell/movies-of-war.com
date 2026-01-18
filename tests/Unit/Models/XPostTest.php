@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\XPostStatus;
 use App\Models\XPost;
 
 // Status Check Methods
@@ -11,7 +12,7 @@ test('is scheduled returns true when status is scheduled', function () {
 });
 
 test('is scheduled returns false when status is not scheduled', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
 
     expect($xPost->isScheduled())->toBeFalse();
 });
@@ -23,13 +24,13 @@ test('is published returns true when status is published', function () {
 });
 
 test('is published returns false when status is not published', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
 
     expect($xPost->isPublished())->toBeFalse();
 });
 
 test('is draft returns true when status is draft', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
 
     expect($xPost->isDraft())->toBeTrue();
 });
@@ -47,7 +48,7 @@ test('has failed returns true when status is failed', function () {
 });
 
 test('has failed returns false when status is not failed', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
 
     expect($xPost->hasFailed())->toBeFalse();
 });
@@ -55,7 +56,7 @@ test('has failed returns false when status is not failed', function () {
 // Business Logic Methods
 
 test('can publish returns true for draft posts', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
 
     expect($xPost->canPublish())->toBeTrue();
 });
@@ -157,37 +158,37 @@ test('get full thread content filters out empty values', function () {
 // State Transition Methods
 
 test('mark as scheduled updates status and scheduled for datetime', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
     $scheduledFor = now()->addHours(2);
 
     $xPost->markAsScheduled($scheduledFor);
 
     $xPost->refresh();
-    expect($xPost->status)->toBe(XPost::STATUS_SCHEDULED);
+    expect($xPost->status)->toBe(XPostStatus::Scheduled);
     expect($xPost->scheduled_for->format('Y-m-d H:i:s'))->toBe($scheduledFor->format('Y-m-d H:i:s'));
 });
 
 test('mark as published updates status with x post id and published at', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
     $xPostId = '1234567890123456789';
 
     $xPost->markAsPublished($xPostId);
 
     $xPost->refresh();
-    expect($xPost->status)->toBe(XPost::STATUS_PUBLISHED);
+    expect($xPost->status)->toBe(XPostStatus::Published);
     expect($xPost->x_post_id)->toBe($xPostId);
     expect($xPost->published_at)->not->toBeNull();
     expect($xPost->error_message)->toBeNull();
 });
 
 test('mark as failed updates status with error message', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
     $errorMessage = 'Failed to connect to X API';
 
     $xPost->markAsFailed($errorMessage);
 
     $xPost->refresh();
-    expect($xPost->status)->toBe(XPost::STATUS_FAILED);
+    expect($xPost->status)->toBe(XPostStatus::Failed);
     expect($xPost->error_message)->toBe($errorMessage);
 });
 
@@ -197,16 +198,16 @@ test('cancel updates status to cancelled when currently scheduled', function () 
     $xPost->cancel();
 
     $xPost->refresh();
-    expect($xPost->status)->toBe(XPost::STATUS_CANCELLED);
+    expect($xPost->status)->toBe(XPostStatus::Cancelled);
 });
 
 test('cancel does not update status when not scheduled', function () {
-    $xPost = XPost::factory()->create(['status' => XPost::STATUS_DRAFT]);
+    $xPost = XPost::factory()->create(['status' => XPostStatus::Draft]);
 
     $xPost->cancel();
 
     $xPost->refresh();
-    expect($xPost->status)->toBe(XPost::STATUS_DRAFT);
+    expect($xPost->status)->toBe(XPostStatus::Draft);
 });
 
 test('cancel does not update status when already published', function () {
@@ -215,5 +216,5 @@ test('cancel does not update status when already published', function () {
     $xPost->cancel();
 
     $xPost->refresh();
-    expect($xPost->status)->toBe(XPost::STATUS_PUBLISHED);
+    expect($xPost->status)->toBe(XPostStatus::Published);
 });

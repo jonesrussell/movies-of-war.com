@@ -5,12 +5,20 @@ import { computed, readonly } from 'vue';
 
 import { toUrl } from '@/lib/utils';
 
-const page = usePage();
-const currentUrlReactive = computed(
-    () => new URL(page.url, window?.location.origin).pathname,
-);
+/**
+ * Get the current URL pathname, stripping query strings.
+ * Inertia's page.url is a relative URL (pathname + optional query string).
+ */
+function getCurrentPathname(url: string): string {
+    // Split on '?' to remove query string, then take the first part (pathname)
+    return url.split('?')[0] ?? url;
+}
 
 export function useActiveUrl() {
+    const page = usePage();
+
+    const currentUrlReactive = computed(() => getCurrentPathname(page.url));
+
     function urlIsActive(
         urlToCheck: NonNullable<InertiaLinkProps['href']>,
         currentUrl?: string,

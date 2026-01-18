@@ -90,4 +90,14 @@ class Movie extends Model
     {
         return $query->where('status', self::STATUS_ARCHIVED);
     }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('is_upcoming', true);
+    }
+
+    public function scopeReleased($query)
+    {
+        return $query->where('is_upcoming', false);
+    }
 }

@@ -64,7 +64,10 @@ const isItemActive = (item: NavItem): boolean => {
                                     :is-active="isItemActive(item)"
                                     :tooltip="item.title"
                                 >
-                                    <component v-if="item.icon" :is="item.icon" />
+                                    <component
+                                        v-if="item.icon"
+                                        :is="item.icon"
+                                    />
                                     <span>{{ item.title }}</span>
                                     <ChevronRight
                                         class="ml-auto transition-transform duration-200"
@@ -80,9 +83,16 @@ const isItemActive = (item: NavItem): boolean => {
                                     >
                                         <SidebarMenuSubButton
                                             as-child
-                                            :is-active="subItem.href ? urlIsActive(subItem.href) : false"
+                                            :is-active="
+                                                subItem.href
+                                                    ? urlIsActive(subItem.href)
+                                                    : false
+                                            "
                                         >
-                                            <Link v-if="subItem.href" :href="subItem.href">
+                                            <Link
+                                                v-if="subItem.href"
+                                                :href="subItem.href"
+                                            >
                                                 <component
                                                     v-if="subItem.icon"
                                                     :is="subItem.icon"

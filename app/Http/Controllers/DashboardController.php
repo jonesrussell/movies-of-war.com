@@ -28,26 +28,58 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
+        // Core stats
+        $publishedMoviesCount = Movie::published()->count();
+        $draftMoviesCount = Movie::draft()->count();
+        $archivedMoviesCount = Movie::archived()->count();
+
         $stats = [
-            'movies' => Movie::published()->count(),
-            'tags' => \App\Models\Tag::count(),
+            'movies' => $publishedMoviesCount,
+            'drafts' => $draftMoviesCount,
+            'archived' => $archivedMoviesCount,
+            'tags' => Tag::count(),
             'activeFeatures' => \App\Models\FeaturedSlot::active()->count(),
-            'tmdbDrafts' => $user->is_admin ? Movie::draft()->count() : 0,
+            'tmdbDrafts' => $user->is_admin ? $draftMoviesCount : 0,
         ];
 
+        // Recent movies for the dashboard (latest 6 published)
+        $recentMovies = Movie::query()
+            ->published()
+            ->with('tags')
+            ->latest('updated_at')
+            ->limit(6)
+            ->get();
+
+        // User's watchlist count
+        $watchlistCount = $user->watchlist()->count();
+
         // Add X API stats for admins
+        $xStats = null;
         if ($user->is_admin) {
             $xPerformanceReport = $this->analyticsService->getPerformanceReport(now()->subDays(30), now());
 
-            $stats['x_published_posts'] = XPost::published()->count();
-            $stats['x_scheduled_posts'] = XPost::scheduled()->count();
-            $stats['x_failed_posts'] = XPost::failed()->count();
-            $stats['x_total_impressions'] = $xPerformanceReport['total_impressions'] ?? 0;
-            $stats['x_active_keywords'] = XTrendKeyword::active()->count();
+            $xStats = [
+                'published_posts' => XPost::published()->count(),
+                'scheduled_posts' => XPost::scheduled()->count(),
+                'failed_posts' => XPost::failed()->count(),
+                'total_impressions' => $xPerformanceReport['total_impressions'] ?? 0,
+                'active_keywords' => XTrendKeyword::active()->count(),
+                'engagement_rate' => $xPerformanceReport['average_engagement_rate'] ?? 0,
+            ];
+
+            // Keep legacy stats for backwards compatibility
+            $stats['x_published_posts'] = $xStats['published_posts'];
+            $stats['x_scheduled_posts'] = $xStats['scheduled_posts'];
+            $stats['x_failed_posts'] = $xStats['failed_posts'];
+            $stats['x_total_impressions'] = $xStats['total_impressions'];
+            $stats['x_active_keywords'] = $xStats['active_keywords'];
         }
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,
+            'recentMovies' => $recentMovies,
+            'watchlistCount' => $watchlistCount,
+            'xStats' => $xStats,
         ]);
     }
 

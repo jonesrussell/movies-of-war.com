@@ -1,18 +1,38 @@
 <script setup lang="ts">
-import type { AppPageProps } from '@/types';
+import type { AppPageProps, Movie } from '@/types';
 
-import { Head, usePage } from '@inertiajs/vue3';
-import { Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import {
+    Archive,
+    Bookmark,
+    Database,
+    FileEdit,
+    Film,
+    Plus,
+    Star,
+    Tags,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 
-import QuickActionsSection from '@/components/QuickActionsSection.vue';
-import StatsGrid from '@/components/StatsGrid.vue';
-import TmdbImportsSummaryCard from '@/components/TmdbImportsSummaryCard.vue';
+import AdminQuickLinks from '@/components/dashboard/AdminQuickLinks.vue';
+import DashboardStatCard from '@/components/dashboard/DashboardStatCard.vue';
+import RecentMoviesCard from '@/components/dashboard/RecentMoviesCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+interface XStats {
+    published_posts: number;
+    scheduled_posts: number;
+    failed_posts: number;
+    total_impressions: number;
+    active_keywords: number;
+    engagement_rate: number;
+}
 
 interface Props {
     stats: {
         movies: number;
+        drafts: number;
+        archived: number;
         tags: number;
         activeFeatures: number;
         tmdbDrafts: number;
@@ -22,53 +42,33 @@ interface Props {
         x_total_impressions?: number;
         x_active_keywords?: number;
     };
+    recentMovies: Movie[];
+    watchlistCount: number;
+    xStats: XStats | null;
 }
 
 interface PageProps extends AppPageProps {
-    stats: {
-        movies: number;
-        tags: number;
-        activeFeatures: number;
-        tmdbDrafts: number;
-        x_published_posts?: number;
-        x_scheduled_posts?: number;
-        x_failed_posts?: number;
-        x_total_impressions?: number;
-        x_active_keywords?: number;
-    };
+    stats: Props['stats'];
+    recentMovies: Movie[];
+    watchlistCount: number;
+    xStats: XStats | null;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const page = usePage<PageProps>();
 
 const auth = page.props.auth;
+const isAdmin = computed(() => auth.user?.is_admin);
 
-const statsArray = computed(() => {
-    const base = [
-        { title: 'Published Movies', value: props.stats.movies },
-        { title: 'Total Tags', value: props.stats.tags },
-        { title: 'Active Features', value: props.stats.activeFeatures },
-    ];
+const greeting = computed(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+});
 
-    // Add X API stats for admins
-    if (auth.user?.is_admin && props.stats.x_published_posts !== undefined) {
-        base.push(
-            {
-                title: 'X Published Posts',
-                value: props.stats.x_published_posts,
-            },
-            {
-                title: 'X Scheduled Posts',
-                value: props.stats.x_scheduled_posts ?? 0,
-            },
-            {
-                title: 'X Total Impressions',
-                value: props.stats.x_total_impressions ?? 0,
-            },
-        );
-    }
-
-    return base;
+const firstName = computed(() => {
+    return auth.user?.name?.split(' ')[0] || 'there';
 });
 </script>
 
@@ -76,87 +76,306 @@ const statsArray = computed(() => {
     <Head title="Dashboard - Movies of War" />
 
     <AppSidebarLayout>
-        <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
-            <!-- Stats Grid -->
-            <StatsGrid :stats="statsArray" class="mb-8" />
+        <div
+            class="dashboard-container w-full"
+            style="container-type: inline-size"
+        >
+            <div class="px-4 py-8 sm:px-6 lg:px-8">
+                <!-- Welcome Header -->
+                <div class="mb-8">
+                    <h1
+                        class="text-2xl font-bold tracking-tight text-white sm:text-3xl"
+                    >
+                        {{ greeting }}, {{ firstName }}
+                    </h1>
+                    <p class="mt-1 text-zinc-400">
+                        <template v-if="isAdmin">
+                            Here's what's happening with your war films
+                            collection.
+                        </template>
+                        <template v-else>
+                            Welcome back to Movies of War.
+                        </template>
+                    </p>
+                </div>
 
-            <!-- Admin TMDB Summary Card -->
-            <div v-if="auth.user?.is_admin" class="mb-8">
-                <TmdbImportsSummaryCard :draft-count="props.stats.tmdbDrafts" />
-            </div>
+                <!-- Admin Stats Grid -->
+                <div
+                    v-if="isAdmin"
+                    class="dashboard-stats-grid mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
+                >
+                    <DashboardStatCard
+                        title="Published"
+                        :value="stats.movies"
+                        :icon="Film"
+                        href="/movies"
+                        :trend="null"
+                        variant="success"
+                    />
+                    <DashboardStatCard
+                        title="Drafts"
+                        :value="stats.drafts"
+                        :icon="FileEdit"
+                        href="/dashboard/tmdb/imports"
+                        :trend="null"
+                        variant="warning"
+                    />
+                    <DashboardStatCard
+                        title="Archived"
+                        :value="stats.archived"
+                        :icon="Archive"
+                        :href="null"
+                        :trend="null"
+                        variant="default"
+                    />
+                    <DashboardStatCard
+                        title="Tags"
+                        :value="stats.tags"
+                        :icon="Tags"
+                        :href="null"
+                        :trend="null"
+                        variant="default"
+                    />
+                    <DashboardStatCard
+                        title="Featured"
+                        :value="stats.activeFeatures"
+                        :icon="Star"
+                        href="/featured-slots"
+                        :trend="null"
+                        variant="default"
+                    />
+                    <DashboardStatCard
+                        title="TMDB Queue"
+                        :value="stats.tmdbDrafts"
+                        :icon="Database"
+                        href="/dashboard/tmdb/imports"
+                        :trend="null"
+                        :variant="stats.tmdbDrafts > 0 ? 'warning' : 'default'"
+                    />
+                </div>
 
-            <!-- Admin X API Quick Links -->
-            <div v-if="auth.user?.is_admin" class="mb-8">
-                <div class="rounded-lg bg-zinc-900 p-6">
-                    <h2 class="mb-4 text-xl font-bold text-white">
-                        X API Management
-                    </h2>
-                    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Regular User Stats -->
+                <div v-else class="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    <DashboardStatCard
+                        title="Movies"
+                        :value="stats.movies"
+                        :icon="Film"
+                        href="/movies"
+                        :trend="null"
+                        variant="default"
+                    />
+                    <DashboardStatCard
+                        title="My Watchlist"
+                        :value="watchlistCount"
+                        :icon="Bookmark"
+                        href="/watchlist"
+                        :trend="null"
+                        variant="success"
+                    />
+                    <DashboardStatCard
+                        title="Tags"
+                        :value="stats.tags"
+                        :icon="Tags"
+                        href="/movies"
+                        :trend="null"
+                        variant="default"
+                    />
+                </div>
+
+                <!-- Main Content Grid -->
+                <div class="dashboard-main-grid grid gap-6 lg:grid-cols-2">
+                    <!-- Recent Movies -->
+                    <div class="lg:col-span-2">
+                        <RecentMoviesCard
+                            :movies="recentMovies"
+                            :title="
+                                isAdmin ? 'Recently Updated' : 'Recently Added'
+                            "
+                        />
+                    </div>
+
+                    <!-- Admin: TMDB Import Card -->
+                    <div v-if="isAdmin">
                         <Link
-                            href="/x-posts"
-                            class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
+                            href="/dashboard/tmdb/imports"
+                            class="group block rounded-xl bg-zinc-900 p-5 ring-1 ring-zinc-800/70 transition-all hover:bg-zinc-800/70 hover:ring-zinc-700/70"
                         >
-                            <div class="text-sm text-zinc-400">
-                                Manage Posts
-                            </div>
-                            <div class="mt-1 text-lg font-semibold text-white">
-                                {{ stats.x_published_posts ?? 0 }} Published
-                            </div>
-                        </Link>
-                        <Link
-                            href="/dashboard/x-analytics"
-                            class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
-                        >
-                            <div class="text-sm text-zinc-400">
-                                View Analytics
-                            </div>
-                            <div class="mt-1 text-lg font-semibold text-white">
-                                {{
-                                    stats.x_total_impressions?.toLocaleString() ??
-                                    '0'
-                                }}
-                                Impressions
-                            </div>
-                        </Link>
-                        <Link
-                            href="/dashboard/x-trends"
-                            class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
-                        >
-                            <div class="text-sm text-zinc-400">
-                                Monitor Trends
-                            </div>
-                            <div class="mt-1 text-lg font-semibold text-white">
-                                {{ stats.x_active_keywords ?? 0 }} Keywords
-                            </div>
-                        </Link>
-                        <Link
-                            href="/dashboard/x-auto-replies"
-                            class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
-                        >
-                            <div class="text-sm text-zinc-400">
-                                Auto Replies
-                            </div>
-                            <div class="mt-1 text-lg font-semibold text-white">
-                                Manage Rules
-                            </div>
-                        </Link>
-                        <Link
-                            href="/dashboard/x-content-discovery"
-                            class="rounded-lg bg-zinc-800 p-4 text-center transition-colors hover:bg-zinc-700"
-                        >
-                            <div class="text-sm text-zinc-400">
-                                Content Discovery
-                            </div>
-                            <div class="mt-1 text-lg font-semibold text-white">
-                                Curated Feed
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex size-12 items-center justify-center rounded-xl bg-amber-500/10"
+                                >
+                                    <Database class="size-6 text-amber-400" />
+                                </div>
+                                <div class="flex-1">
+                                    <h3
+                                        class="text-base font-semibold text-white"
+                                    >
+                                        TMDB Imports
+                                    </h3>
+                                    <p class="text-sm text-zinc-400">
+                                        {{ stats.tmdbDrafts }}
+                                        {{
+                                            stats.tmdbDrafts === 1
+                                                ? 'movie'
+                                                : 'movies'
+                                        }}
+                                        awaiting review
+                                    </p>
+                                </div>
+                                <div
+                                    class="flex size-9 items-center justify-center rounded-lg bg-zinc-800 transition-colors group-hover:bg-zinc-700"
+                                >
+                                    <Plus class="size-4 text-zinc-400" />
+                                </div>
                             </div>
                         </Link>
                     </div>
+
+                    <!-- Admin: Search TMDB -->
+                    <div v-if="isAdmin">
+                        <Link
+                            href="/dashboard/tmdb/search"
+                            class="group block rounded-xl bg-zinc-900 p-5 ring-1 ring-zinc-800/70 transition-all hover:bg-zinc-800/70 hover:ring-zinc-700/70"
+                        >
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex size-12 items-center justify-center rounded-xl bg-red-500/10"
+                                >
+                                    <svg
+                                        class="size-6 text-red-400"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <circle cx="11" cy="11" r="8" />
+                                        <path d="m21 21-4.3-4.3" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h3
+                                        class="text-base font-semibold text-white"
+                                    >
+                                        Search TMDB
+                                    </h3>
+                                    <p class="text-sm text-zinc-400">
+                                        Find and import specific movies
+                                    </p>
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+
+                    <!-- Admin: X Platform Section -->
+                    <div v-if="isAdmin" class="lg:col-span-2">
+                        <AdminQuickLinks :x-stats="xStats" />
+                    </div>
+
+                    <!-- Regular User: Quick Actions -->
+                    <template v-if="!isAdmin">
+                        <Link
+                            href="/movies"
+                            class="group block rounded-xl bg-zinc-900 p-5 ring-1 ring-zinc-800/70 transition-all hover:bg-zinc-800/70 hover:ring-zinc-700/70"
+                        >
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex size-12 items-center justify-center rounded-xl bg-red-500/10"
+                                >
+                                    <Film class="size-6 text-red-400" />
+                                </div>
+                                <div class="flex-1">
+                                    <h3
+                                        class="text-base font-semibold text-white"
+                                    >
+                                        Browse Movies
+                                    </h3>
+                                    <p class="text-sm text-zinc-400">
+                                        Explore the collection
+                                    </p>
+                                </div>
+                            </div>
+                        </Link>
+
+                        <Link
+                            href="/watchlist"
+                            class="group block rounded-xl bg-zinc-900 p-5 ring-1 ring-zinc-800/70 transition-all hover:bg-zinc-800/70 hover:ring-zinc-700/70"
+                        >
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex size-12 items-center justify-center rounded-xl bg-emerald-500/10"
+                                >
+                                    <Bookmark class="size-6 text-emerald-400" />
+                                </div>
+                                <div class="flex-1">
+                                    <h3
+                                        class="text-base font-semibold text-white"
+                                    >
+                                        My Watchlist
+                                    </h3>
+                                    <p class="text-sm text-zinc-400">
+                                        {{ watchlistCount }}
+                                        {{
+                                            watchlistCount === 1
+                                                ? 'movie'
+                                                : 'movies'
+                                        }}
+                                        saved
+                                    </p>
+                                </div>
+                            </div>
+                        </Link>
+                    </template>
+                </div>
+
+                <!-- Admin: Featured Slots Management -->
+                <div v-if="isAdmin" class="mt-6">
+                    <Link
+                        href="/featured-slots"
+                        class="group block rounded-xl bg-gradient-to-r from-red-600/20 via-red-500/10 to-transparent p-5 ring-1 ring-red-500/20 transition-all hover:ring-red-500/40"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex size-12 items-center justify-center rounded-xl bg-red-500/20"
+                                >
+                                    <Star class="size-6 text-red-400" />
+                                </div>
+                                <div>
+                                    <h3
+                                        class="text-base font-semibold text-white"
+                                    >
+                                        Featured Slots
+                                    </h3>
+                                    <p class="text-sm text-zinc-400">
+                                        {{ stats.activeFeatures }} active
+                                        features on homepage
+                                    </p>
+                                </div>
+                            </div>
+                            <div
+                                class="hidden items-center gap-2 text-sm font-medium text-red-400 sm:flex"
+                            >
+                                <span>Manage</span>
+                                <svg
+                                    class="size-4 transition-transform group-hover:translate-x-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
             </div>
-
-            <!-- Quick Actions for Regular Users -->
-            <QuickActionsSection v-if="!auth.user?.is_admin" />
         </div>
     </AppSidebarLayout>
 </template>

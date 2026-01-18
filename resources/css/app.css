@@ -253,6 +253,40 @@
         }
     }
 
+    /* Container query-based dashboard stats grid (admin 6-column layout) */
+    .dashboard-stats-grid {
+        container-type: inline-size;
+    }
+
+    @container (min-width: 32rem) {
+        .dashboard-stats-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @container (min-width: 48rem) {
+        .dashboard-stats-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    @container (min-width: 64rem) {
+        .dashboard-stats-grid {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+    }
+
+    /* Container query-based dashboard main grid */
+    .dashboard-main-grid {
+        container-type: inline-size;
+    }
+
+    @container (min-width: 48rem) {
+        .dashboard-main-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
     /* Container query-based movie detail page */
     .movie-detail-grid {
         container-type: inline-size;

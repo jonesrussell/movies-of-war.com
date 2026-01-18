@@ -1,0 +1,75 @@
+# Caddy Configuration Example for movies-of-war.com
+#
+# This file should be placed on your production server at:
+# /etc/caddy/Caddyfile (or wherever Caddy looks for config)
+#
+# After updating, reload Caddy: sudo systemctl reload caddy
+
+movies-of-war.com {
+    # Root directory
+    root * /home/deployer/movies-of-war.com/current/public
+
+    # Enable gzip compression
+    encode gzip zstd
+
+    # Static assets - long cache (1 year) with cache-busting via Vite hashes
+    handle_path /build/* {
+        header Cache-Control "public, max-age=31536000, immutable"
+        file_server
+    }
+
+    # Images - long cache (1 year)
+    handle_path /images/* {
+        header Cache-Control "public, max-age=31536000, immutable"
+        file_server
+    }
+
+    # Favicons and manifest
+    handle_path /*.png {
+        header Cache-Control "public, max-age=31536000, immutable"
+        file_server
+    }
+
+    handle_path /*.ico {
+        header Cache-Control "public, max-age=31536000, immutable"
+        file_server
+    }
+
+    handle_path /*.svg {
+        header Cache-Control "public, max-age=31536000, immutable"
+        file_server
+    }
+
+    handle_path /*.webmanifest {
+        header Cache-Control "public, max-age=86400"  # 1 day for manifest
+        file_server
+    }
+
+    # Fonts from external CDN (fonts.bunny.net) already have proper cache headers
+
+    # PHP files - no cache, pass to PHP-FPM
+    handle_path /*.php {
+        reverse_proxy unix//run/php/php8.4-fpm.sock {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Laravel routes - pass to PHP-FPM
+    handle {
+        reverse_proxy unix//run/php/php8.4-fpm.sock {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Logging
+    log {
+        output file /var/log/caddy/movies-of-war.com.log
+        format json
+    }
+}

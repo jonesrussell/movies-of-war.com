@@ -32,6 +32,8 @@ const displayedTags = computed(() => {
                 <Poster
                     :src="movie.poster_url"
                     :alt="movie.title"
+                    :poster-path="movie.poster_path"
+                    context="grid"
                     aspect-ratio="2/3"
                     class="transition-transform duration-500 [transition-timing-function:var(--ease-smooth-out)] group-hover:scale-[1.03]"
                 >

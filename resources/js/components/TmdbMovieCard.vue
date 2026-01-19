@@ -3,6 +3,7 @@ import type { Movie } from '@/types/models';
 
 import { Archive, CheckCircle } from 'lucide-vue-next';
 
+import { Poster } from '@/components/primitives';
 import { Button } from '@/components/ui/button';
 
 interface Props {
@@ -27,16 +28,13 @@ function handleArchive() {
 
 <template>
     <div class="group relative overflow-hidden rounded-lg border bg-card">
-        <div class="aspect-[2/3]">
-            <img
-                :src="
-                    movie.poster_url ||
-                    '/images/placeholders/poster-placeholder.png'
-                "
-                :alt="movie.title"
-                class="h-full w-full object-cover"
-            />
-        </div>
+        <Poster
+            :src="movie.poster_url"
+            :alt="movie.title"
+            :poster-path="movie.poster_path"
+            context="grid"
+            aspect-ratio="2/3"
+        />
 
         <div class="p-3">
             <h3 class="mb-1 truncate text-sm font-semibold">

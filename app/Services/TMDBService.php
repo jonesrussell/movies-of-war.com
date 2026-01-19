@@ -141,6 +141,57 @@ class TMDBService
         return "{$this->imageBaseUrl}/{$size}{$posterPath}";
     }
 
+    /**
+     * Get responsive poster URLs for different contexts.
+     *
+     * @param  string|null  $posterPath  The TMDB poster path
+     * @param  string  $context  The context: 'grid', 'detail', or 'hero'
+     * @return array<string, array<string, string>> Returns array with 'webp' and 'jpeg' keys, each containing 'srcset' and 'sizes'
+     */
+    public function getResponsivePosterUrls(?string $posterPath, string $context = 'grid'): array
+    {
+        if (! $posterPath) {
+            return [
+                'webp' => ['srcset' => '', 'sizes' => ''],
+                'jpeg' => ['srcset' => '', 'sizes' => ''],
+            ];
+        }
+
+        $sizes = [
+            'grid' => ['w185', 'w342'],
+            'detail' => ['w342', 'w500', 'w780'],
+            'hero' => ['w500', 'w780', 'original'],
+        ];
+
+        $sizeList = $sizes[$context] ?? $sizes['grid'];
+
+        $webpSrcset = [];
+        $jpegSrcset = [];
+
+        foreach ($sizeList as $size) {
+            $width = $size === 'original' ? '1920' : str_replace('w', '', $size);
+            $webpSrcset[] = "{$this->imageBaseUrl}/{$size}{$posterPath}.webp {$width}w";
+            $jpegSrcset[] = "{$this->imageBaseUrl}/{$size}{$posterPath} {$width}w";
+        }
+
+        $sizesAttr = [
+            'grid' => '(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw',
+            'detail' => '(max-width: 768px) 100vw, 33vw',
+            'hero' => '100vw',
+        ];
+
+        return [
+            'webp' => [
+                'srcset' => implode(', ', $webpSrcset),
+                'sizes' => $sizesAttr[$context] ?? $sizesAttr['grid'],
+            ],
+            'jpeg' => [
+                'srcset' => implode(', ', $jpegSrcset),
+                'sizes' => $sizesAttr[$context] ?? $sizesAttr['grid'],
+            ],
+        ];
+    }
+
     public function getYoutubeTrailerUrl(?array $videos): ?string
     {
         if (! $videos || ! isset($videos['results'])) {

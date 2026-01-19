@@ -6,6 +6,7 @@ import { ArrowLeft, Check, Play, Plus } from 'lucide-vue-next';
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';
+import { Poster } from '@/components/primitives';
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
@@ -13,6 +14,12 @@ import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/PublicLayout.vue';
+import {
+    extractPosterPath,
+    getTmdbPosterSizes,
+    getTmdbPosterSrcset,
+    isTmdbImageUrl,
+} from '@/utils/image';
 
 interface Props {
     movie: Movie;
@@ -105,6 +112,49 @@ const ogDescription = computed(() => {
     const synopsis = props.movie.synopsis || '';
     return synopsis.length > 200 ? synopsis.slice(0, 200) + '...' : synopsis;
 });
+
+const tmdbPosterPath = computed(() => {
+    if (props.movie.poster_path) {
+        return props.movie.poster_path;
+    }
+
+    if (isTmdbImageUrl(props.movie.poster_url)) {
+        return extractPosterPath(props.movie.poster_url);
+    }
+
+    return null;
+});
+
+const backgroundWebpSrcset = computed(() => {
+    if (!tmdbPosterPath.value) {
+        return '';
+    }
+
+    return getTmdbPosterSrcset(tmdbPosterPath.value, 'hero', true);
+});
+
+const backgroundJpegSrcset = computed(() => {
+    if (!tmdbPosterPath.value) {
+        return '';
+    }
+
+    return getTmdbPosterSrcset(tmdbPosterPath.value, 'hero', false);
+});
+
+const backgroundSizes = computed(() => {
+    if (!tmdbPosterPath.value) {
+        return undefined;
+    }
+
+    return getTmdbPosterSizes('hero');
+});
+
+const useResponsiveBackground = computed(() => {
+    return Boolean(
+        tmdbPosterPath.value &&
+        (backgroundWebpSrcset.value || backgroundJpegSrcset.value),
+    );
+});
 </script>
 
 <template>
@@ -133,7 +183,30 @@ const ogDescription = computed(() => {
             <!-- Background layers -->
             <div class="absolute inset-0">
                 <!-- Blurred poster background with scale animation -->
+                <picture v-if="useResponsiveBackground">
+                    <source
+                        v-if="backgroundWebpSrcset"
+                        type="image/webp"
+                        :srcset="backgroundWebpSrcset"
+                        :sizes="backgroundSizes"
+                    />
+                    <source
+                        v-if="backgroundJpegSrcset"
+                        type="image/jpeg"
+                        :srcset="backgroundJpegSrcset"
+                        :sizes="backgroundSizes"
+                    />
+                    <img
+                        :src="posterImage"
+                        :alt="movie.title"
+                        class="h-full w-full scale-110 object-cover opacity-25 blur-2xl transition-transform duration-[2000ms] [transition-timing-function:var(--ease-smooth-out)]"
+                        :class="isVisible ? 'scale-100' : 'scale-110'"
+                        fetchpriority="high"
+                        decoding="async"
+                    />
+                </picture>
                 <img
+                    v-else
                     :src="posterImage"
                     :alt="movie.title"
                     class="h-full w-full scale-110 object-cover opacity-25 blur-2xl transition-transform duration-[2000ms] [transition-timing-function:var(--ease-smooth-out)]"
@@ -182,12 +255,14 @@ const ogDescription = computed(() => {
                         <div
                             class="overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]"
                         >
-                            <img
+                            <Poster
                                 :src="posterImage"
                                 :alt="movie.title"
-                                class="aspect-[2/3] h-auto max-w-full object-cover shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:scale-[1.02] hover:ring-white/20"
-                                fetchpriority="high"
-                                decoding="async"
+                                :poster-path="movie.poster_path"
+                                context="detail"
+                                aspect-ratio="2/3"
+                                :priority="true"
+                                class="shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:scale-[1.02] hover:ring-white/20"
                             />
                         </div>
 

@@ -5,8 +5,14 @@ import { Link } from '@inertiajs/vue3';
 import { Info, Play } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
-import { DotPattern, GradientOverlay } from '@/components/primitives';
+import { DotPattern, GradientOverlay, Poster } from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
+import {
+    extractPosterPath,
+    getTmdbPosterSizes,
+    getTmdbPosterSrcset,
+    isTmdbImageUrl,
+} from '@/utils/image';
 
 interface Props {
     movie: Movie;
@@ -20,6 +26,49 @@ const posterImage = computed(
     () =>
         props.movie.poster_url || '/images/placeholders/poster-placeholder.png',
 );
+
+const tmdbPosterPath = computed(() => {
+    if (props.movie.poster_path) {
+        return props.movie.poster_path;
+    }
+
+    if (isTmdbImageUrl(props.movie.poster_url)) {
+        return extractPosterPath(props.movie.poster_url);
+    }
+
+    return null;
+});
+
+const backgroundWebpSrcset = computed(() => {
+    if (!tmdbPosterPath.value) {
+        return '';
+    }
+
+    return getTmdbPosterSrcset(tmdbPosterPath.value, 'hero', true);
+});
+
+const backgroundJpegSrcset = computed(() => {
+    if (!tmdbPosterPath.value) {
+        return '';
+    }
+
+    return getTmdbPosterSrcset(tmdbPosterPath.value, 'hero', false);
+});
+
+const backgroundSizes = computed(() => {
+    if (!tmdbPosterPath.value) {
+        return undefined;
+    }
+
+    return getTmdbPosterSizes('hero');
+});
+
+const useResponsiveBackground = computed(() => {
+    return Boolean(
+        tmdbPosterPath.value &&
+        (backgroundWebpSrcset.value || backgroundJpegSrcset.value),
+    );
+});
 
 // Entrance animation state
 const isVisible = ref(false);
@@ -36,7 +85,30 @@ onMounted(() => {
         <!-- Background layers -->
         <div class="absolute inset-0">
             <!-- Blurred poster background with scale animation -->
+            <picture v-if="useResponsiveBackground">
+                <source
+                    v-if="backgroundWebpSrcset"
+                    type="image/webp"
+                    :srcset="backgroundWebpSrcset"
+                    :sizes="backgroundSizes"
+                />
+                <source
+                    v-if="backgroundJpegSrcset"
+                    type="image/jpeg"
+                    :srcset="backgroundJpegSrcset"
+                    :sizes="backgroundSizes"
+                />
+                <img
+                    :src="posterImage"
+                    :alt="movie.title"
+                    class="h-full w-full scale-110 object-cover opacity-25 blur-xl transition-transform duration-[2000ms] [transition-timing-function:var(--ease-smooth-out)]"
+                    :class="isVisible ? 'scale-100' : 'scale-110'"
+                    fetchpriority="high"
+                    decoding="async"
+                />
+            </picture>
             <img
+                v-else
                 :src="posterImage"
                 :alt="movie.title"
                 class="h-full w-full scale-110 object-cover opacity-25 blur-xl transition-transform duration-[2000ms] [transition-timing-function:var(--ease-smooth-out)]"
@@ -65,12 +137,14 @@ onMounted(() => {
                             : 'translate-y-8 opacity-0'
                     "
                 >
-                    <img
+                    <Poster
                         :src="posterImage"
                         :alt="movie.title"
-                        class="w-full rounded-2xl shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:ring-white/20"
-                        fetchpriority="high"
-                        decoding="async"
+                        :poster-path="tmdbPosterPath"
+                        context="hero"
+                        aspect-ratio="2/3"
+                        :priority="true"
+                        class="rounded-2xl shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:ring-white/20"
                     />
                 </div>
 

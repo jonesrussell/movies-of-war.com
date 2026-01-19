@@ -4,6 +4,8 @@ import type { Movie } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { Info, Play } from 'lucide-vue-next';
 
+import { Poster } from '@/components/primitives';
+
 interface Props {
     movie: Movie;
     title: string;
@@ -87,12 +89,13 @@ const posterImage =
                 class="featured-movie-poster order-2 flex items-center justify-center border-t border-zinc-800 bg-zinc-950/20 p-6 md:col-span-4 md:border-t-0 md:border-l"
             >
                 <div class="aspect-[2/3] w-full max-w-[260px]">
-                    <img
+                    <Poster
                         :src="posterImage"
                         :alt="movie.title"
-                        class="h-full w-full rounded-md object-contain"
-                        loading="lazy"
-                        decoding="async"
+                        :poster-path="movie.poster_path"
+                        context="grid"
+                        aspect-ratio="2/3"
+                        class="rounded-md"
                     />
                 </div>
             </div>

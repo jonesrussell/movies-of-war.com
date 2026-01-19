@@ -119,12 +119,17 @@ class TMDBService
         }
 
         $imageUrl = "{$this->imageBaseUrl}/w500{$posterPath}";
-        $filename = 'posters/'.basename($posterPath);
+        $basename = basename($posterPath);
+        // Organize by first 2 characters: posters/jo/filename.jpg
+        $subdir = substr($basename, 0, 2);
+        $filename = "posters/{$subdir}/{$basename}";
 
         try {
             $response = Http::timeout(30)->get($imageUrl);
 
             if ($response->successful()) {
+                // Ensure subdirectory exists
+                Storage::disk('public')->makeDirectory("posters/{$subdir}");
                 Storage::disk('public')->put($filename, $response->body());
 
                 // Generate optimized sizes and formats

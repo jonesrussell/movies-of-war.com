@@ -61,6 +61,14 @@ task('artisan:ssr:restart', function () {
 });
 
 /**
+ * Reorganize poster images into subdirectories (posters/XX/filename.ext).
+ * This is idempotent - it will skip files already in subdirectories.
+ */
+task('artisan:reorganize-posters', function () {
+    run('{{bin/php}} {{release_path}}/artisan posters:reorganize');
+});
+
+/**
  * Optimize poster images for movies that haven't been optimized yet.
  * This is idempotent - it will skip posters that already have optimized versions.
  */
@@ -76,5 +84,6 @@ after('deploy:vendors', 'deploy:build');
 before('deploy:symlink', 'artisan:migrate');
 after('deploy:symlink', 'artisan:queue:restart');
 after('deploy:symlink', 'artisan:ssr:restart');
+after('deploy:symlink', 'artisan:reorganize-posters');
 after('deploy:symlink', 'artisan:optimize-posters');
 after('deploy:failed', 'deploy:unlock');

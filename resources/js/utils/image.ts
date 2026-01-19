@@ -32,10 +32,15 @@ export function getLocalPosterSrcset(
         return '';
     }
 
-    // Extract base filename from poster_path (e.g., 'posters/abc123.jpg' -> 'abc123')
+    // Extract directory and base filename from poster_path
+    // Handles both 'posters/filename.jpg' and 'posters/XX/filename.jpg'
     const pathParts = posterPath.split('/');
     const filename = pathParts[pathParts.length - 1] || '';
     const baseFilename = filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+    // Preserve subdirectory structure (e.g., 'posters/XX/' or 'posters/')
+    const directory = pathParts.length > 2
+        ? pathParts.slice(0, -1).join('/') // 'posters/XX'
+        : 'posters';
 
     const sizes = {
         grid: [185, 342],
@@ -49,7 +54,7 @@ export function getLocalPosterSrcset(
 
     return sizeList
         .map((width) => {
-            const url = `/storage/posters/${baseFilename}-${width}.${extension}`;
+            const url = `/storage/${directory}/${baseFilename}-${width}.${extension}`;
             return `${url} ${width}w`;
         })
         .join(', ');
@@ -198,12 +203,17 @@ export function getLocalPosterUrl(
         return '/images/placeholders/poster-placeholder.png';
     }
 
-    // Extract base filename from poster_path
+    // Extract directory and base filename from poster_path
+    // Handles both 'posters/filename.jpg' and 'posters/XX/filename.jpg'
     const pathParts = posterPath.split('/');
     const filename = pathParts[pathParts.length - 1] || '';
     const baseFilename = filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+    // Preserve subdirectory structure (e.g., 'posters/XX/' or 'posters/')
+    const directory = pathParts.length > 2
+        ? pathParts.slice(0, -1).join('/') // 'posters/XX'
+        : 'posters';
     const extension =
         format === 'original' ? getFileExtension(posterPath) : format;
 
-    return `/storage/posters/${baseFilename}-${width}.${extension}`;
+    return `/storage/${directory}/${baseFilename}-${width}.${extension}`;
 }

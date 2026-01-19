@@ -62,8 +62,11 @@ class OptimizePosters extends Command
 
             // Check if already optimized (if --all not set)
             if (! $this->option('all')) {
-                $baseFilename = pathinfo($movie->poster_path, PATHINFO_FILENAME);
-                $hasOptimized = Storage::disk('public')->exists("posters/{$baseFilename}-342.webp");
+                $pathInfo = pathinfo($movie->poster_path);
+                $baseFilename = $pathInfo['filename'];
+                $directory = $pathInfo['dirname'];
+                // Check for optimized version in the same directory
+                $hasOptimized = Storage::disk('public')->exists("{$directory}/{$baseFilename}-342.webp");
 
                 if ($hasOptimized) {
                     $skipped++;

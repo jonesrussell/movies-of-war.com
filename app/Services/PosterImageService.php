@@ -31,6 +31,7 @@ class PosterImageService
         $pathInfo = pathinfo($sourcePath);
         $baseFilename = $pathInfo['filename'];
         $extension = $pathInfo['extension'] ?? 'jpg';
+        // Keep the subdirectory structure (e.g., posters/jo/)
         $directory = $pathInfo['dirname'];
 
         $generatedFiles = [];

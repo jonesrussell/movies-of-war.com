@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { cn } from '@/lib/utils';
 import {
     extractPosterPath,
+    getLocalPosterSrcset,
+    getLocalPosterUrl,
     getTmdbPosterSizes,
     getTmdbPosterSrcset,
     isTmdbImageUrl,
@@ -36,9 +38,22 @@ const props = withDefaults(defineProps<Props>(), {
 const isLoaded = ref(false);
 const hasError = ref(false);
 
-const imageSrc = computed(
-    () => props.src || '/images/placeholders/poster-placeholder.png',
+// Reset loaded state when src changes
+watch(
+    () => props.src,
+    () => {
+        isLoaded.value = false;
+        hasError.value = false;
+    },
 );
+
+// Ensure image loads even if there's an error with responsive images
+watch(hasError, (error) => {
+    if (error) {
+        // If there's an error, try to load the fallback
+        isLoaded.value = true;
+    }
+});
 
 const aspectClass = computed(
     () =>
@@ -52,49 +67,127 @@ const aspectClass = computed(
 
 const loadingAttr = computed(() => (props.priority ? 'eager' : props.loading));
 
-// Extract poster path for TMDB images
-const tmdbPosterPath = computed(() => {
-    if (props.posterPath) {
-        return props.posterPath;
+// Check if we have a local poster path
+const localPosterPath = computed(() => {
+    if (!props.posterPath) {
+        return null;
     }
 
-    if (isTmdbImageUrl(props.src)) {
-        return extractPosterPath(props.src);
+    // Check if it's a local path (starts with 'posters/' or contains '/storage/posters/')
+    if (
+        props.posterPath.startsWith('posters/') ||
+        props.posterPath.includes('/storage/posters/')
+    ) {
+        // Normalize to 'posters/filename.ext' format
+        const match = props.posterPath.match(/posters\/(.+)$/);
+        return match ? `posters/${match[1]}` : null;
     }
 
     return null;
 });
 
-// Generate srcsets for responsive images
-const webpSrcset = computed(() => {
-    if (!tmdbPosterPath.value) {
-        return '';
+// Extract TMDB poster path for fallback
+const tmdbPosterPath = computed(() => {
+    // If we have a local path, don't use TMDB
+    if (localPosterPath.value) {
+        return null;
     }
 
-    return getTmdbPosterSrcset(tmdbPosterPath.value, props.context, true);
+    // If posterPath is provided and it's a TMDB path format
+    if (props.posterPath) {
+        if (
+            props.posterPath.startsWith('/') &&
+            !props.posterPath.startsWith('/posters/') &&
+            !props.posterPath.startsWith('/storage/')
+        ) {
+            return props.posterPath;
+        }
+    }
+
+    // Try to extract from poster_url if it's a TMDB URL
+    if (props.src && isTmdbImageUrl(props.src)) {
+        const extracted = extractPosterPath(props.src);
+        if (extracted && !extracted.startsWith('posters/')) {
+            return extracted;
+        }
+    }
+
+    return null;
 });
 
-const jpegSrcset = computed(() => {
-    if (!tmdbPosterPath.value) {
+// Generate srcsets for local files (AVIF, WebP, original)
+const avifSrcset = computed(() => {
+    if (!localPosterPath.value) {
         return '';
     }
 
-    return getTmdbPosterSrcset(tmdbPosterPath.value, props.context, false);
+    return getLocalPosterSrcset(localPosterPath.value, props.context, 'avif');
+});
+
+const webpSrcset = computed(() => {
+    if (localPosterPath.value) {
+        return getLocalPosterSrcset(
+            localPosterPath.value,
+            props.context,
+            'webp',
+        );
+    }
+
+    if (tmdbPosterPath.value) {
+        return getTmdbPosterSrcset(tmdbPosterPath.value, props.context, true);
+    }
+
+    return '';
+});
+
+const originalSrcset = computed(() => {
+    if (localPosterPath.value) {
+        return getLocalPosterSrcset(
+            localPosterPath.value,
+            props.context,
+            'original',
+        );
+    }
+
+    if (tmdbPosterPath.value) {
+        return getTmdbPosterSrcset(tmdbPosterPath.value, props.context, false);
+    }
+
+    return '';
+});
+
+// Get fallback image URL
+const fallbackImageSrc = computed(() => {
+    if (localPosterPath.value) {
+        // Use 500px width as default fallback for local files
+        const sizes = {
+            grid: 342,
+            detail: 500,
+            hero: 780,
+        };
+        const width = sizes[props.context] || 500;
+        return getLocalPosterUrl(localPosterPath.value, width, 'original');
+    }
+
+    return props.src || '/images/placeholders/poster-placeholder.png';
 });
 
 const sizesAttr = computed(() => {
-    if (!tmdbPosterPath.value) {
-        return undefined;
-    }
-
     return getTmdbPosterSizes(props.context);
 });
 
 // Determine if we should use responsive images
 const useResponsiveImages = computed(() => {
-    return Boolean(
-        tmdbPosterPath.value && (webpSrcset.value || jpegSrcset.value),
+    const hasLocalFiles = Boolean(
+        localPosterPath.value &&
+        (avifSrcset.value || webpSrcset.value || originalSrcset.value),
     );
+
+    const hasTmdbFiles = Boolean(
+        tmdbPosterPath.value && (webpSrcset.value || originalSrcset.value),
+    );
+
+    return hasLocalFiles || hasTmdbFiles;
 });
 </script>
 
@@ -116,23 +209,30 @@ const useResponsiveImages = computed(() => {
 
         <!-- Main image with responsive support -->
         <picture v-if="useResponsiveImages">
-            <!-- WebP source with srcset -->
+            <!-- AVIF format (best compression) - only for local files -->
+            <source
+                v-if="avifSrcset"
+                type="image/avif"
+                :srcset="avifSrcset"
+                :sizes="sizesAttr"
+            />
+            <!-- WebP format (good compression, wider support) -->
             <source
                 v-if="webpSrcset"
                 type="image/webp"
                 :srcset="webpSrcset"
                 :sizes="sizesAttr"
             />
-            <!-- JPEG fallback with srcset -->
+            <!-- Original format (JPEG/PNG) fallback -->
             <source
-                v-if="jpegSrcset"
-                type="image/jpeg"
-                :srcset="jpegSrcset"
+                v-if="originalSrcset"
+                :type="localPosterPath ? 'image/jpeg' : 'image/jpeg'"
+                :srcset="originalSrcset"
                 :sizes="sizesAttr"
             />
             <!-- Fallback img -->
             <img
-                :src="imageSrc"
+                :src="fallbackImageSrc"
                 :alt="alt"
                 :loading="loadingAttr"
                 :fetchpriority="priority ? 'high' : undefined"
@@ -143,10 +243,10 @@ const useResponsiveImages = computed(() => {
                 @error="hasError = true"
             />
         </picture>
-        <!-- Standard img for non-TMDB images -->
+        <!-- Standard img for non-responsive images -->
         <img
             v-else
-            :src="imageSrc"
+            :src="fallbackImageSrc"
             :alt="alt"
             :loading="loadingAttr"
             :fetchpriority="priority ? 'high' : undefined"

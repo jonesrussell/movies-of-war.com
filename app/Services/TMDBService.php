@@ -127,6 +127,10 @@ class TMDBService
             if ($response->successful()) {
                 Storage::disk('public')->put($filename, $response->body());
 
+                // Generate optimized sizes and formats
+                $posterService = app(\App\Services\PosterImageService::class);
+                $posterService->optimizePoster($filename);
+
                 return $filename;
             }
 

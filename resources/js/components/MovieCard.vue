@@ -14,7 +14,7 @@ const props = defineProps<Props>();
 
 const displayedTags = computed(() => {
     const tags = props.movie.tags;
-    if (!tags || !Array.isArray(tags)) {
+    if (!tags || !Array.isArray(tags) || typeof tags.slice !== 'function') {
         return [];
     }
     return tags.slice(0, 3);

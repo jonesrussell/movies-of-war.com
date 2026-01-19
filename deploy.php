@@ -60,6 +60,30 @@ task('artisan:ssr:restart', function () {
     run('{{bin/php}} {{release_path}}/artisan inertia:stop-ssr');
 });
 
+/**
+ * Reorganize poster images into subdirectories (posters/XX/filename.ext).
+ * This is idempotent - it will skip files already in subdirectories.
+ */
+task('artisan:reorganize-posters', function () {
+    run('{{bin/php}} {{release_path}}/artisan posters:reorganize');
+});
+
+/**
+ * Optimize poster images for movies that haven't been optimized yet.
+ * This is idempotent - it will skip posters that already have optimized versions.
+ */
+task('artisan:optimize-posters', function () {
+    run('{{bin/php}} {{release_path}}/artisan posters:optimize');
+});
+
+/**
+ * Clean up orphaned poster files not referenced in the database.
+ * Uses --archive mode to move orphans to posters/_archived/ (safer than deletion).
+ */
+task('artisan:cleanup-orphan-posters', function () {
+    run('{{bin/php}} {{release_path}}/artisan posters:cleanup-orphans --archive');
+});
+
 // Hooks
 
 after('deploy:update_code', 'deploy:npm');
@@ -68,4 +92,7 @@ after('deploy:vendors', 'deploy:build');
 before('deploy:symlink', 'artisan:migrate');
 after('deploy:symlink', 'artisan:queue:restart');
 after('deploy:symlink', 'artisan:ssr:restart');
+after('deploy:symlink', 'artisan:reorganize-posters');
+after('deploy:symlink', 'artisan:optimize-posters');
+after('deploy:symlink', 'artisan:cleanup-orphan-posters');
 after('deploy:failed', 'deploy:unlock');

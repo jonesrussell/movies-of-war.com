@@ -21,7 +21,56 @@ export function getTmdbPosterUrl(
 }
 
 /**
- * Generate srcset for TMDB poster images
+ * Generate srcset for local poster files
+ */
+export function getLocalPosterSrcset(
+    posterPath: string | null,
+    context: 'grid' | 'detail' | 'hero',
+    format: 'avif' | 'webp' | 'original' = 'original',
+): string {
+    if (!posterPath) {
+        return '';
+    }
+
+    // Extract directory and base filename from poster_path
+    // Handles both 'posters/filename.jpg' and 'posters/XX/filename.jpg'
+    const pathParts = posterPath.split('/');
+    const filename = pathParts[pathParts.length - 1] || '';
+    const baseFilename = filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+    // Preserve subdirectory structure (e.g., 'posters/XX/' or 'posters/')
+    const directory =
+        pathParts.length > 2
+            ? pathParts.slice(0, -1).join('/') // 'posters/XX'
+            : 'posters';
+
+    const sizes = {
+        grid: [185, 342],
+        detail: [342, 500, 780],
+        hero: [500, 780],
+    };
+
+    const sizeList = sizes[context];
+    const extension =
+        format === 'original' ? getFileExtension(posterPath) : format;
+
+    return sizeList
+        .map((width) => {
+            const url = `/storage/${directory}/${baseFilename}-${width}.${extension}`;
+            return `${url} ${width}w`;
+        })
+        .join(', ');
+}
+
+/**
+ * Get file extension from a path
+ */
+function getFileExtension(path: string): string {
+    const match = path.match(/\.([^.]+)$/);
+    return match && match[1] ? match[1].toLowerCase() : 'jpg';
+}
+
+/**
+ * Generate srcset for TMDB poster images (fallback when local files not available)
  */
 export function getTmdbPosterSrcset(
     posterPath: string | null,
@@ -49,6 +98,29 @@ export function getTmdbPosterSrcset(
             return `${url} ${width}w`;
         })
         .join(', ');
+}
+
+/**
+ * Generate srcset for poster images (local files preferred, fallback to TMDB)
+ */
+export function getPosterSrcset(
+    localPosterPath: string | null,
+    tmdbPosterPath: string | null,
+    context: 'grid' | 'detail' | 'hero',
+    format: 'avif' | 'webp' | 'original' = 'original',
+): string {
+    // Prefer local files if available
+    if (localPosterPath) {
+        return getLocalPosterSrcset(localPosterPath, context, format);
+    }
+
+    // Fallback to TMDB URLs
+    if (tmdbPosterPath) {
+        const useWebP = format === 'webp';
+        return getTmdbPosterSrcset(tmdbPosterPath, context, useWebP);
+    }
+
+    return '';
 }
 
 /**
@@ -87,9 +159,14 @@ export function extractPosterPath(posterUrl: string | null): string | null {
         return null;
     }
 
-    // If it's already a path (starts with /), return it
-    if (posterUrl.startsWith('/')) {
-        return posterUrl;
+    // If it's a local storage path, return as-is
+    if (
+        posterUrl.startsWith('posters/') ||
+        posterUrl.includes('/storage/posters/')
+    ) {
+        // Normalize to 'posters/filename.ext' format
+        const match = posterUrl.match(/posters\/(.+)$/);
+        return match ? `posters/${match[1]}` : null;
     }
 
     // If it's a TMDB URL, extract the path
@@ -102,13 +179,43 @@ export function extractPosterPath(posterUrl: string | null): string | null {
         }
     }
 
-    // If it's a local storage URL, extract the path
-    if (posterUrl.includes('/storage/posters/')) {
-        const match = posterUrl.match(/\/storage\/posters\/(.+)$/);
-        if (match) {
-            return `/posters/${match[1]}`;
-        }
+    // If it's already a path starting with / (and not a local path), it might be a TMDB path
+    if (
+        posterUrl.startsWith('/') &&
+        !posterUrl.startsWith('/posters/') &&
+        !posterUrl.startsWith('/storage/')
+    ) {
+        return posterUrl;
     }
 
+    // Local storage URLs/paths are not TMDB paths, return null
     return null;
+}
+
+/**
+ * Get local poster URL for a specific size
+ */
+export function getLocalPosterUrl(
+    posterPath: string | null,
+    width: number,
+    format: 'avif' | 'webp' | 'original' = 'original',
+): string {
+    if (!posterPath) {
+        return '/images/placeholders/poster-placeholder.png';
+    }
+
+    // Extract directory and base filename from poster_path
+    // Handles both 'posters/filename.jpg' and 'posters/XX/filename.jpg'
+    const pathParts = posterPath.split('/');
+    const filename = pathParts[pathParts.length - 1] || '';
+    const baseFilename = filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+    // Preserve subdirectory structure (e.g., 'posters/XX/' or 'posters/')
+    const directory =
+        pathParts.length > 2
+            ? pathParts.slice(0, -1).join('/') // 'posters/XX'
+            : 'posters';
+    const extension =
+        format === 'original' ? getFileExtension(posterPath) : format;
+
+    return `/storage/${directory}/${baseFilename}-${width}.${extension}`;
 }

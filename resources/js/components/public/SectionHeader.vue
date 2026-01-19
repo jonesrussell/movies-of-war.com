@@ -1,22 +1,29 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { cn } from '@/lib/utils';
 
 type Align = 'left' | 'center';
+type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 interface Props {
     kicker?: string;
     title: string;
     description?: string;
     align?: Align;
+    level?: HeadingLevel;
     class?: string;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     kicker: '',
     description: '',
     align: 'left',
+    level: 1,
     class: '',
 });
+
+const headingTag = computed(() => `h${props.level}` as const);
 </script>
 
 <template>
@@ -37,12 +44,13 @@ withDefaults(defineProps<Props>(), {
         </p>
 
         <div class="flex items-end justify-between gap-4">
-            <h1
+            <component
+                :is="headingTag"
                 class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl lg:text-5xl"
                 :class="align === 'center' ? 'mx-auto' : ''"
             >
                 {{ title }}
-            </h1>
+            </component>
 
             <div v-if="$slots.action" class="shrink-0">
                 <slot name="action" />
@@ -51,7 +59,7 @@ withDefaults(defineProps<Props>(), {
 
         <p
             v-if="description"
-            class="max-w-prose text-base leading-relaxed text-pretty text-zinc-400 sm:text-lg"
+            class="max-w-prose text-base leading-relaxed text-pretty text-zinc-300 sm:text-lg"
             :class="align === 'center' ? 'mx-auto' : ''"
         >
             {{ description }}

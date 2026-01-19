@@ -157,7 +157,7 @@ const ogDescription = computed(() => {
                 <div class="mb-6">
                     <Link
                         href="/movies"
-                        class="group inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-white focus:outline-none focus-visible:text-white"
+                        class="group inline-flex items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-white focus:outline-none focus-visible:text-white"
                     >
                         <ArrowLeft
                             class="size-4 transition-transform duration-200 group-hover:-translate-x-1"
@@ -348,11 +348,11 @@ const ogDescription = computed(() => {
                                     :href="`https://www.imdb.com/title/${movie.imdb_id}/`"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="group relative text-sm text-zinc-400 transition-colors hover:text-zinc-200"
+                                    class="group relative text-sm text-zinc-300 transition-colors hover:text-zinc-200"
                                 >
                                     <span>View on IMDb</span>
                                     <span
-                                        class="absolute bottom-0 left-0 h-px w-0 bg-zinc-400 transition-all duration-300 group-hover:w-full"
+                                        class="absolute bottom-0 left-0 h-px w-0 bg-zinc-300 transition-all duration-300 group-hover:w-full"
                                     />
                                 </a>
                             </div>
@@ -368,6 +368,7 @@ const ogDescription = computed(() => {
                 <PublicContainer class="flex flex-col gap-6">
                     <SectionHeader
                         title="Related Films"
+                        :level="2"
                         class="transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                         :class="
                             relatedVisible

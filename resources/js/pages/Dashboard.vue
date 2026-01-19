@@ -88,7 +88,7 @@ const firstName = computed(() => {
                     >
                         {{ greeting }}, {{ firstName }}
                     </h1>
-                    <p class="mt-1 text-zinc-400">
+                    <p class="mt-1 text-zinc-300">
                         <template v-if="isAdmin">
                             Here's what's happening with your war films
                             collection.

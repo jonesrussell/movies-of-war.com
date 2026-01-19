@@ -56,14 +56,14 @@ const displayedTags = computed(() => {
                     </Link>
                 </h3>
 
-                <div class="flex items-center gap-2 text-xs text-zinc-400">
+                <div class="flex items-center gap-2 text-xs text-zinc-300">
                     <span>{{ movie.release_year }}</span>
                     <template v-if="movie.runtime">
-                        <span class="text-zinc-600">•</span>
+                        <span class="text-zinc-500">•</span>
                         <span>{{ movie.runtime }} min</span>
                     </template>
                     <template v-if="movie.country">
-                        <span class="text-zinc-600">•</span>
+                        <span class="text-zinc-500">•</span>
                         <span>{{ movie.country }}</span>
                     </template>
                 </div>

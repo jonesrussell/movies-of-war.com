@@ -142,7 +142,7 @@ function getXPostUrl(xPostId: string): string {
                     <h1 class="text-3xl font-bold text-white">
                         Manage X Posts
                     </h1>
-                    <p class="mt-2 text-zinc-400">
+                    <p class="mt-2 text-zinc-300">
                         {{ xPosts?.total ?? 0 }} total posts
                     </p>
                 </div>
@@ -201,27 +201,27 @@ function getXPostUrl(xPostId: string): string {
                     <thead class="bg-zinc-950">
                         <tr>
                             <th
-                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
+                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
                                 Content
                             </th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
+                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
                                 Status
                             </th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
+                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
                                 Date
                             </th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
+                                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
                                 Author
                             </th>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium tracking-wider text-zinc-400 uppercase"
+                                class="px-6 py-3 text-right text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
                                 Actions
                             </th>
@@ -234,7 +234,7 @@ function getXPostUrl(xPostId: string): string {
                         >
                             <td
                                 colspan="5"
-                                class="px-6 py-12 text-center text-zinc-400"
+                                class="px-6 py-12 text-center text-zinc-300"
                             >
                                 No posts found.
                             </td>
@@ -251,14 +251,14 @@ function getXPostUrl(xPostId: string): string {
                                     </div>
                                     <div
                                         v-if="xPost.thread_parts?.length"
-                                        class="mt-1 text-xs text-zinc-500"
+                                        class="mt-1 text-xs text-zinc-400"
                                     >
                                         + {{ xPost.thread_parts.length }} more
                                         tweets in thread
                                     </div>
                                     <div
                                         v-if="xPost.media_urls?.length"
-                                        class="mt-1 text-xs text-zinc-500"
+                                        class="mt-1 text-xs text-zinc-400"
                                     >
                                         {{ xPost.media_urls.length }} media
                                         attached
@@ -287,19 +287,19 @@ function getXPostUrl(xPostId: string): string {
                             </td>
                             <td class="px-6 py-4 text-sm text-zinc-300">
                                 <div v-if="xPost.status === 'scheduled'">
-                                    <span class="text-zinc-500"
+                                    <span class="text-zinc-400"
                                         >Scheduled:</span
                                     >
                                     {{ formatDate(xPost.scheduled_for) }}
                                 </div>
                                 <div v-else-if="xPost.status === 'published'">
-                                    <span class="text-zinc-500"
+                                    <span class="text-zinc-400"
                                         >Published:</span
                                     >
                                     {{ formatDate(xPost.published_at) }}
                                 </div>
                                 <div v-else>
-                                    <span class="text-zinc-500">Created:</span>
+                                    <span class="text-zinc-400">Created:</span>
                                     {{ formatDate(xPost.created_at) }}
                                 </div>
                             </td>
@@ -326,7 +326,7 @@ function getXPostUrl(xPostId: string): string {
                                         </button>
                                         <button
                                             @click="deletePost(xPost)"
-                                            class="text-zinc-400 hover:text-white"
+                                            class="text-zinc-300 hover:text-white"
                                         >
                                             Delete
                                         </button>
@@ -383,7 +383,7 @@ function getXPostUrl(xPostId: string): string {
                                         </button>
                                         <button
                                             @click="deletePost(xPost)"
-                                            class="text-zinc-400 hover:text-white"
+                                            class="text-zinc-300 hover:text-white"
                                         >
                                             Delete
                                         </button>
@@ -395,7 +395,7 @@ function getXPostUrl(xPostId: string): string {
                                     >
                                         <button
                                             @click="deletePost(xPost)"
-                                            class="text-zinc-400 hover:text-white"
+                                            class="text-zinc-300 hover:text-white"
                                         >
                                             Delete
                                         </button>

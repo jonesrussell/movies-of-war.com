@@ -37,14 +37,14 @@ const posterImage =
                 </h3>
 
                 <div
-                    class="mb-3 flex flex-wrap items-center gap-2 text-sm text-zinc-400"
+                    class="mb-3 flex flex-wrap items-center gap-2 text-sm text-zinc-300"
                 >
                     <span>{{ movie.release_year }}</span>
                     <span v-if="movie.runtime">• {{ movie.runtime }} min</span>
                     <span v-if="movie.country">• {{ movie.country }}</span>
                 </div>
 
-                <p class="mb-4 line-clamp-2 text-sm text-zinc-400">
+                <p class="mb-4 line-clamp-2 text-sm text-zinc-300">
                     {{ movie.synopsis }}
                 </p>
 

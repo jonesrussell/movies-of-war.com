@@ -76,7 +76,7 @@ function submit() {
             <div class="mx-auto max-w-3xl">
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-white">Edit X Post</h1>
-                    <p class="mt-2 text-zinc-400">
+                    <p class="mt-2 text-zinc-300">
                         Update X post content, thread, and media
                     </p>
                     <div
@@ -95,7 +95,7 @@ function submit() {
                             class="block text-sm font-medium text-zinc-300"
                         >
                             Tweet Content
-                            <span class="text-zinc-500"
+                            <span class="text-zinc-400"
                                 >({{ characterCount }} remaining)</span
                             >
                         </label>
@@ -122,7 +122,7 @@ function submit() {
                                 class="block text-sm font-medium text-zinc-300"
                             >
                                 Thread Parts
-                                <span class="text-zinc-500"
+                                <span class="text-zinc-400"
                                     >({{ form.thread_parts.length }}/25)</span
                                 >
                             </label>
@@ -153,7 +153,7 @@ function submit() {
                                         :placeholder="`Thread part ${index + 1}`"
                                         class="w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-red-500 focus:ring-red-500"
                                     />
-                                    <div class="mt-1 text-xs text-zinc-500">
+                                    <div class="mt-1 text-xs text-zinc-400">
                                         {{ threadCharacterCounts[index] }}
                                         remaining
                                     </div>
@@ -182,7 +182,7 @@ function submit() {
                                 class="block text-sm font-medium text-zinc-300"
                             >
                                 Media URLs
-                                <span class="text-zinc-500"
+                                <span class="text-zinc-400"
                                     >({{ form.media_urls.length }}/4)</span
                                 >
                             </label>

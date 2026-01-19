@@ -175,7 +175,7 @@ function removeChip(chip: Chip) {
                     >
                         <div class="relative w-full lg:flex-1">
                             <Search
-                                class="pointer-events-none absolute top-1/2 left-3 z-10 size-5 -translate-y-1/2 text-zinc-500"
+                                class="pointer-events-none absolute top-1/2 left-3 z-10 size-5 -translate-y-1/2 text-zinc-400"
                             />
                             <Input
                                 v-model="search"
@@ -299,7 +299,7 @@ function removeChip(chip: Chip) {
                         />
                     </div>
 
-                    <p class="text-sm text-zinc-400">
+                    <p class="text-sm text-zinc-300">
                         {{ movies.meta?.total ?? 0 }} films
                     </p>
                 </div>

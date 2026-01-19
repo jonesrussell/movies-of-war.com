@@ -27,6 +27,12 @@ class XSettingsController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
+        Log::debug('X Settings connection check', [
+            'token_found' => !is_null($token),
+            'token_expires_at' => $token?->expires_at,
+            'now' => now(),
+        ]);
+
         $connectionStatus = [
             'connected' => false,
             'username' => null,
@@ -78,7 +84,7 @@ class XSettingsController extends Controller
     {
         try {
             $client = new GuzzleClient([
-                'base_uri' => 'https://api.twitter.com/2/',
+                'base_uri' => 'https://api.x.com/2/',
             ]);
 
             $response = $client->get('users/me', [

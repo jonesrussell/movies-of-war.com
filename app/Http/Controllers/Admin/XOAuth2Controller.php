@@ -123,15 +123,23 @@ class XOAuth2Controller extends Controller
             }
 
             // Store tokens in database (single record for admin account)
+            $expiresAt = $expiresIn ? now()->addSeconds($expiresIn) : null;
+
             DB::table('x_oauth2_tokens')->truncate(); // Clear old tokens
             DB::table('x_oauth2_tokens')->insert([
                 'access_token' => $accessToken,
                 'refresh_token' => $refreshToken,
-                'expires_at' => $expiresIn ? now()->addSeconds($expiresIn) : null,
+                'expires_at' => $expiresAt,
                 'token_type' => $data['token_type'] ?? 'Bearer',
                 'scope' => $scope,
                 'created_at' => now(),
                 'updated_at' => now(),
+            ]);
+
+            Log::info('X OAuth 2.0 tokens stored successfully', [
+                'expires_at' => $expiresAt,
+                'has_refresh_token' => !empty($refreshToken),
+                'scope' => $scope,
             ]);
 
             return redirect()->route('admin.x-settings.index')

@@ -8,9 +8,12 @@ import { Poster } from '@/components/primitives';
 
 interface Props {
     movie: Movie;
+    showOverlay?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    showOverlay: true,
+});
 
 const displayedTags = computed(() => {
     const tags = props.movie.tags;
@@ -40,10 +43,13 @@ const displayedTags = computed(() => {
                     <!-- Upcoming badge -->
                     <div
                         v-if="movie.is_upcoming"
-                        class="absolute top-3 right-3 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-bold tracking-wide text-white uppercase shadow-lg"
+                        class="absolute top-3 right-3 z-20 rounded-full bg-red-600 px-3 py-1 text-xs font-bold tracking-wide text-white uppercase shadow-lg"
                     >
                         Coming Soon
                     </div>
+
+                    <!-- Overlay slot for actions -->
+                    <slot v-if="showOverlay" name="overlay" />
                 </Poster>
             </Link>
 

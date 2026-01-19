@@ -28,7 +28,7 @@ class XSettingsController extends Controller
             ->first();
 
         Log::debug('X Settings connection check', [
-            'token_found' => !is_null($token),
+            'token_found' => ! is_null($token),
             'token_expires_at' => $token?->expires_at,
             'now' => now(),
         ]);

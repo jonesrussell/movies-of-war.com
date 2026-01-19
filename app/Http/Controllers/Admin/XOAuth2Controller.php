@@ -138,7 +138,7 @@ class XOAuth2Controller extends Controller
 
             Log::info('X OAuth 2.0 tokens stored successfully', [
                 'expires_at' => $expiresAt,
-                'has_refresh_token' => !empty($refreshToken),
+                'has_refresh_token' => ! empty($refreshToken),
                 'scope' => $scope,
             ]);
 

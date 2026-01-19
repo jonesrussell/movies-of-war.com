@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { CheckCircle2, Link as LinkIcon, XCircle } from 'lucide-vue-next';
 import { computed } from 'vue';
 
@@ -169,13 +169,13 @@ function formatDate(dateString: string | null): string {
                     </p>
 
                     <div>
-                        <Link
+                        <a
                             href="/x-oauth2/redirect"
                             class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                         >
                             <LinkIcon class="h-4 w-4" />
                             Connect X Account
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </div>

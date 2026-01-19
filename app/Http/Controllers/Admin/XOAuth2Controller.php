@@ -56,25 +56,25 @@ class XOAuth2Controller extends Controller
         if ($error) {
             Log::error('X OAuth 2.0 error', ['error' => $error]);
 
-            return redirect()->route('dashboard')
+            return redirect()->route('admin.x-settings.index')
                 ->with('error', 'X OAuth 2.0 authorization failed: '.$error);
         }
 
         // Validate state and code
         if (! $stateReturned || ! $code) {
-            return redirect()->route('dashboard')
+            return redirect()->route('admin.x-settings.index')
                 ->with('error', 'Invalid OAuth 2.0 callback: missing state or code');
         }
 
         $storedState = $request->session()->get('x_oauth2_state');
         if ($stateReturned !== $storedState) {
-            return redirect()->route('dashboard')
+            return redirect()->route('admin.x-settings.index')
                 ->with('error', 'Invalid OAuth 2.0 state: state mismatch');
         }
 
         $codeVerifier = $request->session()->get('x_oauth2_code_verifier');
         if (! $codeVerifier) {
-            return redirect()->route('dashboard')
+            return redirect()->route('admin.x-settings.index')
                 ->with('error', 'Missing OAuth 2.0 code verifier');
         }
 
@@ -99,7 +99,7 @@ class XOAuth2Controller extends Controller
                     'body' => $response->body(),
                 ]);
 
-                return redirect()->route('dashboard')
+                return redirect()->route('admin.x-settings.index')
                     ->with('error', 'Failed to exchange authorization code for access token');
             }
 
@@ -110,7 +110,7 @@ class XOAuth2Controller extends Controller
             $scope = $data['scope'] ?? null;
 
             if (! $accessToken) {
-                return redirect()->route('dashboard')
+                return redirect()->route('admin.x-settings.index')
                     ->with('error', 'Failed to get access token from X API response');
             }
 
@@ -126,14 +126,14 @@ class XOAuth2Controller extends Controller
                 'updated_at' => now(),
             ]);
 
-            return redirect()->route('dashboard')
+            return redirect()->route('admin.x-settings.index')
                 ->with('success', 'X OAuth 2.0 authorization successful! You can now post tweets.');
         } catch (\Exception $e) {
             Log::error('X OAuth 2.0 token exchange exception', [
                 'error' => $e->getMessage(),
             ]);
 
-            return redirect()->route('dashboard')
+            return redirect()->route('admin.x-settings.index')
                 ->with('error', 'OAuth 2.0 token exchange failed: '.$e->getMessage());
         }
     }

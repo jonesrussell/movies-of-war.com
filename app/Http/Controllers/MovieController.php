@@ -50,22 +50,37 @@ class MovieController extends Controller
             });
         }
 
-        $movies = $query->latest('release_year')
-            ->latest('release_date')
-            ->paginate(24)
-            ->withQueryString();
+        // Apply sorting
+        $sort = $request->get('sort', 'release_year_desc');
+        $query = match ($sort) {
+            'release_year_asc' => $query->oldest('release_year')->oldest('release_date'),
+            'title_asc' => $query->orderBy('title', 'asc'),
+            'title_desc' => $query->orderBy('title', 'desc'),
+            'created_at_desc' => $query->latest('created_at'),
+            default => $query->latest('release_year')->latest('release_date'),
+        };
+
+        $movies = $query->paginate(24)->withQueryString();
+
+        // Add is_watchlisted flag for authenticated users
+        $watchlistedIds = [];
+        if (auth()->check()) {
+            $watchlistedIds = auth()->user()->watchlist()->pluck('movie_id')->toArray();
+        }
 
         $filterOptions = $this->filterService->getFilterOptions();
 
         return Inertia::render('Movies/Index', [
-            'movies' => MovieResource::collection($movies),
+            'movies' => MovieResource::collection($movies)->additional([
+                'watchlisted_ids' => $watchlistedIds,
+            ]),
             'filters' => [
                 'countries' => $filterOptions['countries'],
                 'conflicts' => $filterOptions['conflicts'],
                 'years' => $filterOptions['years'],
                 'tags' => TagResource::collection($filterOptions['tags']),
             ],
-            'queryParams' => $request->only(['search', 'year', 'country', 'conflict', 'tag']),
+            'queryParams' => $request->only(['search', 'year', 'country', 'conflict', 'tag', 'sort']),
         ]);
     }
 

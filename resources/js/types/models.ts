@@ -82,12 +82,20 @@ export interface PaginationMeta {
     total: number;
 }
 
+export type MovieSortOption =
+    | 'release_year_desc'
+    | 'release_year_asc'
+    | 'title_asc'
+    | 'title_desc'
+    | 'created_at_desc';
+
 export interface MovieFilters {
     search?: string;
     year?: number | string;
     country?: string;
     conflict?: string;
     tag?: string;
+    sort?: MovieSortOption;
 }
 
 export interface User {

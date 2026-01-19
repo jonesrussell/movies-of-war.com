@@ -1,15 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MovieResource;
+use App\Http\Resources\TagResource;
 use App\Models\Movie;
-use App\Models\Tag;
+use App\Services\MovieFilterService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class MovieController extends Controller
 {
+    public function __construct(
+        protected MovieFilterService $filterService
+    ) {}
+
     public function index(Request $request): Response
     {
         $query = Movie::query()->with('tags');
@@ -47,16 +55,16 @@ class MovieController extends Controller
             ->paginate(24)
             ->withQueryString();
 
-        $filters = [
-            'countries' => Movie::query()->distinct()->pluck('country')->filter()->sort()->values(),
-            'conflicts' => Movie::query()->distinct()->pluck('conflict')->filter()->sort()->values(),
-            'years' => Movie::query()->distinct()->pluck('release_year')->sort()->reverse()->values(),
-            'tags' => Tag::all(),
-        ];
+        $filterOptions = $this->filterService->getFilterOptions();
 
         return Inertia::render('Movies/Index', [
-            'movies' => $movies,
-            'filters' => $filters,
+            'movies' => MovieResource::collection($movies),
+            'filters' => [
+                'countries' => $filterOptions['countries'],
+                'conflicts' => $filterOptions['conflicts'],
+                'years' => $filterOptions['years'],
+                'tags' => TagResource::collection($filterOptions['tags']),
+            ],
             'queryParams' => $request->only(['search', 'year', 'country', 'conflict', 'tag']),
         ]);
     }
@@ -89,8 +97,8 @@ class MovieController extends Controller
             ->get();
 
         return Inertia::render('Movies/Show', [
-            'movie' => $movie,
-            'relatedMovies' => $relatedMovies,
+            'movie' => new MovieResource($movie),
+            'relatedMovies' => MovieResource::collection($relatedMovies),
         ]);
     }
 }

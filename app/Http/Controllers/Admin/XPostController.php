@@ -8,6 +8,7 @@ use App\Enums\XPostStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ScheduleXPostRequest;
 use App\Http\Requests\StoreXPostRequest;
+use App\Http\Resources\XPostResource;
 use App\Jobs\PublishXPost;
 use App\Models\XPost;
 use Illuminate\Http\RedirectResponse;
@@ -37,7 +38,7 @@ class XPostController extends Controller
         $xPosts = $query->latest()->paginate(20);
 
         return Inertia::render('Admin/XPosts/Index', [
-            'xPosts' => $xPosts,
+            'xPosts' => XPostResource::collection($xPosts),
             'queryParams' => $request->only(['status', 'search']),
             'statuses' => collect(XPostStatus::cases())->mapWithKeys(fn ($status) => [
                 $status->value => $status->label(),
@@ -97,7 +98,7 @@ class XPostController extends Controller
         $xPost->load('user');
 
         return Inertia::render('Admin/XPosts/Show', [
-            'xPost' => $xPost,
+            'xPost' => new XPostResource($xPost),
         ]);
     }
 

@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Listeners\LinkArticlesToMovies;
 use App\Models\Movie;
 use App\Models\XPost;
+use App\Observers\MovieObserver;
 use App\Policies\MoviePolicy;
 use App\Policies\XPostPolicy;
 use Illuminate\Support\Facades\Event;
@@ -31,6 +32,15 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
         $this->registerEvents();
+        $this->registerObservers();
+    }
+
+    /**
+     * Register model observers.
+     */
+    private function registerObservers(): void
+    {
+        Movie::observe(MovieObserver::class);
     }
 
     /**

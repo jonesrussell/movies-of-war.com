@@ -7,14 +7,12 @@ namespace App\Http\Controllers;
 use App\Enums\MovieStatus;
 use App\Enums\TagType;
 use App\Http\Requests\ImportTmdbMoviesRequest;
+use App\Http\Resources\MovieResource;
 use App\Jobs\ImportTmdbMoviesJob;
-use App\Models\FeaturedSlot;
 use App\Models\Movie;
 use App\Models\Tag;
-use App\Models\XPost;
-use App\Models\XTrendKeyword;
+use App\Services\DashboardStatsService;
 use App\Services\TMDBService;
-use App\Services\XAnalyticsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +23,7 @@ use Inertia\Response;
 class DashboardController extends Controller
 {
     public function __construct(
-        protected XAnalyticsService $analyticsService,
+        protected DashboardStatsService $statsService,
         protected TMDBService $tmdbService
     ) {}
 
@@ -33,19 +31,10 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // Core stats
-        $publishedMoviesCount = Movie::published()->count();
-        $draftMoviesCount = Movie::draft()->count();
-        $archivedMoviesCount = Movie::archived()->count();
-
-        $stats = [
-            'movies' => $publishedMoviesCount,
-            'drafts' => $draftMoviesCount,
-            'archived' => $archivedMoviesCount,
-            'tags' => Tag::count(),
-            'activeFeatures' => FeaturedSlot::active()->count(),
-            'tmdbDrafts' => $user->is_admin ? $draftMoviesCount : 0,
-        ];
+        // Get stats from cache-optimized service
+        $stats = $user->is_admin
+            ? $this->statsService->getAdminStats()
+            : $this->statsService->getUserStats();
 
         // Recent movies for the dashboard (latest 6 published)
         $recentMovies = Movie::query()
@@ -58,31 +47,14 @@ class DashboardController extends Controller
         // User's watchlist count
         $watchlistCount = $user->watchlist()->count();
 
-        // Add X API stats for admins
-        $xStats = null;
-        if ($user->is_admin) {
-            $xPerformanceReport = $this->analyticsService->getPerformanceReport(now()->subDays(30), now());
-
-            $xStats = [
-                'published_posts' => XPost::published()->count(),
-                'scheduled_posts' => XPost::scheduled()->count(),
-                'failed_posts' => XPost::failed()->count(),
-                'total_impressions' => $xPerformanceReport['total_impressions'] ?? 0,
-                'active_keywords' => XTrendKeyword::active()->count(),
-                'engagement_rate' => $xPerformanceReport['average_engagement_rate'] ?? 0,
-            ];
-
-            // Keep legacy stats for backwards compatibility
-            $stats['x_published_posts'] = $xStats['published_posts'];
-            $stats['x_scheduled_posts'] = $xStats['scheduled_posts'];
-            $stats['x_failed_posts'] = $xStats['failed_posts'];
-            $stats['x_total_impressions'] = $xStats['total_impressions'];
-            $stats['x_active_keywords'] = $xStats['active_keywords'];
-        }
+        // Get X stats for admins
+        $xStats = $user->is_admin
+            ? $this->statsService->getXStats()
+            : null;
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,
-            'recentMovies' => $recentMovies,
+            'recentMovies' => MovieResource::collection($recentMovies),
             'watchlistCount' => $watchlistCount,
             'xStats' => $xStats,
         ]);
@@ -101,7 +73,7 @@ class DashboardController extends Controller
         $tmdbDrafts = $query->paginate(24)->withQueryString();
 
         return Inertia::render('Dashboard/TmdbImports', [
-            'tmdbDrafts' => $tmdbDrafts,
+            'tmdbDrafts' => MovieResource::collection($tmdbDrafts),
             'queryParams' => $request->only(['search']),
         ]);
     }

@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
+use App\Data\X\XSearchResponse;
+use App\Data\X\XTweetData;
 use Atymic\Twitter\Facade\Twitter;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
@@ -281,6 +285,35 @@ class XApiService
         // Rate limits are typically returned in response headers
         // For now, return empty array - can be enhanced with actual tracking
         return [];
+    }
+
+    /**
+     * Search tweets and return as DTO.
+     *
+     * @param  string  $query  Search query
+     * @param  array<string, mixed>  $options  Additional search options
+     *
+     * @throws Exception
+     */
+    public function searchTweetsAsDto(string $query, array $options = []): XSearchResponse
+    {
+        $response = $this->searchTweets($query, $options);
+
+        return XSearchResponse::fromApiResponse($response);
+    }
+
+    /**
+     * Get tweet metrics as DTO.
+     *
+     * @param  string  $tweetId  The tweet ID
+     *
+     * @throws Exception
+     */
+    public function getTweetMetricsAsDto(string $tweetId): XTweetData
+    {
+        $data = $this->getTweetMetrics($tweetId);
+
+        return XTweetData::fromApiResponse($data);
     }
 
     /**

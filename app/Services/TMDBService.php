@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
+use App\Data\Tmdb\TmdbMovieData;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -42,6 +45,20 @@ class TMDBService
         }
 
         return null;
+    }
+
+    /**
+     * Get movie details from TMDB and return as DTO.
+     */
+    public function getMovieDetailsAsDto(int $tmdbId): ?TmdbMovieData
+    {
+        $data = $this->getMovieDetails($tmdbId);
+
+        if ($data === null) {
+            return null;
+        }
+
+        return TmdbMovieData::fromApiResponse($data);
     }
 
     public function discoverWarMovies(int $page = 1, bool $upcoming = false): array

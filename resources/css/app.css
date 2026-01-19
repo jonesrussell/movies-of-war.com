@@ -172,6 +172,11 @@
 }
 
 @layer components {
+    /* Definition list grid - sr-only dt elements don't affect grid layout */
+    dl.grid > dt.sr-only {
+        display: contents;
+    }
+
     /* Container query-based movie grid */
     .movie-grid {
         container-type: inline-size;

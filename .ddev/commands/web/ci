@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+## Description: Run lint, tests, and type checks
+## Usage: ci
+## Example: "ddev ci"
+
+set -e
+
+echo "Running PHP linting..."
+composer lint
+
+echo "Running PHP tests..."
+composer test
+
+echo "Running frontend checks..."
+npm run check
+
+echo "All checks passed!"

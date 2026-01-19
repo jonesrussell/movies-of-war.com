@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\MovieStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -42,6 +43,27 @@ class MovieFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'is_upcoming' => true,
             'release_date' => fake()->dateTimeBetween('now', '+1 year'),
+        ]);
+    }
+
+    public function draft(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => MovieStatus::Draft,
+        ]);
+    }
+
+    public function published(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => MovieStatus::Published,
+        ]);
+    }
+
+    public function archived(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => MovieStatus::Archived,
         ]);
     }
 }

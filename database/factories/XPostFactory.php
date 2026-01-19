@@ -28,6 +28,16 @@ class XPostFactory extends Factory
     }
 
     /**
+     * Indicate that the post is a draft.
+     */
+    public function draft(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => XPostStatus::Draft,
+        ]);
+    }
+
+    /**
      * Indicate that the post is scheduled for future publication.
      */
     public function scheduled(): static

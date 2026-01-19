@@ -51,3 +51,31 @@ config.global.stubs = {
     Head: true,
     teleport: true,
 };
+
+// Mock global fetch for API calls (e.g., XFeedWidget)
+global.fetch = vi.fn((url: string | URL | Request) => {
+    let urlString: string;
+
+    if (typeof url === 'string') {
+        urlString = url;
+    } else if (url instanceof URL) {
+        urlString = url.toString();
+    } else if (url instanceof Request) {
+        urlString = url.url;
+    } else {
+        urlString = String(url);
+    }
+
+    // Mock X feed API endpoint
+    if (urlString.includes('/api/x-feed')) {
+        return Promise.resolve({
+            ok: true,
+            status: 200,
+            json: async () => [],
+            headers: new Headers(),
+        } as Response);
+    }
+
+    // For other fetch calls, reject with a clear error
+    return Promise.reject(new Error(`Unmocked fetch call to: ${urlString}`));
+}) as typeof fetch;

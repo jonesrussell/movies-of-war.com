@@ -19,11 +19,19 @@ class TagResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Safely get the enum value, falling back to the raw database value if enum is invalid
+        try {
+            $typeValue = $this->type->value;
+        } catch (\ValueError $e) {
+            // If enum value is invalid, use the raw database value or default to 'genre'
+            $typeValue = $this->getRawOriginal('type') ?? 'genre';
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'type' => $this->type->value,
+            'type' => $typeValue,
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

@@ -77,7 +77,7 @@ return [
     |
     */
     'tags' => [
-        'default_type' => 'war_category',
+        'default_type' => 'theme',
         'auto_create' => true,
     ],
 ];

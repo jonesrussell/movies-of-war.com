@@ -15,8 +15,8 @@ return [
     'access_token_secret' => env('TWITTER_ACCESS_TOKEN_SECRET'),
 
     // OAuth 2.0 credentials
-    'client_id' => env('TWITTER_CLIENT_ID', env('X_CLIENT_SECRET_ID')),
-    'client_secret' => env('TWITTER_CLIENT_SECRET', env('X_CLIENT_SECRET')),
+    'client_id' => env('TWITTER_CLIENT_ID'),
+    'client_secret' => env('TWITTER_CLIENT_SECRET'),
     // Bearer token from developer portal (OAuth 2.0)
     'oauth2_access_token' => env('TWITTER_OAUTH2_ACCESS_TOKEN', env('TWITTER_BEARER_TOKEN')),
 

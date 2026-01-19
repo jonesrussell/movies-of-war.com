@@ -12,7 +12,13 @@ composer lint
 echo "Running PHP tests..."
 composer test
 
-echo "Running frontend checks..."
-npm run check
+echo "Running frontend linting..."
+npm run lint
+
+echo "Running frontend type checking..."
+npm run type-check
+
+echo "Running frontend tests..."
+npm run test
 
 echo "All checks passed!"

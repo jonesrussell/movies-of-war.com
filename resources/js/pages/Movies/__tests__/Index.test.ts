@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
+import { ref } from 'vue';
 
 import {
     createMockMovie,
@@ -30,12 +31,19 @@ vi.mock('@inertiajs/vue3', () => ({
     },
 }));
 
-// Mock VueUse
+// Mock VueUse - handle different storage keys appropriately
 vi.mock('@vueuse/core', async (importOriginal) => {
     const actual = (await importOriginal()) as Record<string, unknown>;
     return {
         ...actual,
         useDebounceFn: vi.fn((fn) => fn),
+        useStorage: vi.fn((key: string, defaultValue: unknown) => {
+            // Return appropriate default values for different keys
+            if (key === 'movies-infinite-scroll') {
+                return ref(false); // Disable infinite scroll to enable pagination
+            }
+            return ref(defaultValue); // Use default value for other keys (like view mode)
+        }),
     };
 });
 

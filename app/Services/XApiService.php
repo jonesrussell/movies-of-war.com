@@ -4,16 +4,48 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Data\X\XMentionsResponse;
+use App\Data\X\XPostTweetResponse;
 use App\Data\X\XSearchResponse;
 use App\Data\X\XTweetData;
+use App\Data\X\XUserData;
 use Atymic\Twitter\Facade\Twitter;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class XApiService
 {
+    /**
+     * Get OAuth 2.0 User Context access token.
+     * Tries database first, then falls back to config.
+     *
+     * @return string|null The access token or null if not found
+     */
+    protected function getOAuth2AccessToken(): ?string
+    {
+        // Try OAuth 2.0 User Context Bearer token from database first (from OAuth 2.0 flow)
+        $oauth2Token = DB::table('x_oauth2_tokens')
+            ->where('expires_at', '>', now())
+            ->orWhereNull('expires_at')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($oauth2Token && $oauth2Token->access_token) {
+            return $oauth2Token->access_token;
+        }
+
+        // Fallback to explicit config token (not TWITTER_BEARER_TOKEN which is app-only)
+        $oauth2AccessToken = config('twitter.oauth2_access_token');
+        if ($oauth2AccessToken && $oauth2AccessToken !== config('services.twitter.bearer_token')) {
+            return $oauth2AccessToken;
+        }
+
+        return null;
+    }
+
     /**
      * Post a tweet using X API v2 (OAuth 2.0 User Context required).
      *
@@ -26,31 +58,37 @@ class XApiService
      */
     public function postTweet(string $text, ?array $mediaIds = null, ?string $replyToTweetId = null): array
     {
+        $dto = $this->postTweetAsDto($text, $mediaIds, $replyToTweetId);
+
+        return $dto->toArray();
+    }
+
+    /**
+     * Post a tweet and return as DTO.
+     *
+     * @param  string  $text  The tweet content (max 280 characters)
+     * @param  array|null  $mediaIds  Optional array of media IDs to attach
+     * @param  string|null  $replyToTweetId  Optional tweet ID to reply to
+     *
+     * @throws Exception
+     */
+    public function postTweetAsDto(string $text, ?array $mediaIds = null, ?string $replyToTweetId = null): XPostTweetResponse
+    {
         try {
             // Ensure text is not empty
             if (empty($text)) {
                 throw new Exception('Tweet text cannot be empty');
             }
 
-            // Try OAuth 2.0 User Context Bearer token from database first (from OAuth 2.0 flow)
-            $oauth2Token = \Illuminate\Support\Facades\DB::table('x_oauth2_tokens')
-                ->where('expires_at', '>', now())
-                ->orWhereNull('expires_at')
-                ->orderBy('created_at', 'desc')
-                ->first();
+            $accessToken = $this->getOAuth2AccessToken();
 
-            if ($oauth2Token && $oauth2Token->access_token) {
-                return $this->postTweetWithOAuth2($text, $mediaIds, $replyToTweetId, $oauth2Token->access_token);
+            if (! $accessToken) {
+                throw new Exception('OAuth 2.0 User Context access token required for posting tweets. Please complete the OAuth 2.0 flow at /x-oauth2/redirect');
             }
 
-            // Fallback to explicit config token (not TWITTER_BEARER_TOKEN which is app-only)
-            $oauth2AccessToken = config('twitter.oauth2_access_token');
-            if ($oauth2AccessToken && $oauth2AccessToken !== config('services.twitter.bearer_token')) {
-                return $this->postTweetWithOAuth2($text, $mediaIds, $replyToTweetId, $oauth2AccessToken);
-            }
+            $data = $this->postTweetWithOAuth2($text, $mediaIds, $replyToTweetId, $accessToken);
 
-            // OAuth 1.0a is deprecated and cannot be used for posting
-            throw new Exception('OAuth 2.0 User Context access token required for posting tweets. Please complete the OAuth 2.0 flow at /x-oauth2/redirect');
+            return XPostTweetResponse::fromApiResponse($data);
         } catch (\Throwable $e) {
             $friendlyMessage = XApiErrorParser::getFriendlyMessage($e);
 
@@ -82,19 +120,9 @@ class XApiService
     public function uploadMedia(string $mediaPath): string
     {
         try {
-            // Get OAuth 2.0 access token (required for media upload in 2026)
-            $oauth2Token = \Illuminate\Support\Facades\DB::table('x_oauth2_tokens')
-                ->where('expires_at', '>', now())
-                ->orWhereNull('expires_at')
-                ->orderBy('created_at', 'desc')
-                ->first();
+            $accessToken = $this->getOAuth2AccessToken();
 
-            $oauth2AccessToken = $oauth2Token?->access_token
-                ?? (config('twitter.oauth2_access_token') !== config('services.twitter.bearer_token')
-                    ? config('twitter.oauth2_access_token')
-                    : null);
-
-            if (! $oauth2AccessToken) {
+            if (! $accessToken) {
                 throw new Exception('OAuth 2.0 User Context access token required for media upload. Please complete the OAuth 2.0 flow at /x-oauth2/redirect');
             }
 
@@ -122,7 +150,7 @@ class XApiService
             }
 
             // Upload using OAuth 2.0 Bearer token (X API v1.1 endpoint, works with v2 tweets)
-            $upload = $this->uploadMediaWithOAuth2($mediaPath, $oauth2AccessToken);
+            $upload = $this->uploadMediaWithOAuth2($mediaPath, $accessToken);
 
             // Clean up temp file if created
             if (isset($isTempFile) && $isTempFile && file_exists($mediaPath)) {
@@ -220,6 +248,20 @@ class XApiService
      */
     public function getMentions(array $options = []): array
     {
+        $dto = $this->getMentionsAsDto($options);
+
+        return $dto->toArray();
+    }
+
+    /**
+     * Get mentions and return as DTO.
+     *
+     * @param  array  $options  Additional options (max_results, since_id, etc.)
+     *
+     * @throws Exception
+     */
+    public function getMentionsAsDto(array $options = []): XMentionsResponse
+    {
         try {
             $userId = config('services.twitter.user_id') ?? Twitter::forApiV2()->user()->getMe()['data']['id'];
 
@@ -232,7 +274,7 @@ class XApiService
 
             $response = Twitter::forApiV2()->user()->getMentions($userId, $params);
 
-            return $response;
+            return XMentionsResponse::fromApiResponse($response);
         } catch (Exception $e) {
             Log::error('X API: Failed to get mentions', [
                 'error' => $e->getMessage(),
@@ -252,6 +294,20 @@ class XApiService
      */
     public function getUserByUsername(string $username): array
     {
+        $dto = $this->getUserByUsernameAsDto($username);
+
+        return $dto->toArray();
+    }
+
+    /**
+     * Get user information by username and return as DTO.
+     *
+     * @param  string  $username  The username (without @)
+     *
+     * @throws Exception
+     */
+    public function getUserByUsernameAsDto(string $username): XUserData
+    {
         try {
             $params = [
                 'user.fields' => 'id,username,name,public_metrics,created_at',
@@ -263,7 +319,7 @@ class XApiService
                 throw new Exception('Failed to get user from X API response');
             }
 
-            return $response['data'];
+            return XUserData::fromApiResponse($response['data']);
         } catch (Exception $e) {
             Log::error('X API: Failed to get user by username', [
                 'error' => $e->getMessage(),

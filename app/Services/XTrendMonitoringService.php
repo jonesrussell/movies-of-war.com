@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\XTrendKeyword;
 use App\Models\XTrendResult;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -30,34 +29,30 @@ class XTrendMonitoringService
             $query = $this->buildSearchQuery($keyword);
 
             // Search tweets
-            $response = $this->xApiService->searchTweets($query, [
+            $response = $this->xApiService->searchTweetsAsDto($query, [
                 'max_results' => min($maxResults, 100), // API limit
             ]);
 
-            $tweets = $response['data'] ?? [];
-            $users = collect($response['includes']['users'] ?? [])->keyBy('id');
-
             $resultsCount = 0;
 
-            foreach ($tweets as $tweet) {
-                $authorId = $tweet['author_id'] ?? null;
-                $author = $authorId ? $users->get($authorId) : null;
-                $metrics = $tweet['public_metrics'] ?? [];
+            foreach ($response->tweets as $tweet) {
+                $author = $tweet->author;
+                $metrics = $tweet->metrics;
 
                 // Check if result already exists
-                $existing = XTrendResult::where('tweet_id', $tweet['id'])->first();
+                $existing = XTrendResult::where('tweet_id', $tweet->id)->first();
 
                 if (! $existing) {
                     XTrendResult::create([
                         'trend_keyword_id' => $keyword->id,
-                        'tweet_id' => $tweet['id'],
-                        'author_username' => $author['username'] ?? 'unknown',
-                        'content' => $tweet['text'] ?? '',
-                        'like_count' => $metrics['like_count'] ?? 0,
-                        'retweet_count' => $metrics['retweet_count'] ?? 0,
-                        'reply_count' => $metrics['reply_count'] ?? 0,
-                        'tweet_created_at' => isset($tweet['created_at']) ? Carbon::parse($tweet['created_at']) : now(),
-                        'url' => "https://x.com/{$author['username']}/status/{$tweet['id']}",
+                        'tweet_id' => $tweet->id,
+                        'author_username' => $author?->username ?? 'unknown',
+                        'content' => $tweet->text,
+                        'like_count' => $metrics?->likeCount ?? 0,
+                        'retweet_count' => $metrics?->retweetCount ?? 0,
+                        'reply_count' => $metrics?->replyCount ?? 0,
+                        'tweet_created_at' => $tweet->createdAt ?? now(),
+                        'url' => $tweet->getTweetUrl(),
                     ]);
 
                     $resultsCount++;

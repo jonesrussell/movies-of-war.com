@@ -15,7 +15,7 @@ final class XPostPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->is_admin;
+        return ($user->is_admin ?? false) === true;
     }
 
     /**
@@ -24,7 +24,7 @@ final class XPostPolicy
      */
     public function view(User $user, XPost $xPost): bool
     {
-        return $user->is_admin;
+        return ($user->is_admin ?? false) === true;
     }
 
     /**
@@ -33,7 +33,7 @@ final class XPostPolicy
      */
     public function create(User $user): bool
     {
-        return $user->is_admin;
+        return ($user->is_admin ?? false) === true;
     }
 
     /**
@@ -42,7 +42,7 @@ final class XPostPolicy
      */
     public function update(User $user, XPost $xPost): bool
     {
-        return $user->is_admin && $xPost->canEdit();
+        return ($user->is_admin ?? false) === true && $xPost->canEdit();
     }
 
     /**
@@ -51,7 +51,7 @@ final class XPostPolicy
      */
     public function delete(User $user, XPost $xPost): bool
     {
-        return $user->is_admin && $xPost->canEdit();
+        return ($user->is_admin ?? false) === true && $xPost->canEdit();
     }
 
     /**
@@ -60,7 +60,7 @@ final class XPostPolicy
      */
     public function publish(User $user, XPost $xPost): bool
     {
-        return $user->is_admin && $xPost->canPublish();
+        return ($user->is_admin ?? false) === true && $xPost->canPublish();
     }
 
     /**
@@ -69,7 +69,7 @@ final class XPostPolicy
      */
     public function schedule(User $user, XPost $xPost): bool
     {
-        return $user->is_admin && $xPost->canSchedule();
+        return ($user->is_admin ?? false) === true && $xPost->canSchedule();
     }
 
     /**
@@ -78,6 +78,6 @@ final class XPostPolicy
      */
     public function cancel(User $user, XPost $xPost): bool
     {
-        return $user->is_admin && $xPost->canCancel();
+        return ($user->is_admin ?? false) === true && $xPost->canCancel();
     }
 }

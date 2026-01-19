@@ -37,7 +37,7 @@ final class MoviePolicy
      */
     public function create(User $user): bool
     {
-        return $user->is_admin;
+        return ($user->is_admin ?? false) === true;
     }
 
     /**
@@ -46,7 +46,7 @@ final class MoviePolicy
      */
     public function update(User $user, Movie $movie): bool
     {
-        return $user->is_admin;
+        return ($user->is_admin ?? false) === true;
     }
 
     /**
@@ -55,7 +55,7 @@ final class MoviePolicy
      */
     public function delete(User $user, Movie $movie): bool
     {
-        return $user->is_admin;
+        return ($user->is_admin ?? false) === true;
     }
 
     /**
@@ -64,7 +64,7 @@ final class MoviePolicy
      */
     public function publish(User $user, Movie $movie): bool
     {
-        return $user->is_admin && $movie->isDraft();
+        return ($user->is_admin ?? false) === true && $movie->isDraft();
     }
 
     /**
@@ -73,7 +73,7 @@ final class MoviePolicy
      */
     public function unpublish(User $user, Movie $movie): bool
     {
-        return $user->is_admin && $movie->isPublished();
+        return ($user->is_admin ?? false) === true && $movie->isPublished();
     }
 
     /**
@@ -82,7 +82,7 @@ final class MoviePolicy
      */
     public function archive(User $user, Movie $movie): bool
     {
-        return $user->is_admin && ! $movie->isArchived();
+        return ($user->is_admin ?? false) === true && ! $movie->isArchived();
     }
 
     /**
@@ -91,7 +91,7 @@ final class MoviePolicy
      */
     public function restore(User $user, Movie $movie): bool
     {
-        return $user->is_admin && $movie->isArchived();
+        return ($user->is_admin ?? false) === true && $movie->isArchived();
     }
 
     /**
@@ -100,6 +100,6 @@ final class MoviePolicy
      */
     public function feature(User $user, Movie $movie): bool
     {
-        return $user->is_admin && $movie->isPublished();
+        return ($user->is_admin ?? false) === true && $movie->isPublished();
     }
 }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Data\Tmdb\TmdbDiscoverResponse;
 use App\Data\Tmdb\TmdbMovieData;
+use App\Data\Tmdb\TmdbSearchResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -31,6 +33,21 @@ class TMDBService
         ]);
 
         return $response->json()['results'] ?? [];
+    }
+
+    /**
+     * Search movies and return as DTO.
+     */
+    public function searchMoviesAsDto(string $query): TmdbSearchResponse
+    {
+        $response = Http::get("{$this->baseUrl}/search/movie", [
+            'api_key' => $this->apiKey,
+            'query' => $query,
+        ]);
+
+        $data = $response->json();
+
+        return TmdbSearchResponse::fromApiResponse($data);
     }
 
     public function getMovieDetails(int $tmdbId): ?array
@@ -63,6 +80,16 @@ class TMDBService
 
     public function discoverWarMovies(int $page = 1, bool $upcoming = false): array
     {
+        $dto = $this->discoverWarMoviesAsDto($page, $upcoming);
+
+        return $dto->toArray();
+    }
+
+    /**
+     * Discover war movies and return as DTO.
+     */
+    public function discoverWarMoviesAsDto(int $page = 1, bool $upcoming = false): TmdbDiscoverResponse
+    {
         $query = [
             'api_key' => $this->apiKey,
             'with_genres' => '10752', // War genre
@@ -82,11 +109,7 @@ class TMDBService
 
         $data = $response->json();
 
-        return [
-            'results' => $data['results'] ?? [],
-            'total_pages' => $data['total_pages'] ?? 1,
-            'total_results' => $data['total_results'] ?? 0,
-        ];
+        return TmdbDiscoverResponse::fromApiResponse($data);
     }
 
     public function downloadPoster(string $posterPath): ?string

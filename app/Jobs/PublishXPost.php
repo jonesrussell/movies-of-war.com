@@ -162,8 +162,8 @@ class PublishXPost implements ShouldQueue
             $tweetMediaIds = ($index === 0 && ! empty($mediaIds)) ? $mediaIds : null;
 
             // Post tweet (will include reply info if previousTweetId is set)
-            $tweetData = $xApiService->postTweet($content, $tweetMediaIds, $previousTweetId);
-            $tweetId = $tweetData['id'];
+            $tweetResponse = $xApiService->postTweetAsDto($content, $tweetMediaIds, $previousTweetId);
+            $tweetId = $tweetResponse->id;
 
             // Store the first tweet ID to return
             if ($firstTweetId === null) {

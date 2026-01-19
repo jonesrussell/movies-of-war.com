@@ -22,10 +22,9 @@ class XAutoReplyService
     {
         try {
             // Get recent mentions
-            $mentionsResponse = $this->xApiService->getMentions(['max_results' => $limit]);
-            $mentions = $mentionsResponse['data'] ?? [];
+            $mentionsResponse = $this->xApiService->getMentionsAsDto(['max_results' => $limit]);
 
-            if (empty($mentions)) {
+            if ($mentionsResponse->isEmpty()) {
                 return 0;
             }
 
@@ -38,19 +37,19 @@ class XAutoReplyService
 
             $repliesSent = 0;
 
-            foreach ($mentions as $mention) {
-                $text = strtolower($mention['text'] ?? '');
+            foreach ($mentionsResponse->tweets as $tweet) {
+                $text = strtolower($tweet->text);
 
                 // Find matching rule
                 foreach ($rules as $rule) {
                     if ($rule->matches($text)) {
                         try {
-                            $this->checkAndReply($mention, $rule);
+                            $this->checkAndReply($tweet, $rule);
                             $repliesSent++;
                             break; // Only reply once per mention
                         } catch (Exception $e) {
                             Log::warning('X Auto Reply: Failed to send reply', [
-                                'tweet_id' => $mention['id'] ?? null,
+                                'tweet_id' => $tweet->id,
                                 'rule_id' => $rule->id,
                                 'error' => $e->getMessage(),
                             ]);
@@ -77,28 +76,22 @@ class XAutoReplyService
     /**
      * Check if a mention matches a rule and send reply.
      *
-     * @param  array  $mention  Mention tweet data from API
+     * @param  \App\Data\X\XTweetData  $tweet  Mention tweet data
      * @param  XAutoReplyRule  $rule  Auto-reply rule
      * @return bool Success
      *
      * @throws Exception
      */
-    public function checkAndReply(array $mention, XAutoReplyRule $rule): bool
+    public function checkAndReply(\App\Data\X\XTweetData $tweet, XAutoReplyRule $rule): bool
     {
-        $tweetId = $mention['id'] ?? null;
-
-        if (! $tweetId) {
-            throw new Exception('Invalid mention data: missing tweet ID');
-        }
-
         $context = [
-            'author' => $mention['author_id'] ?? 'user',
-            'tweet_id' => $tweetId,
+            'author' => $tweet->authorId,
+            'tweet_id' => $tweet->id,
         ];
 
         $replyContent = $rule->generateReply($context);
 
-        return $this->sendReply($tweetId, $replyContent);
+        return $this->sendReply($tweet->id, $replyContent);
     }
 
     /**

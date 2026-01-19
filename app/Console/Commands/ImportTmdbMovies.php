@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\MovieStatus;
 use App\Models\Movie;
 use App\Models\Tag;
 use App\Services\TMDBService;
@@ -66,10 +67,10 @@ class ImportTmdbMovies extends Command
                     continue;
                 }
 
-                $details = $this->tmdb->getMovieDetails($tmdbId);
+                $movieData = $this->tmdb->getMovieDetailsAsDto($tmdbId);
 
-                if ($details) {
-                    $result = $this->importMovie($details);
+                if ($movieData) {
+                    $result = $this->importMovie($movieData);
                     if ($result['action'] === 'created') {
                         $created++;
                     } else {
@@ -100,15 +101,15 @@ class ImportTmdbMovies extends Command
 
         if ($random) {
             // Get total pages available from TMDB
-            $firstPageData = $this->tmdb->discoverWarMovies(1, $upcoming);
+            $firstPageResponse = $this->tmdb->discoverWarMoviesAsDto(1, $upcoming);
 
             if ($this->debug) {
                 $this->line("\n=== DEBUG: First Page Response ===");
-                $this->line(json_encode($firstPageData, JSON_PRETTY_PRINT));
+                $this->line(json_encode($firstPageResponse->toArray(), JSON_PRETTY_PRINT));
                 $this->line("===================================\n");
             }
 
-            $totalPages = min($firstPageData['total_pages'], 500); // TMDB limits to 500 pages
+            $totalPages = min($firstPageResponse->totalPages, 500); // TMDB limits to 500 pages
 
             $this->line("Total pages available: {$totalPages}");
 
@@ -121,26 +122,24 @@ class ImportTmdbMovies extends Command
             $this->line('Fetching from random pages: '.implode(', ', $pagesToFetch->take(10)->toArray()).'...');
 
             foreach ($pagesToFetch as $page) {
-                $data = $this->tmdb->discoverWarMovies($page, $upcoming);
+                $response = $this->tmdb->discoverWarMoviesAsDto($page, $upcoming);
 
                 if ($this->debug) {
                     $this->line("\n=== DEBUG: Page {$page} Response ===");
-                    $this->line('Results count: '.count($data['results'] ?? []));
-                    $this->line('Total pages: '.($data['total_pages'] ?? 'N/A'));
-                    $this->line('Total results: '.($data['total_results'] ?? 'N/A'));
-                    if (! empty($data['results'])) {
-                        $this->line('First result: '.json_encode($data['results'][0] ?? [], JSON_PRETTY_PRINT));
+                    $this->line('Results count: '.$response->results->count());
+                    $this->line('Total pages: '.$response->totalPages);
+                    $this->line('Total results: '.$response->totalResults);
+                    if ($response->results->isNotEmpty()) {
+                        $this->line('First result: '.json_encode($response->results->first(), JSON_PRETTY_PRINT));
                     }
                     $this->line("===================================\n");
                 }
 
-                $movies = $data['results'] ?? [];
-
-                if (empty($movies)) {
+                if ($response->isEmpty()) {
                     continue;
                 }
 
-                foreach ($movies as $movie) {
+                foreach ($response->results as $movie) {
                     $ids->push($movie['id']);
 
                     if ($ids->count() >= $limit) {
@@ -155,26 +154,24 @@ class ImportTmdbMovies extends Command
             $page = $startPage;
 
             while ($ids->count() < $limit) {
-                $data = $this->tmdb->discoverWarMovies($page, $upcoming);
+                $response = $this->tmdb->discoverWarMoviesAsDto($page, $upcoming);
 
                 if ($this->debug) {
                     $this->line("\n=== DEBUG: Page {$page} Response ===");
-                    $this->line('Results count: '.count($data['results'] ?? []));
-                    $this->line('Total pages: '.($data['total_pages'] ?? 'N/A'));
-                    $this->line('Total results: '.($data['total_results'] ?? 'N/A'));
-                    if (! empty($data['results'])) {
-                        $this->line('First result: '.json_encode($data['results'][0] ?? [], JSON_PRETTY_PRINT));
+                    $this->line('Results count: '.$response->results->count());
+                    $this->line('Total pages: '.$response->totalPages);
+                    $this->line('Total results: '.$response->totalResults);
+                    if ($response->results->isNotEmpty()) {
+                        $this->line('First result: '.json_encode($response->results->first(), JSON_PRETTY_PRINT));
                     }
                     $this->line("===================================\n");
                 }
 
-                $movies = $data['results'] ?? [];
-
-                if (empty($movies)) {
+                if ($response->isEmpty()) {
                     break;
                 }
 
-                foreach ($movies as $movie) {
+                foreach ($response->results as $movie) {
                     $ids->push($movie['id']);
 
                     if ($ids->count() >= $limit) {
@@ -189,30 +186,30 @@ class ImportTmdbMovies extends Command
         return $ids;
     }
 
-    protected function importMovie(array $details): array
+    protected function importMovie(\App\Data\Tmdb\TmdbMovieData $movieData): array
     {
         if ($this->debug) {
             $this->line("\n=== DEBUG: Movie Details Response ===");
-            $this->line(json_encode($details, JSON_PRETTY_PRINT));
+            $this->line(json_encode($movieData->toArray(), JSON_PRETTY_PRINT));
             $this->line("===================================\n");
         }
 
         $posterPath = null;
         $posterUrl = null;
 
-        if ($details['poster_path']) {
-            $posterPath = $this->tmdb->downloadPoster($details['poster_path']);
-            $posterUrl = $this->tmdb->getPosterUrl($details['poster_path']);
+        if ($movieData->posterPath) {
+            $posterPath = $this->tmdb->downloadPoster($movieData->posterPath);
+            $posterUrl = $this->tmdb->getPosterUrl($movieData->posterPath);
         }
 
-        $trailerUrl = $this->tmdb->getYoutubeTrailerUrl($details['videos'] ?? null);
+        $trailerUrl = $movieData->getTrailerUrl();
 
         // First try to find by tmdb_id, then by slug to avoid duplicates
-        $slug = Str::slug($details['title']);
+        $slug = Str::slug($movieData->title);
 
-        $this->line("\nProcessing: {$details['title']} (TMDB ID: {$details['id']}, Slug: {$slug})");
+        $this->line("\nProcessing: {$movieData->title} (TMDB ID: {$movieData->id}, Slug: {$slug})");
 
-        $movieByTmdbId = Movie::where('tmdb_id', $details['id'])->first();
+        $movieByTmdbId = Movie::where('tmdb_id', $movieData->id)->first();
         if ($movieByTmdbId) {
             $this->line("  → Found by TMDB ID: {$movieByTmdbId->id}");
             $movie = $movieByTmdbId;
@@ -225,29 +222,21 @@ class ImportTmdbMovies extends Command
                 $action = 'updated';
             } else {
                 $this->line('  → Creating new movie');
-                $movie = new Movie(['tmdb_id' => $details['id']]);
+                $movie = new Movie(['tmdb_id' => $movieData->id]);
                 $action = 'created';
             }
         }
 
-        $movie->fill([
-            'tmdb_id' => $details['id'],
-            'title' => $details['title'],
+        $movie->fill(array_merge($movieData->toMovieAttributes(), [
             'slug' => $slug,
-            'release_year' => (int) substr($details['release_date'] ?? now()->year, 0, 4),
-            'release_date' => $details['release_date'] ?? null,
-            'synopsis' => $details['overview'] ?? '',
-            'runtime' => $details['runtime'] ?? null,
             'poster_path' => $posterPath,
             'poster_url' => $posterUrl,
             'trailer_url' => $trailerUrl,
-            'imdb_id' => $details['imdb_id'] ?? null,
-            'is_upcoming' => ! empty($details['release_date']) && $details['release_date'] > now(),
-        ]);
+        ]));
 
         // Only set status to draft if this is a new movie
         if (! $movie->exists) {
-            $movie->status = Movie::STATUS_DRAFT;
+            $movie->status = MovieStatus::Draft;
         }
 
         $this->line('  → Saving (exists: '.($movie->exists ? 'yes' : 'no').')');
@@ -255,39 +244,34 @@ class ImportTmdbMovies extends Command
         $this->line("  → Saved as ID: {$movie->id}");
 
         // Tag the movie
-        $this->tagMovie($movie, $details);
+        $this->tagMovie($movie, $movieData);
 
         return ['action' => $action];
     }
 
-    protected function tagMovie(Movie $movie, array $details): void
+    protected function tagMovie(Movie $movie, \App\Data\Tmdb\TmdbMovieData $movieData): void
     {
         $tags = collect();
 
         // Add genre tags
-        foreach ($details['genres'] ?? [] as $genre) {
+        foreach ($movieData->genres as $genre) {
             $tag = Tag::firstOrCreate(
-                ['slug' => Str::slug($genre['name'])],
-                ['name' => $genre['name'], 'type' => 'genre']
+                ['slug' => Str::slug($genre->name)],
+                ['name' => $genre->name, 'type' => 'genre']
             );
             $tags->push($tag->id);
         }
 
         // Add era tags based on keywords
-        if (isset($details['keywords']['keywords'])) {
-            foreach ($details['keywords']['keywords'] as $keyword) {
-                $keywordName = $keyword['name'];
+        foreach ($movieData->keywords as $keyword) {
+            $matchedEra = $keyword->matchEra();
 
-                if (str_contains($keywordName, 'world war ii') || str_contains($keywordName, 'ww2')) {
-                    $tag = Tag::firstOrCreate(['slug' => 'wwii'], ['name' => 'WWII', 'type' => 'era']);
-                    $tags->push($tag->id);
-                } elseif (str_contains($keywordName, 'world war i') || str_contains($keywordName, 'ww1')) {
-                    $tag = Tag::firstOrCreate(['slug' => 'wwi'], ['name' => 'WWI', 'type' => 'era']);
-                    $tags->push($tag->id);
-                } elseif (str_contains($keywordName, 'vietnam')) {
-                    $tag = Tag::firstOrCreate(['slug' => 'vietnam-war'], ['name' => 'Vietnam War', 'type' => 'era']);
-                    $tags->push($tag->id);
-                }
+            if ($matchedEra !== null) {
+                $tag = Tag::firstOrCreate(
+                    ['slug' => Str::slug($matchedEra)],
+                    ['name' => $matchedEra, 'type' => 'era']
+                );
+                $tags->push($tag->id);
             }
         }
 

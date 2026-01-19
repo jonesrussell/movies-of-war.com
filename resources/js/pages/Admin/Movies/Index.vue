@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Movie, PaginatedMovies } from '@/types/models';
+import { MovieStatus } from '@/types/enums';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
@@ -174,17 +175,17 @@ function unpublishMovie(movie: Movie) {
                                 <span
                                     :class="[
                                         'inline-flex rounded-full px-2 py-1 text-xs font-semibold',
-                                        movie.status === 'published'
+                                        movie.status === MovieStatus.Published
                                             ? 'bg-green-900/50 text-green-300'
-                                            : movie.status === 'draft'
+                                            : movie.status === MovieStatus.Draft
                                               ? 'bg-yellow-900/50 text-yellow-300'
                                               : 'bg-zinc-800 text-zinc-400',
                                     ]"
                                 >
                                     {{
-                                        movie.status === 'published'
+                                        movie.status === MovieStatus.Published
                                             ? 'Published'
-                                            : movie.status === 'draft'
+                                            : movie.status === MovieStatus.Draft
                                               ? 'Draft'
                                               : 'Archived'
                                     }}
@@ -199,7 +200,7 @@ function unpublishMovie(movie: Movie) {
                                     <Edit class="size-4" />
                                 </Link>
                                 <button
-                                    v-if="movie.status !== 'published'"
+                                    v-if="movie.status !== MovieStatus.Published"
                                     @click="publishMovie(movie)"
                                     class="inline-flex items-center justify-center rounded-lg bg-green-600/20 p-2 text-green-500 transition-colors hover:bg-green-600/30"
                                     title="Publish"
@@ -207,7 +208,7 @@ function unpublishMovie(movie: Movie) {
                                     <CheckCircle class="size-4" />
                                 </button>
                                 <button
-                                    v-if="movie.status === 'published'"
+                                    v-if="movie.status === MovieStatus.Published"
                                     @click="unpublishMovie(movie)"
                                     class="inline-flex items-center justify-center rounded-lg bg-yellow-600/20 p-2 text-yellow-500 transition-colors hover:bg-yellow-600/30"
                                     title="Unpublish"
@@ -215,7 +216,7 @@ function unpublishMovie(movie: Movie) {
                                     <XCircle class="size-4" />
                                 </button>
                                 <button
-                                    v-if="movie.status !== 'archived'"
+                                    v-if="movie.status !== MovieStatus.Archived"
                                     @click="archiveMovie(movie)"
                                     class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
                                     title="Archive"
@@ -335,17 +336,17 @@ function unpublishMovie(movie: Movie) {
                                 <span
                                     :class="[
                                         'inline-flex rounded-full px-2 py-1 text-xs font-semibold',
-                                        movie.status === 'published'
+                                        movie.status === MovieStatus.Published
                                             ? 'bg-green-900/50 text-green-300'
-                                            : movie.status === 'draft'
+                                            : movie.status === MovieStatus.Draft
                                               ? 'bg-yellow-900/50 text-yellow-300'
                                               : 'bg-zinc-800 text-zinc-400',
                                     ]"
                                 >
                                     {{
-                                        movie.status === 'published'
+                                        movie.status === MovieStatus.Published
                                             ? 'Published'
-                                            : movie.status === 'draft'
+                                            : movie.status === MovieStatus.Draft
                                               ? 'Draft'
                                               : 'Archived'
                                     }}
@@ -363,7 +364,7 @@ function unpublishMovie(movie: Movie) {
                                         <Edit class="size-4" />
                                     </Link>
                                     <button
-                                        v-if="movie.status !== 'published'"
+                                        v-if="movie.status !== MovieStatus.Published"
                                         @click="publishMovie(movie)"
                                         class="inline-flex items-center justify-center rounded-lg bg-green-600/20 p-2 text-green-500 transition-colors hover:bg-green-600/30"
                                         title="Publish"
@@ -371,7 +372,7 @@ function unpublishMovie(movie: Movie) {
                                         <CheckCircle class="size-4" />
                                     </button>
                                     <button
-                                        v-if="movie.status === 'published'"
+                                        v-if="movie.status === MovieStatus.Published"
                                         @click="unpublishMovie(movie)"
                                         class="inline-flex items-center justify-center rounded-lg bg-yellow-600/20 p-2 text-yellow-500 transition-colors hover:bg-yellow-600/30"
                                         title="Unpublish"
@@ -379,7 +380,7 @@ function unpublishMovie(movie: Movie) {
                                         <XCircle class="size-4" />
                                     </button>
                                     <button
-                                        v-if="movie.status !== 'archived'"
+                                        v-if="movie.status !== MovieStatus.Archived"
                                         @click="archiveMovie(movie)"
                                         class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
                                         title="Archive"

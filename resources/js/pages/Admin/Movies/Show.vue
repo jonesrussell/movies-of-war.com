@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Movie } from '@/types/models';
+import { MovieStatus } from '@/types/enums';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 import {
@@ -96,7 +97,7 @@ const posterImage =
                         <Edit class="size-5" />
                     </Link>
                     <Button
-                        v-if="movie.status !== 'published'"
+                        v-if="movie.status !== MovieStatus.Published"
                         @click="publishMovie"
                         class="bg-green-600 p-2 hover:bg-green-700"
                         title="Publish movie"
@@ -104,7 +105,7 @@ const posterImage =
                         <CheckCircle class="size-5" />
                     </Button>
                     <Button
-                        v-if="movie.status === 'published'"
+                        v-if="movie.status === MovieStatus.Published"
                         @click="unpublishMovie"
                         variant="outline"
                         class="border-yellow-600 p-2 text-yellow-500 hover:bg-yellow-900/20"
@@ -113,7 +114,7 @@ const posterImage =
                         <XCircle class="size-5" />
                     </Button>
                     <Button
-                        v-if="movie.status !== 'archived'"
+                        v-if="movie.status !== MovieStatus.Archived"
                         @click="archiveMovie"
                         variant="outline"
                         class="border-zinc-600 p-2 text-zinc-400 hover:bg-zinc-800"
@@ -137,17 +138,17 @@ const posterImage =
                 <span
                     :class="[
                         'inline-flex rounded-full px-3 py-1 text-xs font-semibold',
-                        movie.status === 'published'
+                        movie.status === MovieStatus.Published
                             ? 'bg-green-900/50 text-green-300'
-                            : movie.status === 'draft'
+                            : movie.status === MovieStatus.Draft
                               ? 'bg-yellow-900/50 text-yellow-300'
                               : 'bg-zinc-800 text-zinc-400',
                     ]"
                 >
                     {{
-                        movie.status === 'published'
+                        movie.status === MovieStatus.Published
                             ? 'Published'
-                            : movie.status === 'draft'
+                            : movie.status === MovieStatus.Draft
                               ? 'Draft'
                               : 'Archived'
                     }}

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PaginatedXPosts, XPost } from '@/types/models';
+import { XPostStatus } from '@/types/enums';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
@@ -55,17 +56,17 @@ function filterByStatus(status: string) {
     );
 }
 
-function getStatusBadgeClass(status: string): string {
+function getStatusBadgeClass(status: XPostStatus | string): string {
     switch (status) {
-        case 'draft':
+        case XPostStatus.Draft:
             return 'bg-yellow-900/50 text-yellow-300';
-        case 'scheduled':
+        case XPostStatus.Scheduled:
             return 'bg-blue-900/50 text-blue-300';
-        case 'published':
+        case XPostStatus.Published:
             return 'bg-green-900/50 text-green-300';
-        case 'failed':
+        case XPostStatus.Failed:
             return 'bg-red-900/50 text-red-300';
-        case 'cancelled':
+        case XPostStatus.Cancelled:
             return 'bg-zinc-800 text-zinc-400';
         default:
             return 'bg-zinc-800 text-zinc-400';

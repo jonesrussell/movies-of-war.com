@@ -1,3 +1,5 @@
+import { MovieStatus, TagType, XPostStatus } from './enums';
+
 export interface Movie {
     id: number;
     tmdb_id: number | null;
@@ -14,7 +16,7 @@ export interface Movie {
     trailer_url: string | null;
     imdb_id: string | null;
     is_upcoming: boolean;
-    status?: 'draft' | 'published' | 'archived';
+    status?: MovieStatus;
     created_at: string;
     updated_at: string;
     tags?: Tag[];
@@ -25,7 +27,7 @@ export interface Tag {
     id: number;
     name: string;
     slug: string;
-    type: 'genre' | 'theme' | 'era';
+    type: TagType;
     created_at: string;
     updated_at: string;
 }
@@ -104,7 +106,7 @@ export interface XPost {
     content: string | null;
     thread_parts: string[] | null;
     media_urls: string[] | null;
-    status: 'draft' | 'scheduled' | 'published' | 'failed' | 'cancelled';
+    status: XPostStatus;
     scheduled_for: string | null;
     published_at: string | null;
     x_post_id: string | null;

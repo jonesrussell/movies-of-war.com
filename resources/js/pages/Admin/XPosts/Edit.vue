@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { XPost } from '@/types/models';
+import { XPostStatus } from '@/types/enums';
 
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { Plus, Trash2, X } from 'lucide-vue-next';
@@ -19,7 +20,7 @@ const form = useForm({
     content: props.xPost.content || '',
     thread_parts: props.xPost.thread_parts || [],
     media_urls: props.xPost.media_urls || [],
-    status: props.xPost.status === 'scheduled' ? 'scheduled' : 'draft',
+    status: props.xPost.status === XPostStatus.Scheduled ? XPostStatus.Scheduled : XPostStatus.Draft,
     scheduled_for: props.xPost.scheduled_for
         ? new Date(props.xPost.scheduled_for).toISOString().slice(0, 16)
         : '',
@@ -33,7 +34,7 @@ const threadCharacterCounts = computed(() =>
     form.thread_parts.map((part) => props.maxTweetLength - part.length),
 );
 
-const isScheduled = computed(() => form.status === 'scheduled');
+const isScheduled = computed(() => form.status === XPostStatus.Scheduled);
 
 function addThreadPart() {
     if (form.thread_parts.length < 25) {

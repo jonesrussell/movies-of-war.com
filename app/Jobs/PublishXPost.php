@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\XPost;
+use App\Services\XApiErrorParser;
 use App\Services\XApiService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -79,17 +80,21 @@ class PublishXPost implements ShouldQueue
                 'has_thread' => $this->xPost->hasThread(),
                 'has_media' => $this->xPost->hasMedia(),
             ]);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
+            // Get user-friendly error message (XApiService already converts errors, but double-check)
+            $errorMessage = XApiErrorParser::getFriendlyMessage($e);
+
             // Log the failure
             Log::error('Failed to publish XPost', [
                 'x_post_id' => $this->xPost->id,
-                'error' => $e->getMessage(),
+                'error' => $errorMessage,
+                'original_error' => $e->getPrevious()?->getMessage() ?? $e->getMessage(),
                 'attempt' => $this->attempts(),
             ]);
 
             // Mark as failed if we've exhausted retries
             if ($this->attempts() >= $this->tries) {
-                $this->xPost->markAsFailed($e->getMessage());
+                $this->xPost->markAsFailed($errorMessage);
             }
 
             // Re-throw to trigger retry mechanism
@@ -182,11 +187,15 @@ class PublishXPost implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
+        // Get user-friendly error message
+        $errorMessage = XApiErrorParser::getFriendlyMessage($exception);
+
         Log::error('XPost job failed after all retries', [
             'x_post_id' => $this->xPost->id,
-            'error' => $exception->getMessage(),
+            'error' => $errorMessage,
+            'original_error' => $exception->getMessage(),
         ]);
 
-        $this->xPost->markAsFailed($exception->getMessage());
+        $this->xPost->markAsFailed($errorMessage);
     }
 }

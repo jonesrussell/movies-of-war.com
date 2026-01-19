@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\XApiErrorParser;
 use Atymic\Twitter\Facade\Twitter;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
@@ -47,15 +48,20 @@ class XApiService
 
             // OAuth 1.0a is deprecated and cannot be used for posting
             throw new Exception('OAuth 2.0 User Context access token required for posting tweets. Please complete the OAuth 2.0 flow at /x-oauth2/redirect');
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
+            $friendlyMessage = XApiErrorParser::getFriendlyMessage($e);
+
             Log::error('X API: Failed to post tweet', [
                 'error' => $e->getMessage(),
+                'friendly_message' => $friendlyMessage,
                 'text_length' => strlen($text),
                 'has_media' => ! empty($mediaIds),
                 'reply_to' => $replyToTweetId,
             ]);
 
-            throw $e;
+            // Throw a new exception with the friendly message (preserve original exception)
+            $exception = $e instanceof Exception ? $e : new Exception($e->getMessage(), $e->getCode(), $e);
+            throw new Exception($friendlyMessage, $exception->getCode(), $exception);
         }
     }
 
@@ -121,13 +127,18 @@ class XApiService
             }
 
             return $upload;
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
+            $friendlyMessage = XApiErrorParser::getFriendlyMessage($e);
+
             Log::error('X API: Failed to upload media', [
                 'error' => $e->getMessage(),
+                'friendly_message' => $friendlyMessage,
                 'media_path' => $mediaPath,
             ]);
 
-            throw $e;
+            // Throw a new exception with the friendly message (preserve original exception)
+            $exception = $e instanceof Exception ? $e : new Exception($e->getMessage(), $e->getCode(), $e);
+            throw new Exception($friendlyMessage, $exception->getCode(), $exception);
         }
     }
 
@@ -307,7 +318,7 @@ class XApiService
             $payload['reply'] = ['in_reply_to_tweet_id' => $replyToTweetId];
         }
 
-        $response = $client->post('tweets', [
+            $response = $client->post('tweets', [
             RequestOptions::HEADERS => [
                 'Authorization' => 'Bearer '.$accessToken,
                 'Content-Type' => 'application/json',

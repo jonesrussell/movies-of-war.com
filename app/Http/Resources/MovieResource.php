@@ -40,7 +40,7 @@ class MovieResource extends JsonResource
             'status' => $this->status->value,
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
-            'tags' => TagResource::collection($this->whenLoaded('tags')),
+            'tags' => TagResource::collection($this->whenLoaded('tags') ?? []),
             'is_watchlisted' => $this->when(
                 property_exists($this->resource, 'is_watchlisted') || isset($this->resource->is_watchlisted),
                 fn () => $this->resource->is_watchlisted ?? false

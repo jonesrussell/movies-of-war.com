@@ -32,7 +32,7 @@ const auth = page.props.auth;
 // Entrance animation state
 const isVisible = ref(false);
 const relatedVisible = ref(false);
-const relatedSection = ref<InstanceType<typeof PublicSection> | null>(null);
+const relatedSection = ref<HTMLElement | null>(null);
 let observer: IntersectionObserver | null = null;
 
 onMounted(() => {
@@ -44,9 +44,8 @@ onMounted(() => {
     // Set up Intersection Observer for related films section
     // Wait for nextTick to ensure component is fully mounted
     void nextTick(() => {
-        const element =
-            (relatedSection.value?.$el as HTMLElement | undefined) ?? null;
-        if (element) {
+        const element = relatedSection.value;
+        if (element && element instanceof HTMLElement) {
             observer = new IntersectionObserver(
                 (entries) => {
                     const entry = entries[0];
@@ -364,36 +363,36 @@ const ogDescription = computed(() => {
         </div>
 
         <!-- Related Films section with scroll-triggered animation -->
-        <PublicSection
-            v-if="relatedMovies.length > 0"
-            ref="relatedSection"
-            spacing="md"
-        >
-            <PublicContainer class="flex flex-col gap-6">
-                <SectionHeader
-                    title="Related Films"
-                    class="transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
-                    :class="
-                        relatedVisible
-                            ? 'translate-y-0 opacity-100'
-                            : 'translate-y-8 opacity-0'
-                    "
-                />
-                <MovieGrid>
-                    <MovieCard
-                        v-for="(movie, index) in relatedMovies"
-                        :key="movie.id"
-                        :movie="movie"
+        <PublicSection v-if="relatedMovies.length > 0" spacing="md">
+            <div ref="relatedSection">
+                <PublicContainer class="flex flex-col gap-6">
+                    <SectionHeader
+                        title="Related Films"
                         class="transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                         :class="
                             relatedVisible
                                 ? 'translate-y-0 opacity-100'
                                 : 'translate-y-8 opacity-0'
                         "
-                        :style="{ transitionDelay: `${100 + index * 50}ms` }"
                     />
-                </MovieGrid>
-            </PublicContainer>
+                    <MovieGrid>
+                        <MovieCard
+                            v-for="(movie, index) in relatedMovies"
+                            :key="movie.id"
+                            :movie="movie"
+                            class="transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
+                            :class="
+                                relatedVisible
+                                    ? 'translate-y-0 opacity-100'
+                                    : 'translate-y-8 opacity-0'
+                            "
+                            :style="{
+                                transitionDelay: `${100 + index * 50}ms`,
+                            }"
+                        />
+                    </MovieGrid>
+                </PublicContainer>
+            </div>
         </PublicSection>
     </PublicLayout>
 </template>

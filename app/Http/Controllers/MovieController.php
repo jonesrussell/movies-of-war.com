@@ -98,7 +98,7 @@ class MovieController extends Controller
 
         return Inertia::render('Movies/Show', [
             'movie' => new MovieResource($movie),
-            'relatedMovies' => MovieResource::collection($relatedMovies),
+            'relatedMovies' => array_values(MovieResource::collection($relatedMovies)->resolve(request())),
         ]);
     }
 }

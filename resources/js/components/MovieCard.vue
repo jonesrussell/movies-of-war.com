@@ -12,7 +12,13 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const displayedTags = computed(() => props.movie.tags?.slice(0, 3) ?? []);
+const displayedTags = computed(() => {
+    const tags = props.movie.tags;
+    if (!tags || !Array.isArray(tags)) {
+        return [];
+    }
+    return tags.slice(0, 3);
+});
 </script>
 
 <template>

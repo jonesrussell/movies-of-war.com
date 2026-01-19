@@ -63,6 +63,7 @@ class XApiErrorParser
         if ($errorData && isset($errorData['title'])) {
             if ($errorData['title'] === 'CreditsDepleted') {
                 $accountId = $errorData['account_id'] ?? 'your account';
+
                 return "Your X API account has run out of credits. Please purchase more credits in the X Developer Portal (Account ID: {$accountId}).";
             }
 

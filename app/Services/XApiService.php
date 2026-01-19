@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Services\XApiErrorParser;
 use Atymic\Twitter\Facade\Twitter;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
@@ -318,7 +317,7 @@ class XApiService
             $payload['reply'] = ['in_reply_to_tweet_id' => $replyToTweetId];
         }
 
-            $response = $client->post('tweets', [
+        $response = $client->post('tweets', [
             RequestOptions::HEADERS => [
                 'Authorization' => 'Bearer '.$accessToken,
                 'Content-Type' => 'application/json',

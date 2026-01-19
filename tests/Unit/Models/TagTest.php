@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\TagType;
 use App\Models\Tag;
 
 test('slug is automatically generated from name when creating tag without slug', function () {
@@ -67,4 +68,21 @@ test('slug generation handles empty name by generating from name after creation'
     $tag->save();
 
     expect($tag->slug)->toBe('thriller');
+});
+
+test('tag casts type to TagType enum', function () {
+    $tag = Tag::factory()->create(['type' => TagType::Genre]);
+
+    expect($tag->type)->toBeInstanceOf(TagType::class)
+        ->and($tag->type)->toBe(TagType::Genre);
+});
+
+test('tag type enum values are correct', function () {
+    $genreTag = Tag::factory()->create(['type' => TagType::Genre]);
+    $themeTag = Tag::factory()->create(['type' => TagType::Theme]);
+    $eraTag = Tag::factory()->create(['type' => TagType::Era]);
+
+    expect($genreTag->type->value)->toBe('genre')
+        ->and($themeTag->type->value)->toBe('theme')
+        ->and($eraTag->type->value)->toBe('era');
 });

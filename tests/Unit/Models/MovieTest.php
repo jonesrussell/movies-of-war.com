@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\MovieStatus;
 use App\Models\Movie;
 
 test('slug is automatically generated from title when creating movie without slug', function () {
@@ -67,4 +68,55 @@ test('slug generation handles empty title by generating from title after creatio
     $movie->save();
 
     expect($movie->slug)->toBe('platoon');
+});
+
+test('movie casts status to MovieStatus enum', function () {
+    $movie = Movie::factory()->create(['status' => MovieStatus::Published]);
+
+    expect($movie->status)->toBeInstanceOf(MovieStatus::class)
+        ->and($movie->status)->toBe(MovieStatus::Published);
+});
+
+test('movie status helper methods work correctly', function () {
+    $draftMovie = Movie::factory()->draft()->create();
+    $publishedMovie = Movie::factory()->published()->create();
+    $archivedMovie = Movie::factory()->archived()->create();
+
+    expect($draftMovie->isDraft())->toBeTrue()
+        ->and($draftMovie->isPublished())->toBeFalse()
+        ->and($draftMovie->isArchived())->toBeFalse();
+
+    expect($publishedMovie->isDraft())->toBeFalse()
+        ->and($publishedMovie->isPublished())->toBeTrue()
+        ->and($publishedMovie->isArchived())->toBeFalse();
+
+    expect($archivedMovie->isDraft())->toBeFalse()
+        ->and($archivedMovie->isPublished())->toBeFalse()
+        ->and($archivedMovie->isArchived())->toBeTrue();
+});
+
+test('movie can transition from draft to published', function () {
+    $movie = Movie::factory()->draft()->create();
+
+    $movie->publish();
+
+    expect($movie->fresh()->status)->toBe(MovieStatus::Published);
+});
+
+test('movie can transition from published to archived', function () {
+    $movie = Movie::factory()->published()->create();
+
+    $movie->archive();
+
+    expect($movie->fresh()->status)->toBe(MovieStatus::Archived);
+});
+
+test('movie scopes filter by status correctly', function () {
+    Movie::factory()->count(3)->published()->create();
+    Movie::factory()->count(2)->draft()->create();
+    Movie::factory()->count(1)->archived()->create();
+
+    expect(Movie::published()->count())->toBe(3)
+        ->and(Movie::draft()->count())->toBe(2)
+        ->and(Movie::archived()->count())->toBe(1);
 });

@@ -302,8 +302,12 @@ test('admin can publish a draft x-post immediately', function () {
 test('admin can create x-post with publish immediately', function () {
     // Mock XApiService to avoid actual API calls
     $mockXApiService = \Mockery::mock(\App\Services\XApiService::class);
-    $mockXApiService->shouldReceive('postTweet')
-        ->andReturn(['id' => '123456789']);
+    $mockResponse = new \App\Data\X\XPostTweetResponse(
+        id: '123456789',
+        text: 'Publish immediately test'
+    );
+    $mockXApiService->shouldReceive('postTweetAsDto')
+        ->andReturn($mockResponse);
     $this->app->instance(\App\Services\XApiService::class, $mockXApiService);
 
     $admin = User::factory()->create(['is_admin' => true]);

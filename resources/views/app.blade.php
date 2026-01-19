@@ -43,9 +43,9 @@
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
         {{-- Open Graph / Social Media Meta Tags --}}
-        @if(isset($page['component']) && $page['component'] === 'Movies/Show' && isset($page['props']['movie']) && is_array($page['props']['movie']))
+        @if(isset($page['component']) && $page['component'] === 'Movies/Show' && isset($page['props']['movie']))
             @php
-                $movie = $page['props']['movie'];
+                $movie = is_array($page['props']['movie']) ? $page['props']['movie'] : (array) $page['props']['movie'];
                 $title = $movie['title'] ?? 'Movie';
                 $releaseYear = $movie['release_year'] ?? '';
                 $ogTitle = $title . ($releaseYear ? ' (' . $releaseYear . ')' : '');

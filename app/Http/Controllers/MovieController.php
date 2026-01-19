@@ -97,7 +97,7 @@ class MovieController extends Controller
             ->get();
 
         return Inertia::render('Movies/Show', [
-            'movie' => new MovieResource($movie),
+            'movie' => (new MovieResource($movie))->resolve(request()),
             'relatedMovies' => array_values(MovieResource::collection($relatedMovies)->resolve(request())),
         ]);
     }

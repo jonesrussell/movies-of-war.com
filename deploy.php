@@ -76,6 +76,14 @@ task('artisan:optimize-posters', function () {
     run('{{bin/php}} {{release_path}}/artisan posters:optimize');
 });
 
+/**
+ * Clean up orphaned poster files not referenced in the database.
+ * Uses --archive mode to move orphans to posters/_archived/ (safer than deletion).
+ */
+task('artisan:cleanup-orphan-posters', function () {
+    run('{{bin/php}} {{release_path}}/artisan posters:cleanup-orphans --archive');
+});
+
 // Hooks
 
 after('deploy:update_code', 'deploy:npm');
@@ -86,4 +94,5 @@ after('deploy:symlink', 'artisan:queue:restart');
 after('deploy:symlink', 'artisan:ssr:restart');
 after('deploy:symlink', 'artisan:reorganize-posters');
 after('deploy:symlink', 'artisan:optimize-posters');
+after('deploy:symlink', 'artisan:cleanup-orphan-posters');
 after('deploy:failed', 'deploy:unlock');

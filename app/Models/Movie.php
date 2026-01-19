@@ -1,23 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Enums\MovieStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
+/**
+ * @property-read int $id
+ * @property int|null $tmdb_id
+ * @property string $title
+ * @property string $slug
+ * @property MovieStatus $status
+ * @property int|null $release_year
+ * @property \Illuminate\Support\Carbon|null $release_date
+ * @property string|null $synopsis
+ * @property int|null $runtime
+ * @property string|null $country
+ * @property string|null $conflict
+ * @property string|null $poster_path
+ * @property string|null $poster_url
+ * @property string|null $trailer_url
+ * @property string|null $imdb_id
+ * @property bool $is_upcoming
+ */
 class Movie extends Model
 {
     /** @use HasFactory<\Database\Factories\MovieFactory> */
     use HasFactory;
 
-    const STATUS_DRAFT = 'draft';
+    /**
+     * @deprecated Use MovieStatus::Draft instead
+     */
+    public const STATUS_DRAFT = 'draft';
 
-    const STATUS_PUBLISHED = 'published';
+    /**
+     * @deprecated Use MovieStatus::Published instead
+     */
+    public const STATUS_PUBLISHED = 'published';
 
-    const STATUS_ARCHIVED = 'archived';
+    /**
+     * @deprecated Use MovieStatus::Archived instead
+     */
+    public const STATUS_ARCHIVED = 'archived';
 
     protected $fillable = [
         'tmdb_id',
@@ -42,17 +73,21 @@ class Movie extends Model
         return [
             'release_date' => 'date',
             'is_upcoming' => 'boolean',
+            'status' => MovieStatus::class,
         ];
     }
 
     protected static function booted(): void
     {
-        static::creating(function (Movie $movie) {
-            if (empty($movie->slug)) {
-                $movie->slug = Str::slug($movie->title);
-            }
+        static::creating(function (Movie $movie): void {
+            $movie->slug ??= Str::slug($movie->title);
+            $movie->status ??= MovieStatus::Draft;
         });
     }
+
+    // =========================================================================
+    // Relationships
+    // =========================================================================
 
     public function tags(): BelongsToMany
     {
@@ -76,28 +111,95 @@ class Movie extends Model
             ->withPivot('confidence');
     }
 
-    public function scopeDraft($query)
+    // =========================================================================
+    // Scopes
+    // =========================================================================
+
+    /**
+     * @param  Builder<Movie>  $query
+     * @return Builder<Movie>
+     */
+    public function scopeDraft(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_DRAFT);
+        return $query->where('status', MovieStatus::Draft);
     }
 
-    public function scopePublished($query)
+    /**
+     * @param  Builder<Movie>  $query
+     * @return Builder<Movie>
+     */
+    public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_PUBLISHED);
+        return $query->where('status', MovieStatus::Published);
     }
 
-    public function scopeArchived($query)
+    /**
+     * @param  Builder<Movie>  $query
+     * @return Builder<Movie>
+     */
+    public function scopeArchived(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_ARCHIVED);
+        return $query->where('status', MovieStatus::Archived);
     }
 
-    public function scopeUpcoming($query)
+    /**
+     * @param  Builder<Movie>  $query
+     * @return Builder<Movie>
+     */
+    public function scopeUpcoming(Builder $query): Builder
     {
         return $query->where('is_upcoming', true);
     }
 
-    public function scopeReleased($query)
+    /**
+     * @param  Builder<Movie>  $query
+     * @return Builder<Movie>
+     */
+    public function scopeReleased(Builder $query): Builder
     {
         return $query->where('is_upcoming', false);
+    }
+
+    // =========================================================================
+    // State Checks
+    // =========================================================================
+
+    public function isDraft(): bool
+    {
+        return $this->status === MovieStatus::Draft;
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->status === MovieStatus::Published;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->status === MovieStatus::Archived;
+    }
+
+    // =========================================================================
+    // State Transitions
+    // =========================================================================
+
+    public function publish(): void
+    {
+        $this->update(['status' => MovieStatus::Published]);
+    }
+
+    public function unpublish(): void
+    {
+        $this->update(['status' => MovieStatus::Draft]);
+    }
+
+    public function archive(): void
+    {
+        $this->update(['status' => MovieStatus::Archived]);
+    }
+
+    public function restore(): void
+    {
+        $this->update(['status' => MovieStatus::Draft]);
     }
 }

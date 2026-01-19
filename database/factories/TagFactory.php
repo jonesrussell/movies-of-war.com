@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
+use App\Enums\TagType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -22,7 +25,7 @@ class TagFactory extends Factory
         return [
             'name' => ucfirst($name),
             'slug' => Str::slug($name),
-            'type' => fake()->randomElement(['genre', 'theme', 'era']),
+            'type' => fake()->randomElement(TagType::cases()),
         ];
     }
 }

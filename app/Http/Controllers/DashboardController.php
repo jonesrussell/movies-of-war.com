@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Enums\MovieStatus;
+use App\Enums\TagType;
 use App\Http\Requests\ImportTmdbMoviesRequest;
 use App\Jobs\ImportTmdbMoviesJob;
+use App\Models\FeaturedSlot;
 use App\Models\Movie;
 use App\Models\Tag;
 use App\Models\XPost;
@@ -38,7 +43,7 @@ class DashboardController extends Controller
             'drafts' => $draftMoviesCount,
             'archived' => $archivedMoviesCount,
             'tags' => Tag::count(),
-            'activeFeatures' => \App\Models\FeaturedSlot::active()->count(),
+            'activeFeatures' => FeaturedSlot::active()->count(),
             'tmdbDrafts' => $user->is_admin ? $draftMoviesCount : 0,
         ];
 
@@ -85,9 +90,7 @@ class DashboardController extends Controller
 
     public function tmdbImports(Request $request): Response
     {
-        if (! auth()->user()->is_admin) {
-            abort(403);
-        }
+        $this->authorize('create', Movie::class);
 
         $query = Movie::query()->draft()->with('tags')->latest();
 
@@ -105,9 +108,7 @@ class DashboardController extends Controller
 
     public function tmdbSearch(): Response
     {
-        if (! auth()->user()->is_admin) {
-            abort(403);
-        }
+        $this->authorize('create', Movie::class);
 
         return Inertia::render('Dashboard/TmdbSearch', [
             'searchResults' => [],
@@ -117,9 +118,7 @@ class DashboardController extends Controller
 
     public function performTmdbSearch(Request $request): Response
     {
-        if (! auth()->user()->is_admin) {
-            abort(403);
-        }
+        $this->authorize('create', Movie::class);
 
         $query = $request->input('query', '');
         $results = [];
@@ -146,9 +145,7 @@ class DashboardController extends Controller
 
     public function importSingleTmdbMovie(Request $request): RedirectResponse
     {
-        if (! auth()->user()->is_admin) {
-            abort(403);
-        }
+        $this->authorize('create', Movie::class);
 
         $request->validate([
             'tmdb_id' => 'required|integer',
@@ -199,7 +196,7 @@ class DashboardController extends Controller
             }
         }
 
-        // Create movie
+        // Create movie with MovieStatus enum
         $movie = Movie::create([
             'tmdb_id' => $movieData['id'],
             'title' => $movieData['title'],
@@ -213,15 +210,15 @@ class DashboardController extends Controller
             'trailer_url' => $trailerUrl,
             'imdb_id' => $movieData['imdb_id'] ?? null,
             'is_upcoming' => $isUpcoming,
-            'status' => Movie::STATUS_DRAFT,
+            'status' => MovieStatus::Draft,
         ]);
 
-        // Attach genre tags
+        // Attach genre tags using TagType enum
         if (! empty($movieData['genres'])) {
             foreach ($movieData['genres'] as $genre) {
                 $tag = Tag::firstOrCreate(
-                    ['name' => $genre['name'], 'type' => 'genre'],
-                    ['name' => $genre['name'], 'type' => 'genre']
+                    ['name' => $genre['name'], 'type' => TagType::Genre],
+                    ['name' => $genre['name'], 'type' => TagType::Genre]
                 );
                 $movie->tags()->attach($tag);
             }
@@ -232,36 +229,27 @@ class DashboardController extends Controller
 
     public function publishMovie(Movie $movie): RedirectResponse
     {
-        if (! auth()->user()->is_admin) {
-            abort(403);
-        }
+        $this->authorize('publish', $movie);
 
-        $movie->status = Movie::STATUS_PUBLISHED;
-        $movie->save();
+        $movie->publish();
 
         return redirect()->route('dashboard.tmdb.imports')->with('success', 'Movie published successfully.');
     }
 
     public function archiveMovie(Movie $movie): RedirectResponse
     {
-        if (! auth()->user()->is_admin) {
-            abort(403);
-        }
+        $this->authorize('archive', $movie);
 
-        $movie->status = Movie::STATUS_ARCHIVED;
-        $movie->save();
+        $movie->archive();
 
         return redirect()->route('dashboard.tmdb.imports')->with('success', 'Movie archived successfully.');
     }
 
     public function unpublishMovie(Movie $movie): RedirectResponse
     {
-        if (! auth()->user()->is_admin) {
-            abort(403);
-        }
+        $this->authorize('unpublish', $movie);
 
-        $movie->status = Movie::STATUS_DRAFT;
-        $movie->save();
+        $movie->unpublish();
 
         return redirect()->back()->with('success', 'Movie unpublished successfully.');
     }

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\XPostStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ScheduleXPostRequest;
 use App\Http\Requests\StoreXPostRequest;
@@ -36,13 +39,9 @@ class XPostController extends Controller
         return Inertia::render('Admin/XPosts/Index', [
             'xPosts' => $xPosts,
             'queryParams' => $request->only(['status', 'search']),
-            'statuses' => [
-                'draft' => XPost::STATUS_DRAFT,
-                'scheduled' => XPost::STATUS_SCHEDULED,
-                'published' => XPost::STATUS_PUBLISHED,
-                'failed' => XPost::STATUS_FAILED,
-                'cancelled' => XPost::STATUS_CANCELLED,
-            ],
+            'statuses' => collect(XPostStatus::cases())->mapWithKeys(fn ($status) => [
+                $status->value => $status->label(),
+            ])->all(),
         ]);
     }
 
@@ -81,7 +80,7 @@ class XPostController extends Controller
         }
 
         $message = match ($xPost->status) {
-            XPost::STATUS_SCHEDULED => 'X post scheduled for '.
+            XPostStatus::Scheduled => 'X post scheduled for '.
                 $xPost->scheduled_for->format('M j, Y g:i A'),
             default => 'X post draft created successfully.',
         };
@@ -108,7 +107,7 @@ class XPostController extends Controller
     public function edit(XPost $xPost): Response
     {
         // Only allow editing drafts and failed posts
-        if (! in_array($xPost->status, [XPost::STATUS_DRAFT, XPost::STATUS_FAILED])) {
+        if (! $xPost->canEdit()) {
             return redirect()->route('admin.x-posts.index')
                 ->with('error', 'Only draft and failed posts can be edited.');
         }
@@ -125,7 +124,7 @@ class XPostController extends Controller
     public function update(StoreXPostRequest $request, XPost $xPost): RedirectResponse
     {
         // Only allow editing drafts and failed posts
-        if (! in_array($xPost->status, [XPost::STATUS_DRAFT, XPost::STATUS_FAILED])) {
+        if (! $xPost->canEdit()) {
             return redirect()->route('admin.x-posts.index')
                 ->with('error', 'Only draft and failed posts can be edited.');
         }

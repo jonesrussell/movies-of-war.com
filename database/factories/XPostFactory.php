@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
+use App\Enums\XPostStatus;
 use App\Models\User;
-use App\Models\XPost;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +22,7 @@ class XPostFactory extends Factory
     {
         return [
             'content' => $this->faker->text(280),
-            'status' => XPost::STATUS_DRAFT,
+            'status' => XPostStatus::Draft,
             'user_id' => User::factory(),
         ];
     }
@@ -31,7 +33,7 @@ class XPostFactory extends Factory
     public function scheduled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => XPost::STATUS_SCHEDULED,
+            'status' => XPostStatus::Scheduled,
             'scheduled_for' => now()->addHours($this->faker->numberBetween(1, 48)),
         ]);
     }
@@ -42,7 +44,7 @@ class XPostFactory extends Factory
     public function readyToPublish(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => XPost::STATUS_SCHEDULED,
+            'status' => XPostStatus::Scheduled,
             'scheduled_for' => now()->subMinutes($this->faker->numberBetween(1, 30)),
         ]);
     }
@@ -53,7 +55,7 @@ class XPostFactory extends Factory
     public function published(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => XPost::STATUS_PUBLISHED,
+            'status' => XPostStatus::Published,
             'published_at' => now()->subHours($this->faker->numberBetween(1, 24)),
             'x_post_id' => (string) $this->faker->numerify('####################'),
         ]);
@@ -65,7 +67,7 @@ class XPostFactory extends Factory
     public function failed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => XPost::STATUS_FAILED,
+            'status' => XPostStatus::Failed,
             'error_message' => 'Failed to connect to X API',
         ]);
     }
@@ -76,7 +78,7 @@ class XPostFactory extends Factory
     public function cancelled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => XPost::STATUS_CANCELLED,
+            'status' => XPostStatus::Cancelled,
         ]);
     }
 

@@ -1,0 +1,184 @@
+<script setup lang="ts">
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { CheckCircle2, Link as LinkIcon, XCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
+
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+interface ConnectionStatus {
+    connected: boolean;
+    username: string | null;
+    name: string | null;
+    connected_at: string | null;
+    expires_at: string | null;
+}
+
+interface Props {
+    connectionStatus: ConnectionStatus;
+}
+
+defineProps<Props>();
+
+const page = usePage();
+const flash = computed(
+    () => page.props.flash as { success?: string; error?: string },
+);
+
+function disconnect() {
+    if (
+        confirm(
+            'Are you sure you want to disconnect your X account? You will need to reconnect to post tweets.',
+        )
+    ) {
+        router.post(
+            '/dashboard/x-settings/disconnect',
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    }
+}
+
+function formatDate(dateString: string | null): string {
+    if (!dateString) {
+        return 'Never expires';
+    }
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+</script>
+
+<template>
+    <AppSidebarLayout>
+        <Head title="X Settings - Admin" />
+
+        <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-white">X Settings</h1>
+                <p class="mt-2 text-zinc-400">
+                    Manage your X.com account connection
+                </p>
+            </div>
+
+            <!-- Flash Messages -->
+            <div
+                v-if="flash?.success"
+                class="mb-6 rounded-lg bg-green-900/50 p-4 text-green-300 ring-1 ring-green-800"
+            >
+                {{ flash.success }}
+            </div>
+
+            <div
+                v-if="flash?.error"
+                class="mb-6 rounded-lg bg-red-900/50 p-4 text-red-300 ring-1 ring-red-800"
+            >
+                {{ flash.error }}
+            </div>
+
+            <!-- Connection Status Card -->
+            <div class="rounded-lg bg-zinc-900 p-6 ring-1 ring-zinc-800/70">
+                <div class="mb-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">
+                            Account Connection
+                        </h2>
+                        <p class="mt-1 text-sm text-zinc-400">
+                            Connect your @MoviesOfWar account to enable posting
+                        </p>
+                    </div>
+                    <div
+                        v-if="connectionStatus.connected"
+                        class="flex items-center gap-2 text-green-400"
+                    >
+                        <CheckCircle2 class="h-5 w-5" />
+                        <span class="font-medium">Connected</span>
+                    </div>
+                    <div v-else class="flex items-center gap-2 text-zinc-400">
+                        <XCircle class="h-5 w-5" />
+                        <span class="font-medium">Not Connected</span>
+                    </div>
+                </div>
+
+                <!-- Connected State -->
+                <div v-if="connectionStatus.connected" class="space-y-4">
+                    <div
+                        v-if="
+                            connectionStatus.username || connectionStatus.name
+                        "
+                        class="rounded-lg bg-zinc-800/50 p-4"
+                    >
+                        <div class="space-y-2 text-sm">
+                            <div
+                                v-if="connectionStatus.username"
+                                class="flex items-center gap-2"
+                            >
+                                <span class="text-zinc-400">Username:</span>
+                                <span class="font-medium text-white">
+                                    @{{ connectionStatus.username }}
+                                </span>
+                            </div>
+                            <div
+                                v-if="connectionStatus.name"
+                                class="flex items-center gap-2"
+                            >
+                                <span class="text-zinc-400">Name:</span>
+                                <span class="font-medium text-white">
+                                    {{ connectionStatus.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-sm text-zinc-400">
+                        <div class="flex items-center justify-between">
+                            <span>Connected:</span>
+                            <span class="text-white">
+                                {{ formatDate(connectionStatus.connected_at) }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Token Expires:</span>
+                            <span class="text-white">
+                                {{ formatDate(connectionStatus.expires_at) }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button
+                            @click="disconnect"
+                            class="rounded-lg bg-red-600/90 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                        >
+                            Disconnect Account
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Not Connected State -->
+                <div v-else class="space-y-4">
+                    <p class="text-zinc-400">
+                        You need to connect your X.com account to enable posting
+                        tweets. Click the button below to authorize the
+                        application.
+                    </p>
+
+                    <div>
+                        <Link
+                            href="/x-oauth2/redirect"
+                            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                        >
+                            <LinkIcon class="h-4 w-4" />
+                            Connect X Account
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AppSidebarLayout>
+</template>

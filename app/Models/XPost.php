@@ -1,28 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Enums\XPostStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property-read int $id
+ * @property string|null $content
+ * @property array<string>|null $thread_parts
+ * @property array<string>|null $media_urls
+ * @property XPostStatus $status
+ * @property \Illuminate\Support\Carbon|null $scheduled_for
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property string|null $x_post_id
+ * @property string|null $error_message
+ * @property int|null $user_id
+ */
 class XPost extends Model
 {
     /** @use HasFactory<\Database\Factories\XPostFactory> */
     use HasFactory;
 
-    const STATUS_DRAFT = 'draft';
+    /**
+     * @deprecated Use XPostStatus::Draft instead
+     */
+    public const STATUS_DRAFT = 'draft';
 
-    const STATUS_SCHEDULED = 'scheduled';
+    /**
+     * @deprecated Use XPostStatus::Scheduled instead
+     */
+    public const STATUS_SCHEDULED = 'scheduled';
 
-    const STATUS_PUBLISHED = 'published';
+    /**
+     * @deprecated Use XPostStatus::Published instead
+     */
+    public const STATUS_PUBLISHED = 'published';
 
-    const STATUS_FAILED = 'failed';
+    /**
+     * @deprecated Use XPostStatus::Failed instead
+     */
+    public const STATUS_FAILED = 'failed';
 
-    const STATUS_CANCELLED = 'cancelled';
+    /**
+     * @deprecated Use XPostStatus::Cancelled instead
+     */
+    public const STATUS_CANCELLED = 'cancelled';
 
-    const MAX_TWEET_LENGTH = 280;
+    public const MAX_TWEET_LENGTH = 280;
 
     protected $fillable = [
         'content',
@@ -43,8 +75,13 @@ class XPost extends Model
             'media_urls' => 'array',
             'scheduled_for' => 'datetime',
             'published_at' => 'datetime',
+            'status' => XPostStatus::class,
         ];
     }
+
+    // =========================================================================
+    // Relationships
+    // =========================================================================
 
     public function user(): BelongsTo
     {
@@ -56,66 +93,122 @@ class XPost extends Model
         return $this->hasMany(XAnalytics::class);
     }
 
-    public function latestAnalytics()
+    public function latestAnalytics(): HasOne
     {
         return $this->hasOne(XAnalytics::class)->latest('recorded_at');
     }
 
-    public function scopeDraft($query)
+    // =========================================================================
+    // Scopes
+    // =========================================================================
+
+    /**
+     * @param  Builder<XPost>  $query
+     * @return Builder<XPost>
+     */
+    public function scopeDraft(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_DRAFT);
+        return $query->where('status', XPostStatus::Draft);
     }
 
-    public function scopeScheduled($query)
+    /**
+     * @param  Builder<XPost>  $query
+     * @return Builder<XPost>
+     */
+    public function scopeScheduled(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_SCHEDULED);
+        return $query->where('status', XPostStatus::Scheduled);
     }
 
-    public function scopePublished($query)
+    /**
+     * @param  Builder<XPost>  $query
+     * @return Builder<XPost>
+     */
+    public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_PUBLISHED);
+        return $query->where('status', XPostStatus::Published);
     }
 
-    public function scopeFailed($query)
+    /**
+     * @param  Builder<XPost>  $query
+     * @return Builder<XPost>
+     */
+    public function scopeFailed(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_FAILED);
+        return $query->where('status', XPostStatus::Failed);
     }
 
-    public function scopeCancelled($query)
+    /**
+     * @param  Builder<XPost>  $query
+     * @return Builder<XPost>
+     */
+    public function scopeCancelled(Builder $query): Builder
     {
-        return $query->where('status', self::STATUS_CANCELLED);
+        return $query->where('status', XPostStatus::Cancelled);
     }
 
-    public function scopeReadyToPublish($query)
+    /**
+     * @param  Builder<XPost>  $query
+     * @return Builder<XPost>
+     */
+    public function scopeReadyToPublish(Builder $query): Builder
     {
         return $query->scheduled()
             ->where('scheduled_for', '<=', now());
     }
 
+    // =========================================================================
+    // State Checks
+    // =========================================================================
+
     public function isScheduled(): bool
     {
-        return $this->status === self::STATUS_SCHEDULED;
+        return $this->status === XPostStatus::Scheduled;
     }
 
     public function isPublished(): bool
     {
-        return $this->status === self::STATUS_PUBLISHED;
+        return $this->status === XPostStatus::Published;
     }
 
     public function isDraft(): bool
     {
-        return $this->status === self::STATUS_DRAFT;
+        return $this->status === XPostStatus::Draft;
     }
 
     public function hasFailed(): bool
     {
-        return $this->status === self::STATUS_FAILED;
+        return $this->status === XPostStatus::Failed;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === XPostStatus::Cancelled;
     }
 
     public function canPublish(): bool
     {
-        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_SCHEDULED, self::STATUS_FAILED]);
+        return $this->status->canPublish();
     }
+
+    public function canSchedule(): bool
+    {
+        return $this->status->canSchedule();
+    }
+
+    public function canCancel(): bool
+    {
+        return $this->status->canCancel();
+    }
+
+    public function canEdit(): bool
+    {
+        return $this->status->canEdit();
+    }
+
+    // =========================================================================
+    // Content Helpers
+    // =========================================================================
 
     public function hasThread(): bool
     {
@@ -127,6 +220,9 @@ class XPost extends Model
         return ! empty($this->media_urls);
     }
 
+    /**
+     * @return array<string>
+     */
     public function getFullThreadContent(): array
     {
         $parts = [$this->content];
@@ -138,10 +234,14 @@ class XPost extends Model
         return array_filter($parts);
     }
 
-    public function markAsScheduled(\DateTime $scheduledFor): void
+    // =========================================================================
+    // State Transitions
+    // =========================================================================
+
+    public function markAsScheduled(\DateTimeInterface $scheduledFor): void
     {
         $this->update([
-            'status' => self::STATUS_SCHEDULED,
+            'status' => XPostStatus::Scheduled,
             'scheduled_for' => $scheduledFor,
         ]);
     }
@@ -149,7 +249,7 @@ class XPost extends Model
     public function markAsPublished(string $xPostId): void
     {
         $this->update([
-            'status' => self::STATUS_PUBLISHED,
+            'status' => XPostStatus::Published,
             'published_at' => now(),
             'x_post_id' => $xPostId,
             'error_message' => null,
@@ -159,15 +259,15 @@ class XPost extends Model
     public function markAsFailed(string $errorMessage): void
     {
         $this->update([
-            'status' => self::STATUS_FAILED,
+            'status' => XPostStatus::Failed,
             'error_message' => $errorMessage,
         ]);
     }
 
     public function cancel(): void
     {
-        if ($this->isScheduled()) {
-            $this->update(['status' => self::STATUS_CANCELLED]);
+        if ($this->canCancel()) {
+            $this->update(['status' => XPostStatus::Cancelled]);
         }
     }
 }

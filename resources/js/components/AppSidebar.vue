@@ -14,6 +14,7 @@ import {
     MessageSquare,
     Reply,
     Search,
+    Settings,
     Star,
     TrendingUp,
 } from 'lucide-vue-next';
@@ -113,6 +114,11 @@ const mainNavItems = computed<NavItem[]>(() => [
                           title: 'Content Discovery',
                           href: '/dashboard/x-content-discovery',
                           icon: Search,
+                      },
+                      {
+                          title: 'Settings',
+                          href: '/dashboard/x-settings',
+                          icon: Settings,
                       },
                   ],
               },

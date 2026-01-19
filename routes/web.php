@@ -84,6 +84,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/x-oauth2/redirect', [App\Http\Controllers\Admin\XOAuth2Controller::class, 'redirect'])->name('admin.x-oauth2.redirect');
         Route::get('/x-oauth2/callback', [App\Http\Controllers\Admin\XOAuth2Controller::class, 'callback'])->name('admin.x-oauth2.callback');
 
+        // X Settings
+        Route::get('/dashboard/x-settings', [App\Http\Controllers\Admin\XSettingsController::class, 'index'])->name('admin.x-settings.index');
+        Route::post('/dashboard/x-settings/disconnect', [App\Http\Controllers\Admin\XSettingsController::class, 'disconnect'])->name('admin.x-settings.disconnect');
+
         // X Post Management
         Route::prefix('x-posts')->name('admin.x-posts.')->group(function () {
             Route::post('/{xPost}/schedule', [App\Http\Controllers\Admin\XPostController::class, 'schedule'])->name('schedule');

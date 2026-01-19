@@ -4,6 +4,8 @@ import type { Component } from 'vue';
 import { mount as vueMount } from '@vue/test-utils';
 import { vi } from 'vitest';
 
+import { MovieStatus, TagType } from '@/types/enums';
+
 /**
  * Creates a mock User object
  */
@@ -27,7 +29,7 @@ export function createMockTag(overrides: Partial<Tag> = {}): Tag {
         id: 1,
         name: 'Action',
         slug: 'action',
-        type: 'genre',
+        type: TagType.Genre,
         created_at: '2024-01-01T00:00:00.000000Z',
         updated_at: '2024-01-01T00:00:00.000000Z',
         ...overrides,
@@ -54,7 +56,7 @@ export function createMockMovie(overrides: Partial<Movie> = {}): Movie {
         trailer_url: 'https://youtube.com/watch?v=test',
         imdb_id: 'tt1234567',
         is_upcoming: false,
-        status: 'published',
+        status: MovieStatus.Published,
         created_at: '2024-01-01T00:00:00.000000Z',
         updated_at: '2024-01-01T00:00:00.000000Z',
         tags: [],

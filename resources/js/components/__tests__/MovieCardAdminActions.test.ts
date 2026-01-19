@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createMockMovie } from '@/__tests__/utils/test-utils';
+import { MovieStatus } from '@/types/enums';
 
 const postMock = vi.fn();
 
@@ -19,7 +20,10 @@ describe('MovieCardAdminActions', () => {
         postMock.mockClear();
     });
 
-    function mountAdminActions(status: 'draft' | 'published', id = 1) {
+    function mountAdminActions(
+        status: MovieStatus.Draft | MovieStatus.Published,
+        id = 1,
+    ) {
         const movie = createMockMovie({ id, status });
 
         const wrapper = mount(MovieCardAdminActions, {
@@ -47,21 +51,21 @@ describe('MovieCardAdminActions', () => {
     }
 
     it('shows Unpublish for published movies', () => {
-        const { wrapper } = mountAdminActions('published');
+        const { wrapper } = mountAdminActions(MovieStatus.Published);
         expect(wrapper.text()).toContain('Unpublish');
         expect(wrapper.text()).not.toContain('Publish');
         expect(wrapper.text()).toContain('Archive');
     });
 
     it('shows Publish for draft movies', () => {
-        const { wrapper } = mountAdminActions('draft');
+        const { wrapper } = mountAdminActions(MovieStatus.Draft);
         expect(wrapper.text()).toContain('Publish');
         expect(wrapper.text()).not.toContain('Unpublish');
         expect(wrapper.text()).toContain('Archive');
     });
 
     it('posts to publish route when Publish clicked', async () => {
-        const { wrapper, movie } = mountAdminActions('draft', 123);
+        const { wrapper, movie } = mountAdminActions(MovieStatus.Draft, 123);
         await getButton(wrapper, 'Publish').trigger('click');
 
         expect(postMock).toHaveBeenCalledWith(
@@ -72,7 +76,10 @@ describe('MovieCardAdminActions', () => {
     });
 
     it('posts to unpublish route when Unpublish clicked', async () => {
-        const { wrapper, movie } = mountAdminActions('published', 456);
+        const { wrapper, movie } = mountAdminActions(
+            MovieStatus.Published,
+            456,
+        );
         await getButton(wrapper, 'Unpublish').trigger('click');
 
         expect(postMock).toHaveBeenCalledWith(
@@ -83,7 +90,10 @@ describe('MovieCardAdminActions', () => {
     });
 
     it('posts to archive route when confirmed', async () => {
-        const { wrapper, movie } = mountAdminActions('published', 789);
+        const { wrapper, movie } = mountAdminActions(
+            MovieStatus.Published,
+            789,
+        );
 
         const confirmMock = vi
             .spyOn(window, 'confirm')
@@ -101,7 +111,7 @@ describe('MovieCardAdminActions', () => {
     });
 
     it('does not archive when not confirmed', async () => {
-        const { wrapper } = mountAdminActions('published', 999);
+        const { wrapper } = mountAdminActions(MovieStatus.Published, 999);
 
         const confirmMock = vi
             .spyOn(window, 'confirm')

@@ -1,4 +1,4 @@
-import { MovieStatus, TagType, XPostStatus } from './enums';
+import { type MovieStatus, type TagType, type XPostStatus } from './enums';
 
 export interface Movie {
     id: number;

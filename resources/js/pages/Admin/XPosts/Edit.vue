@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { XPost } from '@/types/models';
-import { XPostStatus } from '@/types/enums';
 
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { Plus, Trash2, X } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import { XPostStatus } from '@/types/enums';
 
 interface Props {
     xPost: XPost;
@@ -20,7 +20,10 @@ const form = useForm({
     content: props.xPost.content || '',
     thread_parts: props.xPost.thread_parts || [],
     media_urls: props.xPost.media_urls || [],
-    status: props.xPost.status === XPostStatus.Scheduled ? XPostStatus.Scheduled : XPostStatus.Draft,
+    status:
+        props.xPost.status === XPostStatus.Scheduled
+            ? XPostStatus.Scheduled
+            : XPostStatus.Draft,
     scheduled_for: props.xPost.scheduled_for
         ? new Date(props.xPost.scheduled_for).toISOString().slice(0, 16)
         : '',

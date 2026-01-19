@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Movie } from '@/types/models';
-import { MovieStatus } from '@/types/enums';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 import {
@@ -15,6 +14,7 @@ import {
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import { Button } from '@/components/ui/button';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import { MovieStatus } from '@/types/enums';
 
 interface Props {
     movie: Movie;

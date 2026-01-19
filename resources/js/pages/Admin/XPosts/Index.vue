@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { PaginatedXPosts, XPost } from '@/types/models';
-import { XPostStatus } from '@/types/enums';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import { XPostStatus } from '@/types/enums';
 
 interface Props {
     xPosts: PaginatedXPosts;

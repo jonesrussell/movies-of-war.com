@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Movie, PaginatedMovies } from '@/types/models';
-import { MovieStatus } from '@/types/enums';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
@@ -9,6 +8,7 @@ import { computed, ref, watch } from 'vue';
 
 import { Input } from '@/components/ui/input';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import { MovieStatus } from '@/types/enums';
 
 interface Props {
     movies: PaginatedMovies;
@@ -200,7 +200,9 @@ function unpublishMovie(movie: Movie) {
                                     <Edit class="size-4" />
                                 </Link>
                                 <button
-                                    v-if="movie.status !== MovieStatus.Published"
+                                    v-if="
+                                        movie.status !== MovieStatus.Published
+                                    "
                                     @click="publishMovie(movie)"
                                     class="inline-flex items-center justify-center rounded-lg bg-green-600/20 p-2 text-green-500 transition-colors hover:bg-green-600/30"
                                     title="Publish"
@@ -208,7 +210,9 @@ function unpublishMovie(movie: Movie) {
                                     <CheckCircle class="size-4" />
                                 </button>
                                 <button
-                                    v-if="movie.status === MovieStatus.Published"
+                                    v-if="
+                                        movie.status === MovieStatus.Published
+                                    "
                                     @click="unpublishMovie(movie)"
                                     class="inline-flex items-center justify-center rounded-lg bg-yellow-600/20 p-2 text-yellow-500 transition-colors hover:bg-yellow-600/30"
                                     title="Unpublish"
@@ -364,7 +368,10 @@ function unpublishMovie(movie: Movie) {
                                         <Edit class="size-4" />
                                     </Link>
                                     <button
-                                        v-if="movie.status !== MovieStatus.Published"
+                                        v-if="
+                                            movie.status !==
+                                            MovieStatus.Published
+                                        "
                                         @click="publishMovie(movie)"
                                         class="inline-flex items-center justify-center rounded-lg bg-green-600/20 p-2 text-green-500 transition-colors hover:bg-green-600/30"
                                         title="Publish"
@@ -372,7 +379,10 @@ function unpublishMovie(movie: Movie) {
                                         <CheckCircle class="size-4" />
                                     </button>
                                     <button
-                                        v-if="movie.status === MovieStatus.Published"
+                                        v-if="
+                                            movie.status ===
+                                            MovieStatus.Published
+                                        "
                                         @click="unpublishMovie(movie)"
                                         class="inline-flex items-center justify-center rounded-lg bg-yellow-600/20 p-2 text-yellow-500 transition-colors hover:bg-yellow-600/30"
                                         title="Unpublish"
@@ -380,7 +390,10 @@ function unpublishMovie(movie: Movie) {
                                         <XCircle class="size-4" />
                                     </button>
                                     <button
-                                        v-if="movie.status !== MovieStatus.Archived"
+                                        v-if="
+                                            movie.status !==
+                                            MovieStatus.Archived
+                                        "
                                         @click="archiveMovie(movie)"
                                         class="inline-flex items-center justify-center rounded-lg bg-zinc-800 p-2 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-white"
                                         title="Archive"

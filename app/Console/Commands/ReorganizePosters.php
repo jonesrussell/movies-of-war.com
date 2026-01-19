@@ -15,19 +15,28 @@ class ReorganizePosters extends Command
 
     protected $description = 'Reorganize poster images into subdirectories (posters/XX/filename.ext)';
 
+    protected ?string $logFile = null;
+
     public function handle(): int
     {
         $disk = Storage::disk('public');
         $postersPath = 'posters';
         $dryRun = $this->option('dry-run');
+        $verbose = $this->getOutput()->isVerbose();
+
+        // Setup logging
+        $this->logFile = storage_path('logs/posters-reorganize-'.date('Y-m-d').'.log');
+        $this->log('Starting reorganization', $verbose);
 
         if (! $disk->exists($postersPath)) {
             $this->info('Posters directory does not exist.');
+            $this->log('Posters directory does not exist', $verbose);
 
             return self::SUCCESS;
         }
 
         $this->info('Scanning poster files...');
+        $this->log('Scanning poster files', $verbose);
         $files = $disk->files($postersPath);
 
         // Filter out files that are already in subdirectories
@@ -41,14 +50,17 @@ class ReorganizePosters extends Command
 
         if ($filesToMove->isEmpty()) {
             $this->info('No files need to be reorganized. All posters are already organized.');
+            $this->log('No files need reorganization', $verbose);
 
             return self::SUCCESS;
         }
 
         $this->info("Found {$filesToMove->count()} files to reorganize.");
+        $this->log("Found {$filesToMove->count()} files to reorganize", $verbose);
 
         if ($dryRun) {
             $this->warn('DRY RUN MODE - No files will be moved');
+            $this->log('DRY RUN MODE - No files will be moved', $verbose);
         }
 
         $progressBar = $this->output->createProgressBar($filesToMove->count());
@@ -59,15 +71,8 @@ class ReorganizePosters extends Command
 
         foreach ($filesToMove as $file) {
             $filename = basename($file);
-            $subdir = substr($filename, 0, 2);
-
-            if (strlen($subdir) < 2) {
-                // Skip files with names shorter than 2 characters
-                $failed++;
-                $progressBar->advance();
-
-                continue;
-            }
+            // Normalize to lowercase and handle short filenames
+            $subdir = strtolower(substr($filename, 0, 2)) ?: '_misc';
 
             $newPath = "posters/{$subdir}/{$filename}";
 
@@ -75,6 +80,7 @@ class ReorganizePosters extends Command
                 if ($dryRun) {
                     $this->newLine();
                     $this->line("  Would move: {$file} -> {$newPath}");
+                    $this->log("Would move: {$file} -> {$newPath}", $verbose);
                 } else {
                     // Ensure subdirectory exists
                     $disk->makeDirectory("posters/{$subdir}");
@@ -83,14 +89,17 @@ class ReorganizePosters extends Command
                     if ($disk->exists($file)) {
                         $disk->move($file, $newPath);
                         $moved++;
+                        $this->log("Moved: {$file} -> {$newPath}", $verbose);
                     } else {
                         $failed++;
+                        $this->log("File not found: {$file}", $verbose);
                     }
                 }
             } catch (\Exception $e) {
                 $failed++;
                 $this->newLine();
                 $this->error("  Error moving {$file}: {$e->getMessage()}");
+                $this->log("Error moving {$file}: {$e->getMessage()}", $verbose);
             }
 
             $progressBar->advance();
@@ -101,6 +110,7 @@ class ReorganizePosters extends Command
 
         if ($dryRun) {
             $this->info('Dry run complete. Use without --dry-run to actually move files.');
+            $this->log("Dry run complete. Would move: {$filesToMove->count()}", $verbose);
         } else {
             $this->info('Reorganization complete!');
             $this->info("Moved: {$moved}");
@@ -108,9 +118,16 @@ class ReorganizePosters extends Command
                 $this->warn("Failed: {$failed}");
             }
 
+            $this->log("Reorganization complete. Moved: {$moved}, Failed: {$failed}", $verbose);
+
             // Update movie records with new paths
             $this->info('Updating movie records...');
+            $this->log('Updating movie records', $verbose);
             $this->updateMoviePaths();
+        }
+
+        if ($this->logFile) {
+            $this->info("Log file: {$this->logFile}");
         }
 
         return self::SUCCESS;
@@ -135,11 +152,8 @@ class ReorganizePosters extends Command
             }
 
             $filename = basename($movie->poster_path);
-            $subdir = substr($filename, 0, 2);
-
-            if (strlen($subdir) < 2) {
-                continue;
-            }
+            // Normalize to lowercase and handle short filenames
+            $subdir = strtolower(substr($filename, 0, 2)) ?: '_misc';
 
             $newPath = "posters/{$subdir}/{$filename}";
 
@@ -152,5 +166,25 @@ class ReorganizePosters extends Command
         }
 
         $this->info("Updated {$updated} movie records.");
+        $this->log("Updated {$updated} movie records", $this->option('verbose'));
+    }
+
+    /**
+     * Log message to file with timestamp.
+     */
+    protected function log(string $message, bool $verbose = false): void
+    {
+        if (! $this->logFile) {
+            return;
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+        $logMessage = "[{$timestamp}] {$message}";
+
+        file_put_contents($this->logFile, $logMessage."\n", FILE_APPEND);
+
+        if ($verbose) {
+            $this->line("  [LOG] {$message}");
+        }
     }
 }

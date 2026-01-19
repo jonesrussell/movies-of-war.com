@@ -121,7 +121,8 @@ class TMDBService
         $imageUrl = "{$this->imageBaseUrl}/w500{$posterPath}";
         $basename = basename($posterPath);
         // Organize by first 2 characters: posters/jo/filename.jpg
-        $subdir = substr($basename, 0, 2);
+        // Normalize to lowercase and handle short filenames
+        $subdir = strtolower(substr($basename, 0, 2)) ?: '_misc';
         $filename = "posters/{$subdir}/{$basename}";
 
         try {

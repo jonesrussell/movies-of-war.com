@@ -43,15 +43,18 @@
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
         {{-- Open Graph / Social Media Meta Tags --}}
-        @if(isset($page['component']) && $page['component'] === 'Movies/Show' && isset($page['props']['movie']))
+        @if(isset($page['component']) && $page['component'] === 'Movies/Show' && isset($page['props']['movie']) && is_array($page['props']['movie']))
             @php
                 $movie = $page['props']['movie'];
-                $ogTitle = $movie['title'] . ' (' . $movie['release_year'] . ')';
+                $title = $movie['title'] ?? 'Movie';
+                $releaseYear = $movie['release_year'] ?? '';
+                $ogTitle = $title . ($releaseYear ? ' (' . $releaseYear . ')' : '');
                 $ogDescription = Str::limit($movie['synopsis'] ?? '', 200);
-                $ogImage = str_starts_with($movie['poster_url'] ?? '', 'http')
-                    ? $movie['poster_url']
-                    : url($movie['poster_url'] ?? '/images/placeholders/poster-placeholder.png');
-                $ogUrl = url('/movies/' . $movie['slug']);
+                $posterUrl = $movie['poster_url'] ?? null;
+                $ogImage = $posterUrl && str_starts_with($posterUrl, 'http')
+                    ? $posterUrl
+                    : url($posterUrl ?? '/images/placeholders/poster-placeholder.png');
+                $ogUrl = url('/movies/' . ($movie['slug'] ?? ''));
             @endphp
             <meta property="og:type" content="video.movie">
             <meta property="og:title" content="{{ $ogTitle }}">

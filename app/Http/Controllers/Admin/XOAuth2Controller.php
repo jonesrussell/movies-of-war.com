@@ -30,7 +30,7 @@ class XOAuth2Controller extends Controller
         $request->session()->put('x_oauth2_state', $state);
         $request->session()->put('x_oauth2_code_verifier', $codeVerifier);
 
-        $authorizeUrl = 'https://x.com/i/oauth2/authorize?'.http_build_query([
+        $params = [
             'response_type' => 'code',
             'client_id' => $clientId,
             'redirect_uri' => $redirectUri,
@@ -38,7 +38,15 @@ class XOAuth2Controller extends Controller
             'state' => $state,
             'code_challenge' => $codeChallenge,
             'code_challenge_method' => 'S256',
+        ];
+
+        // Log the redirect URI for debugging
+        Log::info('X OAuth 2.0 redirect', [
+            'client_id' => $clientId,
+            'redirect_uri' => $redirectUri,
         ]);
+
+        $authorizeUrl = 'https://x.com/i/oauth2/authorize?'.http_build_query($params);
 
         return redirect($authorizeUrl);
     }

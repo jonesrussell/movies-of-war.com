@@ -38,9 +38,10 @@ export function getLocalPosterSrcset(
     const filename = pathParts[pathParts.length - 1] || '';
     const baseFilename = filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
     // Preserve subdirectory structure (e.g., 'posters/XX/' or 'posters/')
-    const directory = pathParts.length > 2
-        ? pathParts.slice(0, -1).join('/') // 'posters/XX'
-        : 'posters';
+    const directory =
+        pathParts.length > 2
+            ? pathParts.slice(0, -1).join('/') // 'posters/XX'
+            : 'posters';
 
     const sizes = {
         grid: [185, 342],
@@ -209,9 +210,10 @@ export function getLocalPosterUrl(
     const filename = pathParts[pathParts.length - 1] || '';
     const baseFilename = filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
     // Preserve subdirectory structure (e.g., 'posters/XX/' or 'posters/')
-    const directory = pathParts.length > 2
-        ? pathParts.slice(0, -1).join('/') // 'posters/XX'
-        : 'posters';
+    const directory =
+        pathParts.length > 2
+            ? pathParts.slice(0, -1).join('/') // 'posters/XX'
+            : 'posters';
     const extension =
         format === 'original' ? getFileExtension(posterPath) : format;
 

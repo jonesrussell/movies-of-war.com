@@ -33,6 +33,11 @@ task('deploy:npm', function () {
     run('npm ci --production=false');
 });
 
+task('deploy:wayfinder', function () {
+    cd('{{release_path}}');
+    run('{{bin/php}} artisan wayfinder:generate --with-form');
+});
+
 task('deploy:build', function () {
     cd('{{release_path}}');
     run('npm run build:ssr');
@@ -58,6 +63,7 @@ task('artisan:ssr:restart', function () {
 // Hooks
 
 after('deploy:update_code', 'deploy:npm');
+before('deploy:build', 'deploy:wayfinder');
 after('deploy:vendors', 'deploy:build');
 before('deploy:symlink', 'artisan:migrate');
 after('deploy:symlink', 'artisan:queue:restart');

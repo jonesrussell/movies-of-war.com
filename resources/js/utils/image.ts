@@ -37,11 +37,21 @@ export function getLocalPosterSrcset(
     const pathParts = posterPath.split('/');
     const filename = pathParts[pathParts.length - 1] || '';
     const baseFilename = filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+    
     // Preserve subdirectory structure (e.g., 'posters/XX/' or 'posters/')
-    const directory =
-        pathParts.length > 2
-            ? pathParts.slice(0, -1).join('/') // 'posters/XX'
-            : 'posters';
+    // If path has subdirectory (length > 2), use it; otherwise infer from filename
+    let directory = 'posters';
+    if (pathParts.length > 2) {
+        // Already has subdirectory: 'posters/XX/filename.jpg'
+        directory = pathParts.slice(0, -1).join('/'); // 'posters/XX'
+    } else if (pathParts.length === 2 && pathParts[0] === 'posters') {
+        // Old format without subdirectory: 'posters/filename.jpg'
+        // Infer subdirectory from filename (first 2 chars, lowercase)
+        const subdir = filename.length >= 2 
+            ? filename.substring(0, 2).toLowerCase() || '_misc'
+            : '_misc';
+        directory = `posters/${subdir}`;
+    }
 
     const sizes = {
         grid: [185, 342],
@@ -209,13 +219,31 @@ export function getLocalPosterUrl(
     const pathParts = posterPath.split('/');
     const filename = pathParts[pathParts.length - 1] || '';
     const baseFilename = filename.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+    
     // Preserve subdirectory structure (e.g., 'posters/XX/' or 'posters/')
-    const directory =
-        pathParts.length > 2
-            ? pathParts.slice(0, -1).join('/') // 'posters/XX'
-            : 'posters';
+    // If path has subdirectory (length > 2), use it; otherwise infer from filename
+    let directory = 'posters';
+    if (pathParts.length > 2) {
+        // Already has subdirectory: 'posters/XX/filename.jpg'
+        directory = pathParts.slice(0, -1).join('/'); // 'posters/XX'
+    } else if (pathParts.length === 2 && pathParts[0] === 'posters') {
+        // Old format without subdirectory: 'posters/filename.jpg'
+        // Infer subdirectory from filename (first 2 chars, lowercase)
+        const subdir = filename.length >= 2 
+            ? strtolower(filename.substring(0, 2)) || '_misc'
+            : '_misc';
+        directory = `posters/${subdir}`;
+    }
+    
     const extension =
         format === 'original' ? getFileExtension(posterPath) : format;
 
     return `/storage/${directory}/${baseFilename}-${width}.${extension}`;
+}
+
+/**
+ * Helper to convert string to lowercase (since we can't use native toLowerCase in some contexts)
+ */
+function strtolower(str: string): string {
+    return str.toLowerCase();
 }

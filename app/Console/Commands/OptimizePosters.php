@@ -87,6 +87,17 @@ class OptimizePosters extends Command
             }
 
             try {
+                // Check if file exists before trying to optimize
+                if (! Storage::disk('public')->exists($movie->poster_path)) {
+                    $failed++;
+                    $this->newLine();
+                    $this->warn("  Poster file not found: {$movie->title} (ID: {$movie->id}) - {$movie->poster_path}");
+                    $this->log("Poster file not found: {$movie->title} (ID: {$movie->id}) - {$movie->poster_path}", $verbose);
+                    $progressBar->advance();
+
+                    continue;
+                }
+
                 $generated = $this->posterService->optimizePoster($movie->poster_path);
 
                 if (count($generated) > 0) {
@@ -95,14 +106,14 @@ class OptimizePosters extends Command
                 } else {
                     $failed++;
                     $this->newLine();
-                    $this->warn("  Failed to optimize poster for: {$movie->title} (ID: {$movie->id})");
-                    $this->log("Failed to optimize: {$movie->title} (ID: {$movie->id})", $verbose);
+                    $this->warn("  Failed to optimize poster for: {$movie->title} (ID: {$movie->id}) - No files generated");
+                    $this->log("Failed to optimize: {$movie->title} (ID: {$movie->id}) - No files generated. Path: {$movie->poster_path}", $verbose);
                 }
             } catch (\Exception $e) {
                 $failed++;
                 $this->newLine();
                 $this->error("  Error optimizing poster for: {$movie->title} (ID: {$movie->id}): {$e->getMessage()}");
-                $this->log("Error optimizing {$movie->title} (ID: {$movie->id}): {$e->getMessage()}", $verbose);
+                $this->log("Error optimizing {$movie->title} (ID: {$movie->id}): {$e->getMessage()}. Path: {$movie->poster_path}", $verbose);
             }
 
             $progressBar->advance();

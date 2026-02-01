@@ -32,6 +32,12 @@ use Illuminate\Support\Str;
  * @property int|null $tmdb_vote_count
  * @property string|null $director
  * @property array|null $writers
+ * @property string|null $production_status
+ * @property string|null $original_language
+ * @property int|null $budget
+ * @property int|null $revenue
+ * @property array|null $cast
+ * @property array|null $crew
  * @property \Illuminate\Support\Carbon|null $tmdb_last_synced_at
  * @property bool $is_upcoming
  */
@@ -73,6 +79,12 @@ class Movie extends Model
         'tmdb_vote_count',
         'director',
         'writers',
+        'production_status',
+        'original_language',
+        'budget',
+        'revenue',
+        'cast',
+        'crew',
         'tmdb_last_synced_at',
         'is_upcoming',
         'status',
@@ -86,6 +98,8 @@ class Movie extends Model
             'is_upcoming' => 'boolean',
             'status' => MovieStatus::class,
             'writers' => 'array',
+            'cast' => 'array',
+            'crew' => 'array',
         ];
     }
 
@@ -121,6 +135,13 @@ class Movie extends Model
         return $this->belongsToMany(WarArticle::class, 'article_movie')
             ->withTimestamps()
             ->withPivot('confidence');
+    }
+
+    public function people(): BelongsToMany
+    {
+        return $this->belongsToMany(Person::class, 'movie_person')
+            ->withTimestamps()
+            ->withPivot('job', 'character', 'department', 'cast_order');
     }
 
     // =========================================================================

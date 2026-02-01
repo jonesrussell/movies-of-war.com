@@ -1,5 +1,23 @@
 import { type MovieStatus, type TagType, type XPostStatus } from './enums';
 
+export interface CastMember {
+    tmdb_id: number;
+    name: string;
+    character: string | null;
+    order: number;
+    profile_path: string | null;
+    slug?: string;
+}
+
+export interface CrewMember {
+    tmdb_id: number;
+    name: string;
+    job: string;
+    department: string | null;
+    profile_path: string | null;
+    slug?: string;
+}
+
 export interface Movie {
     id: number;
     tmdb_id: number | null;
@@ -19,12 +37,47 @@ export interface Movie {
     tmdb_vote_count?: number | null;
     director?: string | null;
     writers?: string[] | null;
+    production_status?: string | null;
+    original_language?: string | null;
+    budget?: number | null;
+    revenue?: number | null;
+    cast?: CastMember[];
+    crew?: CrewMember[];
     is_upcoming: boolean;
     status?: MovieStatus;
     created_at: string;
     updated_at: string;
     tags?: Tag[];
     is_watchlisted?: boolean;
+}
+
+export interface FilmographyEntry {
+    movie_id: number;
+    movie_title: string;
+    movie_slug: string;
+    release_year: number | null;
+    poster_url: string | null;
+    character?: string | null;
+    cast_order?: number | null;
+    job?: string;
+}
+
+export interface Person {
+    id: number;
+    tmdb_id: number;
+    name: string;
+    slug: string;
+    profile_path: string | null;
+    biography: string | null;
+    birthday: string | null;
+    deathday: string | null;
+    place_of_birth: string | null;
+    also_known_as: string[] | null;
+    known_for: FilmographyEntry[];
+    filmography_cast: FilmographyEntry[];
+    filmography_crew: FilmographyEntry[];
+    created_at: string;
+    updated_at: string;
 }
 
 export interface Tag {

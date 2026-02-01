@@ -13,4 +13,6 @@ return [
     'refresh_popular_vote_count' => 10_000,
     'refresh_obscure_vote_count' => 100,
     'refresh_max_age_days' => 120,
+
+    'refresh_people_max_age_days' => 180,
 ];

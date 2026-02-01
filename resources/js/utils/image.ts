@@ -249,3 +249,19 @@ export function getLocalPosterUrl(
 function strtolower(str: string): string {
     return str.toLowerCase();
 }
+
+const TMDB_PROFILE_BASE_URL = 'https://image.tmdb.org/t/p';
+
+/**
+ * Generate TMDB profile image URL for cast/crew.
+ * Uses w185 by default for thumbnails.
+ */
+export function getProfileImageUrl(
+    profilePath: string | null,
+    size: string = 'w185',
+): string {
+    if (!profilePath) {
+        return '/images/placeholders/poster-placeholder.png';
+    }
+    return `${TMDB_PROFILE_BASE_URL}/${size}${profilePath}`;
+}

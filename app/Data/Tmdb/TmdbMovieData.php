@@ -16,6 +16,8 @@ readonly class TmdbMovieData
      * @param  Collection<int, TmdbVideoData>  $videos
      * @param  Collection<int, TmdbKeywordData>  $keywords
      * @param  array<int, string>  $writers
+     * @param  array<int, array{tmdb_id: int, name: string, character: string|null, order: int, profile_path: string|null}>  $cast
+     * @param  array<int, array{tmdb_id: int, name: string, job: string, department: string|null, profile_path: string|null}>  $crew
      */
     public function __construct(
         public int $id,
@@ -35,6 +37,12 @@ readonly class TmdbMovieData
         public Collection $keywords,
         public ?string $director = null,
         public array $writers = [],
+        public ?string $productionStatus = null,
+        public ?string $originalLanguage = null,
+        public ?int $budget = null,
+        public ?int $revenue = null,
+        public array $cast = [],
+        public array $crew = [],
     ) {}
 
     /**
@@ -48,19 +56,24 @@ readonly class TmdbMovieData
             ? self::parseCredits($data['credits']['crew'])
             : ['director' => null, 'writers' => []];
 
+        $castRaw = $data['credits']['cast'] ?? [];
+        $crewRaw = $data['credits']['crew'] ?? [];
+        $cast = is_array($castRaw) ? self::parseCast($castRaw) : [];
+        $crew = is_array($crewRaw) ? self::parseCrew($crewRaw) : [];
+
         return new self(
             id: $data['id'],
-            title: $data['title'],
+            title: $data['title'] ?? '',
             originalTitle: $data['original_title'] ?? null,
             overview: $data['overview'] ?? null,
             releaseDate: $data['release_date'] ?? null,
-            runtime: $data['runtime'] ?? null,
+            runtime: isset($data['runtime']) ? (int) $data['runtime'] : null,
             posterPath: $data['poster_path'] ?? null,
             backdropPath: $data['backdrop_path'] ?? null,
             imdbId: $data['imdb_id'] ?? null,
-            voteAverage: $data['vote_average'] ?? null,
-            voteCount: $data['vote_count'] ?? null,
-            popularity: $data['popularity'] ?? null,
+            voteAverage: isset($data['vote_average']) ? (float) $data['vote_average'] : null,
+            voteCount: isset($data['vote_count']) ? (int) $data['vote_count'] : null,
+            popularity: isset($data['popularity']) ? (float) $data['popularity'] : null,
             genres: collect($data['genres'] ?? [])
                 ->map(fn (array $genre) => TmdbGenreData::fromApiResponse($genre)),
             videos: collect($data['videos']['results'] ?? [])
@@ -69,6 +82,12 @@ readonly class TmdbMovieData
                 ->map(fn (array $keyword) => TmdbKeywordData::fromApiResponse($keyword)),
             director: $credits['director'],
             writers: $credits['writers'],
+            productionStatus: isset($data['status']) && $data['status'] !== '' ? (string) $data['status'] : null,
+            originalLanguage: isset($data['original_language']) && $data['original_language'] !== '' ? (string) $data['original_language'] : null,
+            budget: isset($data['budget']) && $data['budget'] > 0 ? (int) $data['budget'] : null,
+            revenue: isset($data['revenue']) && $data['revenue'] > 0 ? (int) $data['revenue'] : null,
+            cast: $cast,
+            crew: $crew,
         );
     }
 
@@ -106,6 +125,70 @@ readonly class TmdbMovieData
             'director' => $director,
             'writers' => array_values(array_unique($writers)),
         ];
+    }
+
+    /**
+     * Parse cast from TMDB credits.cast array. Top 20 by order, tolerant of missing keys.
+     *
+     * @param  array<int, array<string, mixed>>  $cast
+     * @return array<int, array{tmdb_id: int, name: string, character: string|null, order: int, profile_path: string|null}>
+     */
+    private static function parseCast(array $cast): array
+    {
+        $parsed = [];
+        foreach ($cast as $member) {
+            $id = isset($member['id']) ? (int) $member['id'] : null;
+            $name = isset($member['name']) ? trim((string) $member['name']) : '';
+            $order = isset($member['order']) ? (int) $member['order'] : 999;
+            if ($id === null || $name === '') {
+                continue;
+            }
+            $parsed[] = [
+                'tmdb_id' => $id,
+                'name' => $name,
+                'character' => isset($member['character']) && $member['character'] !== '' ? (string) $member['character'] : null,
+                'order' => $order,
+                'profile_path' => isset($member['profile_path']) && $member['profile_path'] !== '' ? (string) $member['profile_path'] : null,
+            ];
+        }
+        usort($parsed, fn (array $a, array $b) => $a['order'] <=> $b['order']);
+
+        return array_slice($parsed, 0, 20);
+    }
+
+    /**
+     * Parse crew from TMDB credits.crew array. Unique by (name, job), tolerant of missing keys.
+     *
+     * @param  array<int, array<string, mixed>>  $crew
+     * @return array<int, array{tmdb_id: int, name: string, job: string, department: string|null, profile_path: string|null}>
+     */
+    private static function parseCrew(array $crew): array
+    {
+        $seen = [];
+        $parsed = [];
+        foreach ($crew as $member) {
+            $id = isset($member['id']) ? (int) $member['id'] : null;
+            $name = isset($member['name']) ? trim((string) $member['name']) : '';
+            $job = isset($member['job']) ? trim((string) $member['job']) : '';
+            if ($id === null || $name === '' || $job === '') {
+                continue;
+            }
+            $key = $name.'|'.$job;
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+            $parsed[] = [
+                'tmdb_id' => $id,
+                'name' => $name,
+                'job' => $job,
+                'department' => isset($member['department']) && $member['department'] !== '' ? (string) $member['department'] : null,
+                'profile_path' => isset($member['profile_path']) && $member['profile_path'] !== '' ? (string) $member['profile_path'] : null,
+            ];
+        }
+        usort($parsed, fn (array $a, array $b) => strcmp($a['job'], $b['job']));
+
+        return array_values($parsed);
     }
 
     /**
@@ -178,6 +261,12 @@ readonly class TmdbMovieData
             'tmdb_vote_count' => $this->voteCount,
             'director' => $this->director,
             'writers' => $this->writers,
+            'production_status' => $this->productionStatus,
+            'original_language' => $this->originalLanguage,
+            'budget' => $this->budget,
+            'revenue' => $this->revenue,
+            'cast' => $this->cast,
+            'crew' => $this->crew,
             'is_upcoming' => $this->isUpcoming(),
             'trailer_url' => $this->getTrailerUrl(),
         ];

@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Enums\MovieStatus;
 use App\Models\Movie;
 use App\Models\Tag;
+use App\Services\PersonSyncService;
 use App\Services\TMDBService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
@@ -23,6 +26,8 @@ class ImportTmdbMovies extends Command
 
     protected TMDBService $tmdb;
 
+    protected PersonSyncService $personSync;
+
     protected bool $debug = false;
 
     public function handle(): int
@@ -35,6 +40,7 @@ class ImportTmdbMovies extends Command
         }
 
         $this->tmdb = app(TMDBService::class);
+        $this->personSync = app(PersonSyncService::class);
         $limit = (int) $this->option('limit');
         $upcoming = (bool) $this->option('upcoming');
         $force = $this->option('force');
@@ -243,6 +249,13 @@ class ImportTmdbMovies extends Command
         $this->line('  → Saving (exists: '.($movie->exists ? 'yes' : 'no').')');
         $movie->save();
         $this->line("  → Saved as ID: {$movie->id}");
+
+        // Sync people and pivot, update cast/crew JSON with slugs
+        $peopleData = $this->personSync->syncFromMovieDto($movie, $movieData);
+        $movie->update([
+            'cast' => $peopleData['cast'],
+            'crew' => $peopleData['crew'],
+        ]);
 
         // Tag the movie
         $this->tagMovie($movie, $movieData);

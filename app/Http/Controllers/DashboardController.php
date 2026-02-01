@@ -13,6 +13,7 @@ use App\Jobs\ImportTmdbMoviesJob;
 use App\Models\Movie;
 use App\Models\Tag;
 use App\Services\DashboardStatsService;
+use App\Services\PersonSyncService;
 use App\Services\TMDBService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,7 +26,8 @@ class DashboardController extends Controller
 {
     public function __construct(
         protected DashboardStatsService $statsService,
-        protected TMDBService $tmdbService
+        protected TMDBService $tmdbService,
+        protected PersonSyncService $personSyncService
     ) {}
 
     public function index(Request $request): Response
@@ -155,6 +157,12 @@ class DashboardController extends Controller
         ]);
 
         $movie = Movie::create($attributes);
+
+        $peopleData = $this->personSyncService->syncFromMovieDto($movie, $dto);
+        $movie->update([
+            'cast' => $peopleData['cast'],
+            'crew' => $peopleData['crew'],
+        ]);
 
         $this->syncTagsFromTmdbDto($movie, $dto);
 

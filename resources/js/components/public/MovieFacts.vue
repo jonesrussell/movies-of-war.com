@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { Movie } from '@/types';
+import { formatCurrency, getLanguageName } from '@/utils/format';
 
 import {
     Calendar,
     Clock,
+    DollarSign,
     Film,
+    Globe,
     MapPin,
     PenLine,
     Star,
@@ -57,6 +60,50 @@ defineProps<{ movie: Movie }>();
                     aria-hidden="true"
                 />
                 {{ movie.country }}
+            </dd>
+        </template>
+
+        <template v-if="movie.production_status">
+            <dt class="sr-only">Status</dt>
+            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+                <Film
+                    class="size-4 shrink-0 text-zinc-300"
+                    aria-hidden="true"
+                />
+                {{ movie.production_status }}
+            </dd>
+        </template>
+
+        <template v-if="movie.original_language">
+            <dt class="sr-only">Original language</dt>
+            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+                <Globe
+                    class="size-4 shrink-0 text-zinc-300"
+                    aria-hidden="true"
+                />
+                {{ getLanguageName(movie.original_language) }}
+            </dd>
+        </template>
+
+        <template v-if="movie.budget">
+            <dt class="sr-only">Budget</dt>
+            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+                <DollarSign
+                    class="size-4 shrink-0 text-zinc-300"
+                    aria-hidden="true"
+                />
+                {{ formatCurrency(movie.budget) }}
+            </dd>
+        </template>
+
+        <template v-if="movie.revenue">
+            <dt class="sr-only">Revenue</dt>
+            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+                <DollarSign
+                    class="size-4 shrink-0 text-zinc-300"
+                    aria-hidden="true"
+                />
+                {{ formatCurrency(movie.revenue) }}
             </dd>
         </template>
 

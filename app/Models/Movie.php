@@ -28,6 +28,10 @@ use Illuminate\Support\Str;
  * @property string|null $poster_url
  * @property string|null $trailer_url
  * @property string|null $imdb_id
+ * @property float|null $tmdb_vote_average
+ * @property int|null $tmdb_vote_count
+ * @property string|null $director
+ * @property array|null $writers
  * @property bool $is_upcoming
  */
 class Movie extends Model
@@ -64,6 +68,10 @@ class Movie extends Model
         'poster_url',
         'trailer_url',
         'imdb_id',
+        'tmdb_vote_average',
+        'tmdb_vote_count',
+        'director',
+        'writers',
         'is_upcoming',
         'status',
     ];
@@ -74,6 +82,7 @@ class Movie extends Model
             'release_date' => 'date',
             'is_upcoming' => 'boolean',
             'status' => MovieStatus::class,
+            'writers' => 'array',
         ];
     }
 

@@ -15,6 +15,7 @@ readonly class TmdbMovieData
      * @param  Collection<int, TmdbGenreData>  $genres
      * @param  Collection<int, TmdbVideoData>  $videos
      * @param  Collection<int, TmdbKeywordData>  $keywords
+     * @param  array<int, string>  $writers
      */
     public function __construct(
         public int $id,
@@ -32,6 +33,8 @@ readonly class TmdbMovieData
         public Collection $genres,
         public Collection $videos,
         public Collection $keywords,
+        public ?string $director = null,
+        public array $writers = [],
     ) {}
 
     /**
@@ -41,6 +44,10 @@ readonly class TmdbMovieData
      */
     public static function fromApiResponse(array $data): self
     {
+        $credits = isset($data['credits']['crew'])
+            ? self::parseCredits($data['credits']['crew'])
+            : ['director' => null, 'writers' => []];
+
         return new self(
             id: $data['id'],
             title: $data['title'],
@@ -60,7 +67,45 @@ readonly class TmdbMovieData
                 ->map(fn (array $video) => TmdbVideoData::fromApiResponse($video)),
             keywords: collect($data['keywords']['keywords'] ?? [])
                 ->map(fn (array $keyword) => TmdbKeywordData::fromApiResponse($keyword)),
+            director: $credits['director'],
+            writers: $credits['writers'],
         );
+    }
+
+    /**
+     * Parse director and writers from TMDB credits crew array.
+     *
+     * @param  array<int, array<string, mixed>>  $crew
+     * @return array{director: string|null, writers: array<int, string>}
+     */
+    private static function parseCredits(array $crew): array
+    {
+        $director = null;
+        $writers = [];
+
+        $writerJobs = ['Screenplay', 'Writer', 'Story', 'Original Story', 'Novel'];
+
+        foreach ($crew as $member) {
+            $job = $member['job'] ?? null;
+            $name = $member['name'] ?? null;
+
+            if (! $job || ! $name) {
+                continue;
+            }
+
+            if ($job === 'Director' && $director === null) {
+                $director = $name;
+            }
+
+            if (in_array($job, $writerJobs, true)) {
+                $writers[] = $name;
+            }
+        }
+
+        return [
+            'director' => $director,
+            'writers' => array_values(array_unique($writers)),
+        ];
     }
 
     /**
@@ -129,6 +174,10 @@ readonly class TmdbMovieData
             'release_year' => $this->getReleaseYear(),
             'runtime' => $this->runtime,
             'imdb_id' => $this->imdbId,
+            'tmdb_vote_average' => $this->voteAverage,
+            'tmdb_vote_count' => $this->voteCount,
+            'director' => $this->director,
+            'writers' => $this->writers,
             'is_upcoming' => $this->isUpcoming(),
             'trailer_url' => $this->getTrailerUrl(),
         ];

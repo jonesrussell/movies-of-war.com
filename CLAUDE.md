@@ -35,6 +35,12 @@ npm run test                                             # Frontend tests
 ddev artisan tmdb:import --limit=50           # Import war movies (creates drafts)
 ddev artisan tmdb:import --upcoming --limit=30
 
+# TMDB Refresh (stale data)
+ddev artisan tmdb:refresh-stale --limit=50    # Queue refresh jobs for stale movies
+ddev artisan tmdb:refresh-stale --force-backfill --limit=50  # Backfill never-synced
+ddev artisan tmdb:refresh-stale --force --limit=10           # Hard refresh (admin)
+ddev artisan tmdb:refresh-stale --dry-run                     # List candidates only
+
 # User Management
 ddev artisan user:change-password user@example.com
 ddev artisan user:make-admin user@example.com [--revoke]
@@ -55,7 +61,7 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 
 | Model | Key Relationships & Features |
 |-------|------------------------------|
-| **Movie** | `belongsToMany(Tag)`, `hasMany(FeaturedSlot)`, `belongsToMany(User, 'watchlists')`. Scopes: `draft()`, `published()`, `archived()`. Auto-generates slug. TMDB-derived: `tmdb_vote_average`, `tmdb_vote_count`, `director`, `writers` (JSON array); shown on public movie detail page. |
+| **Movie** | `belongsToMany(Tag)`, `hasMany(FeaturedSlot)`, `belongsToMany(User, 'watchlists')`. Scopes: `draft()`, `published()`, `archived()`, `staleForTmdbRefresh()`. Auto-generates slug. TMDB-derived: `tmdb_vote_average`, `tmdb_vote_count`, `director`, `writers` (JSON array), `tmdb_last_synced_at`; shown on public movie detail page. |
 | **FeaturedSlot** | `belongsTo(Movie)`. Slots: `hero`, `pick_of_week`. Scopes: `active()`, `slot($type)`. |
 | **Tag** | Types: `genre`, `theme`, `era`. Used for filtering. |
 | **User** | `is_admin` flag for dashboard access. `belongsToMany(Movie, 'watchlists')`. |
@@ -66,7 +72,14 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 - **Service:** `app/Services/TMDBService.php` - `discoverWarMovies()`, `getMovieDetails()` (requests `videos`, `keywords`, `credits`), `downloadPoster()`
 - **DTO:** `app/Data/Tmdb/TmdbMovieData.php` - parses credits into `director` and `writers`; `toMovieAttributes()` includes vote average/count and credits for import
 - **Import:** `app/Console/Commands/ImportTmdbMovies.php` - uses DTO and `toMovieAttributes()`, rate limited to 4 req/sec. Dashboard single-import (`DashboardController::importSingleTmdbMovie`) also uses DTO and shared slug/tag logic.
-- **Config:** `config/tmdb.php` - requires `TMDB_API_KEY` in `.env`
+- **Config:** `config/tmdb.php` - requires `TMDB_API_KEY` in `.env`; also defines `refresh_cadence_days`, `refresh_popular_vote_count`, `refresh_obscure_vote_count`, `refresh_max_age_days` for stale-refresh cadence.
+
+**TMDB refresh (stale data):**
+- **Column:** `movies.tmdb_last_synced_at` – set on import/refresh; used for cadence-based staleness.
+- **Job:** `app/Jobs/RefreshTmdbMovieJob.php` – one movie per job, queue `tmdb-refresh`; updates from DTO (no poster re-download, no slug change).
+- **Command:** `tmdb:refresh-stale` – `--limit`, `--force-backfill` (null timestamps), `--force` (ignore cadence), `--dry-run`. Dispatches jobs for stale movies (cadence + max-age cap).
+- **Scheduler:** `routes/console.php` – `tmdb:refresh-stale --limit=50` runs `everyFifteenMinutes()->between('03:00', '05:00')`.
+- **Scope:** `Movie::staleForTmdbRefresh($limit, $maxAgeDays)` – cadence by `tmdb_vote_count` (popular 7d, normal 30d, obscure 90d) plus max-age cap (default 120d).
 
 ### X (Twitter) Integration
 
@@ -110,6 +123,8 @@ interface Movie {
 
 ### Routes
 
+- **Entry:** `routes/web.php` – requires `routes/web/*.php` (home, movies, dashboard, watchlist, admin, misc) and `routes/settings.php`. Auth group `['auth', 'verified']` wraps dashboard, watchlist, admin; public movie routes loaded after admin to avoid slug/resource conflicts.
+- **Web split:** `routes/web/home.php` (Welcome), `routes/web/movies.php` (public index/show), `routes/web/dashboard.php`, `routes/web/watchlist.php`, `routes/web/admin.php` (admin middleware + TMDB, movies, featured slots, X), `routes/web/misc.php` (api/x-feed, /admin redirect).
 - **Public:** Movies filtered with `->published()`, featured slots with `->active()`
 - **Auth:** Dashboard, watchlist CRUD
 - **Admin:** Middleware `['auth', 'verified', 'admin']` - publish/archive, featured slots
@@ -151,3 +166,5 @@ const auth = page.props.auth as { user: any }
 **TMDB rate limiting:** `usleep(250000)` for 4 req/sec limit - do not increase.
 
 **Migration order:** Featured slots and watchlists depend on movies table.
+
+**Wayfinder / lint:** Wayfinder-generated files under `resources/js/actions/**`, `resources/js/routes/**`, `resources/js/wayfinder/**` are excluded from ESLint and Prettier (see `eslint.config.js` ignores and `.prettierignore`). Do not manually edit those files; run `php artisan wayfinder:generate` after route changes.

@@ -151,6 +151,7 @@ class DashboardController extends Controller
             'poster_url' => $posterUrl,
             'trailer_url' => $dto->getTrailerUrl(),
             'status' => MovieStatus::Draft,
+            'tmdb_last_synced_at' => now(),
         ]);
 
         $movie = Movie::create($attributes);

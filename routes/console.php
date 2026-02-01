@@ -48,3 +48,10 @@ Schedule::command('x:generate-content')
     ->dailyAt('08:00')
     ->name('generate-war-movie-post')
     ->withoutOverlapping();
+
+// Refresh stale TMDB data (cadence + max-age) within a window to spread load
+Schedule::command('tmdb:refresh-stale --limit=50')
+    ->everyFifteenMinutes()
+    ->between('03:00', '05:00')
+    ->name('tmdb-refresh-stale')
+    ->withoutOverlapping();

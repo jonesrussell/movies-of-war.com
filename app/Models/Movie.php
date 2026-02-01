@@ -32,6 +32,7 @@ use Illuminate\Support\Str;
  * @property int|null $tmdb_vote_count
  * @property string|null $director
  * @property array|null $writers
+ * @property \Illuminate\Support\Carbon|null $tmdb_last_synced_at
  * @property bool $is_upcoming
  */
 class Movie extends Model
@@ -72,6 +73,7 @@ class Movie extends Model
         'tmdb_vote_count',
         'director',
         'writers',
+        'tmdb_last_synced_at',
         'is_upcoming',
         'status',
     ];
@@ -80,6 +82,7 @@ class Movie extends Model
     {
         return [
             'release_date' => 'date',
+            'tmdb_last_synced_at' => 'datetime',
             'is_upcoming' => 'boolean',
             'status' => MovieStatus::class,
             'writers' => 'array',
@@ -167,6 +170,44 @@ class Movie extends Model
     public function scopeReleased(Builder $query): Builder
     {
         return $query->where('is_upcoming', false);
+    }
+
+    /**
+     * Movies that are stale for TMDB refresh (cadence + max-age cap).
+     *
+     * @param  Builder<Movie>  $query
+     * @return Builder<Movie>
+     */
+    public function scopeStaleForTmdbRefresh(Builder $query, int $limit = 50, ?int $maxAgeDays = null): Builder
+    {
+        $maxAgeDays ??= config('tmdb.refresh_max_age_days', 120);
+        $cadence = config('tmdb.refresh_cadence_days', ['popular' => 7, 'normal' => 30, 'obscure' => 90]);
+        $popularThreshold = config('tmdb.refresh_popular_vote_count', 10_000);
+        $obscureThreshold = config('tmdb.refresh_obscure_vote_count', 100);
+
+        return $query->whereNotNull('tmdb_id')
+            ->where(function (Builder $q) use ($maxAgeDays, $cadence, $popularThreshold, $obscureThreshold): void {
+                $q->whereNull('tmdb_last_synced_at')
+                    ->orWhere('tmdb_last_synced_at', '<', now()->subDays($maxAgeDays))
+                    ->orWhere(function (Builder $q2) use ($cadence, $popularThreshold): void {
+                        $q2->where('tmdb_vote_count', '>', $popularThreshold)
+                            ->where('tmdb_last_synced_at', '<', now()->subDays($cadence['popular']));
+                    })
+                    ->orWhere(function (Builder $q2) use ($cadence, $obscureThreshold): void {
+                        $q2->where('tmdb_vote_count', '<', $obscureThreshold)
+                            ->where('tmdb_last_synced_at', '<', now()->subDays($cadence['obscure']));
+                    })
+                    ->orWhere(function (Builder $q2) use ($cadence, $obscureThreshold, $popularThreshold): void {
+                        $q2->where(function (Builder $q3) use ($obscureThreshold, $popularThreshold): void {
+                            $q3->whereBetween('tmdb_vote_count', [$obscureThreshold, $popularThreshold])
+                                ->orWhereNull('tmdb_vote_count');
+                        })
+                            ->where('tmdb_last_synced_at', '<', now()->subDays($cadence['normal']));
+                    });
+            })
+            ->orderByRaw('tmdb_last_synced_at IS NULL DESC')
+            ->orderBy('tmdb_last_synced_at')
+            ->limit($limit);
     }
 
     // =========================================================================

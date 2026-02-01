@@ -20,6 +20,7 @@ export default defineConfigWithVueTs(
             'tailwind.config.js',
             'resources/js/components/ui/*',
             'resources/js/actions/**',
+            'resources/js/routes/**',
             'resources/js/wayfinder/**',
         ],
     },

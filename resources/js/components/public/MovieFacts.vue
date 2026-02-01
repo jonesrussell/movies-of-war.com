@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Movie } from '@/types';
 
-import { Calendar, Clock, Film, MapPin } from 'lucide-vue-next';
+import { Calendar, Clock, Film, MapPin, PenLine, Star, User } from 'lucide-vue-next';
 
 defineProps<{ movie: Movie }>();
 </script>
@@ -18,6 +18,17 @@ defineProps<{ movie: Movie }>();
             />
             {{ movie.release_year }}
         </dd>
+
+        <template v-if="movie.tmdb_vote_average">
+            <dt class="sr-only">TMDB rating</dt>
+            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+                <Star
+                    class="size-4 shrink-0 text-zinc-300"
+                    aria-hidden="true"
+                />
+                {{ movie.tmdb_vote_average }}/10 (TMDB)
+            </dd>
+        </template>
 
         <template v-if="movie.runtime">
             <dt class="sr-only">Runtime</dt>
@@ -49,6 +60,28 @@ defineProps<{ movie: Movie }>();
                     aria-hidden="true"
                 />
                 {{ movie.conflict }}
+            </dd>
+        </template>
+
+        <template v-if="movie.director">
+            <dt class="sr-only">Director</dt>
+            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+                <User
+                    class="size-4 shrink-0 text-zinc-300"
+                    aria-hidden="true"
+                />
+                {{ movie.director }}
+            </dd>
+        </template>
+
+        <template v-if="movie.writers && movie.writers.length">
+            <dt class="sr-only">{{ movie.writers.length === 1 ? 'Writer' : 'Writers' }}</dt>
+            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+                <PenLine
+                    class="size-4 shrink-0 text-zinc-300"
+                    aria-hidden="true"
+                />
+                {{ movie.writers.join(', ') }}
             </dd>
         </template>
     </dl>

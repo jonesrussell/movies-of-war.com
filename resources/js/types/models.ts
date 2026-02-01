@@ -15,6 +15,10 @@ export interface Movie {
     poster_url: string | null;
     trailer_url: string | null;
     imdb_id: string | null;
+    tmdb_vote_average?: number | null;
+    tmdb_vote_count?: number | null;
+    director?: string | null;
+    writers?: string[] | null;
     is_upcoming: boolean;
     status?: MovieStatus;
     created_at: string;

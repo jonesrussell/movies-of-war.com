@@ -55,3 +55,9 @@ Schedule::command('tmdb:refresh-stale --limit=50')
     ->between('03:00', '05:00')
     ->name('tmdb-refresh-stale')
     ->withoutOverlapping();
+
+// Refresh stale TMDB people (lower frequency than movies)
+Schedule::command('tmdb:refresh-people --limit=20')
+    ->dailyAt('04:00')
+    ->name('tmdb-refresh-people')
+    ->withoutOverlapping();

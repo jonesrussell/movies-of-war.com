@@ -3,6 +3,7 @@
 use App\Data\Tmdb\TmdbMovieData;
 use App\Jobs\RefreshTmdbMovieJob;
 use App\Models\Movie;
+use App\Services\PersonSyncService;
 use App\Services\TMDBService;
 use Illuminate\Support\Facades\Log;
 
@@ -43,7 +44,7 @@ test('RefreshTmdbMovieJob updates movie from DTO and sets tmdb_last_synced_at', 
     });
 
     $job = new RefreshTmdbMovieJob($movie);
-    $job->handle(app(TMDBService::class));
+    $job->handle(app(TMDBService::class), app(PersonSyncService::class));
 
     $movie->refresh();
     expect($movie->tmdb_vote_average)->toBe(7.2)
@@ -81,7 +82,7 @@ test('RefreshTmdbMovieJob does not overwrite slug poster_path or poster_url', fu
     });
 
     $job = new RefreshTmdbMovieJob($movie);
-    $job->handle(app(TMDBService::class));
+    $job->handle(app(TMDBService::class), app(PersonSyncService::class));
 
     $movie->refresh();
     expect($movie->slug)->toBe('custom-slug')
@@ -106,7 +107,7 @@ test('RefreshTmdbMovieJob does nothing when TMDB returns null', function () {
     });
 
     $job = new RefreshTmdbMovieJob($movie);
-    $job->handle(app(TMDBService::class));
+    $job->handle(app(TMDBService::class), app(PersonSyncService::class));
 
     $movie->refresh();
     expect($movie->tmdb_last_synced_at)->toBeNull()

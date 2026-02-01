@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Data\Tmdb\TmdbDiscoverResponse;
 use App\Data\Tmdb\TmdbMovieData;
+use App\Data\Tmdb\TmdbPersonData;
 use App\Data\Tmdb\TmdbSearchResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -76,6 +77,37 @@ class TMDBService
         }
 
         return TmdbMovieData::fromApiResponse($data);
+    }
+
+    /**
+     * Get person details from TMDB and return as DTO.
+     */
+    public function getPersonDetailsAsDto(int $tmdbId): ?TmdbPersonData
+    {
+        $response = Http::get("{$this->baseUrl}/person/{$tmdbId}", [
+            'api_key' => $this->apiKey,
+            'append_to_response' => 'movie_credits,images',
+        ]);
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $data = $response->json();
+        if (! is_array($data)) {
+            return null;
+        }
+
+        return TmdbPersonData::fromApiResponse($data);
+    }
+
+    public function getProfileImageUrl(?string $profilePath, string $size = 'w185'): ?string
+    {
+        if (! $profilePath) {
+            return null;
+        }
+
+        return "{$this->imageBaseUrl}/{$size}{$profilePath}";
     }
 
     public function discoverWarMovies(int $page = 1, bool $upcoming = false): array

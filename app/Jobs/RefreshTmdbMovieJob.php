@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Movie;
+use App\Services\PersonSyncService;
 use App\Services\TMDBService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -28,7 +29,7 @@ class RefreshTmdbMovieJob implements ShouldQueue
         $this->onQueue('tmdb-refresh');
     }
 
-    public function handle(TMDBService $tmdb): void
+    public function handle(TMDBService $tmdb, PersonSyncService $personSync): void
     {
         $dto = $tmdb->getMovieDetailsAsDto($this->movie->tmdb_id);
 
@@ -42,9 +43,16 @@ class RefreshTmdbMovieJob implements ShouldQueue
         }
 
         $attrs = $dto->toMovieAttributes();
+        unset($attrs['slug'], $attrs['poster_path'], $attrs['poster_url'], $attrs['cast'], $attrs['crew']);
         $attrs['tmdb_last_synced_at'] = now();
 
         $this->movie->fill($attrs);
         $this->movie->save();
+
+        $peopleData = $personSync->syncFromMovieDto($this->movie, $dto);
+        $this->movie->update([
+            'cast' => $peopleData['cast'],
+            'crew' => $peopleData['crew'],
+        ]);
     }
 }

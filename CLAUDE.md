@@ -55,7 +55,7 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 
 | Model | Key Relationships & Features |
 |-------|------------------------------|
-| **Movie** | `belongsToMany(Tag)`, `hasMany(FeaturedSlot)`, `belongsToMany(User, 'watchlists')`. Scopes: `draft()`, `published()`, `archived()`. Auto-generates slug. |
+| **Movie** | `belongsToMany(Tag)`, `hasMany(FeaturedSlot)`, `belongsToMany(User, 'watchlists')`. Scopes: `draft()`, `published()`, `archived()`. Auto-generates slug. TMDB-derived: `tmdb_vote_average`, `tmdb_vote_count`, `director`, `writers` (JSON array); shown on public movie detail page. |
 | **FeaturedSlot** | `belongsTo(Movie)`. Slots: `hero`, `pick_of_week`. Scopes: `active()`, `slot($type)`. |
 | **Tag** | Types: `genre`, `theme`, `era`. Used for filtering. |
 | **User** | `is_admin` flag for dashboard access. `belongsToMany(Movie, 'watchlists')`. |
@@ -63,8 +63,9 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 
 ### TMDB Integration
 
-- **Service:** `app/Services/TMDBService.php` - `discoverWarMovies()`, `getMovieDetails()`, `downloadPoster()`
-- **Import:** `app/Console/Commands/ImportTmdbMovies.php` - uses `firstOrNew` with `tmdb_id`, rate limited to 4 req/sec
+- **Service:** `app/Services/TMDBService.php` - `discoverWarMovies()`, `getMovieDetails()` (requests `videos`, `keywords`, `credits`), `downloadPoster()`
+- **DTO:** `app/Data/Tmdb/TmdbMovieData.php` - parses credits into `director` and `writers`; `toMovieAttributes()` includes vote average/count and credits for import
+- **Import:** `app/Console/Commands/ImportTmdbMovies.php` - uses DTO and `toMovieAttributes()`, rate limited to 4 req/sec. Dashboard single-import (`DashboardController::importSingleTmdbMovie`) also uses DTO and shared slug/tag logic.
 - **Config:** `config/tmdb.php` - requires `TMDB_API_KEY` in `.env`
 
 ### X (Twitter) Integration
@@ -94,14 +95,16 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 - Auth: `Dashboard.vue` (stats + admin), `Watchlist/Index.vue`
 - Admin: `Admin/*` management pages
 
-**Components** (`resources/js/components/`): `MovieCard.vue`, `MovieHero.vue`, `FeaturedMovie.vue`
+**Components** (`resources/js/components/`): `MovieCard.vue`, `MovieHero.vue`, `FeaturedMovie.vue`, `public/MovieFacts.vue` (release year, runtime, country, conflict, TMDB rating, director, writers)
 
 **Types** (`resources/js/types/models.ts`):
 ```typescript
 interface Movie {
   id: number; tmdb_id: number | null; title: string; slug: string;
   status: 'draft' | 'published' | 'archived'; release_year: number;
-  synopsis: string; poster_url: string | null; trailer_url: string | null; tags?: Tag[];
+  synopsis: string; poster_url: string | null; trailer_url: string | null;
+  tmdb_vote_average?: number | null; director?: string | null; writers?: string[] | null;
+  tags?: Tag[];
 }
 ```
 

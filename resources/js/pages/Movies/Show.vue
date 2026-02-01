@@ -157,18 +157,35 @@ const useResponsiveBackground = computed(() => {
     );
 });
 
-const keyCrewJobs = ['Director', 'Writer', 'Screenplay', 'Director of Photography', 'Cinematography', 'Editing', 'Editor', 'Music', 'Original Music Composer'];
+const keyCrewJobs = [
+    'Director',
+    'Writer',
+    'Screenplay',
+    'Director of Photography',
+    'Cinematography',
+    'Editing',
+    'Editor',
+    'Music',
+    'Original Music Composer',
+];
 
 const keyCrew = computed(() => {
     const crew = props.movie.crew ?? [];
     const seen = new Set<string>();
-    return crew.filter((c: { name: string; job: string }) => {
-        const key = `${c.name}|${c.job}`;
-        if (seen.has(key)) return false;
-        if (!keyCrewJobs.some((job) => c.job.toLowerCase().includes(job.toLowerCase()))) return false;
-        seen.add(key);
-        return true;
-    }).slice(0, 10);
+    return crew
+        .filter((c: { name: string; job: string }) => {
+            const key = `${c.name}|${c.job}`;
+            if (seen.has(key)) return false;
+            if (
+                !keyCrewJobs.some((job) =>
+                    c.job.toLowerCase().includes(job.toLowerCase()),
+                )
+            )
+                return false;
+            seen.add(key);
+            return true;
+        })
+        .slice(0, 10);
 });
 </script>
 
@@ -421,23 +438,37 @@ const keyCrew = computed(() => {
                                 "
                                 :style="{ transitionDelay: '450ms' }"
                             >
-                                <h2 class="mb-4 text-xl font-semibold text-white">
+                                <h2
+                                    class="mb-4 text-xl font-semibold text-white"
+                                >
                                     Cast
                                 </h2>
-                                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                                <div
+                                    class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4"
+                                >
                                     <Link
                                         v-for="(member, idx) in movie.cast"
                                         :key="`${member.tmdb_id}-${idx}`"
-                                        :href="member.slug ? `/people/${member.slug}` : '#'"
+                                        :href="
+                                            member.slug
+                                                ? `/people/${member.slug}`
+                                                : '#'
+                                        "
                                         class="group flex flex-col items-center gap-2 rounded-xl p-3 ring-1 ring-zinc-800/70 transition-all hover:bg-zinc-900/60 hover:ring-zinc-700"
                                     >
                                         <img
-                                            :src="getProfileImageUrl(member.profile_path)"
+                                            :src="
+                                                getProfileImageUrl(
+                                                    member.profile_path,
+                                                )
+                                            "
                                             :alt="member.name"
                                             class="size-16 shrink-0 overflow-hidden rounded-full object-cover ring-1 ring-zinc-700"
                                         />
                                         <div class="min-w-0 text-center">
-                                            <span class="block truncate text-sm font-medium text-white group-hover:text-red-400">
+                                            <span
+                                                class="block truncate text-sm font-medium text-white group-hover:text-red-400"
+                                            >
                                                 {{ member.name }}
                                             </span>
                                             <span
@@ -462,7 +493,9 @@ const keyCrew = computed(() => {
                                 "
                                 :style="{ transitionDelay: '500ms' }"
                             >
-                                <h2 class="mb-4 text-xl font-semibold text-white">
+                                <h2
+                                    class="mb-4 text-xl font-semibold text-white"
+                                >
                                     Crew
                                 </h2>
                                 <dl class="grid gap-2 sm:grid-cols-2">
@@ -474,7 +507,9 @@ const keyCrew = computed(() => {
                                         <dt class="text-sm text-zinc-400">
                                             {{ member.job }}
                                         </dt>
-                                        <dd class="text-sm font-medium text-zinc-200">
+                                        <dd
+                                            class="text-sm font-medium text-zinc-200"
+                                        >
                                             <Link
                                                 v-if="member.slug"
                                                 :href="`/people/${member.slug}`"
@@ -482,7 +517,9 @@ const keyCrew = computed(() => {
                                             >
                                                 {{ member.name }}
                                             </Link>
-                                            <span v-else>{{ member.name }}</span>
+                                            <span v-else>{{
+                                                member.name
+                                            }}</span>
                                         </dd>
                                     </div>
                                 </dl>

@@ -2,7 +2,7 @@
 import type { Person } from '@/types';
 
 import { Head, Link } from '@inertiajs/vue3';
-import { Calendar, MapPin, ArrowLeft } from 'lucide-vue-next';
+import { ArrowLeft, Calendar, MapPin } from 'lucide-vue-next';
 
 import { Poster } from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
@@ -54,7 +54,9 @@ defineProps<Props>();
                     </div>
 
                     <div class="min-w-0 flex-1">
-                        <h1 class="mb-4 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                        <h1
+                            class="mb-4 text-3xl font-semibold tracking-tight text-white md:text-4xl"
+                        >
                             {{ person.name }}
                         </h1>
 
@@ -71,7 +73,9 @@ defineProps<Props>();
                         >
                             <template v-if="person.birthday">
                                 <dt class="sr-only">Birthday</dt>
-                                <dd class="flex items-center gap-2 text-sm text-zinc-300">
+                                <dd
+                                    class="flex items-center gap-2 text-sm text-zinc-300"
+                                >
                                     <Calendar class="size-4 shrink-0" />
                                     {{ person.birthday }}
                                     <span v-if="person.deathday">
@@ -81,7 +85,9 @@ defineProps<Props>();
                             </template>
                             <template v-if="person.place_of_birth">
                                 <dt class="sr-only">Place of birth</dt>
-                                <dd class="flex items-center gap-2 text-sm text-zinc-300">
+                                <dd
+                                    class="flex items-center gap-2 text-sm text-zinc-300"
+                                >
                                     <MapPin class="size-4 shrink-0" />
                                     {{ person.place_of_birth }}
                                 </dd>
@@ -100,14 +106,13 @@ defineProps<Props>();
                         </dl>
 
                         <!-- Biography -->
-                        <div
-                            v-if="person.biography"
-                            class="mb-8"
-                        >
+                        <div v-if="person.biography" class="mb-8">
                             <h2 class="mb-3 text-xl font-semibold text-white">
                                 Biography
                             </h2>
-                            <p class="whitespace-pre-line leading-relaxed text-zinc-300">
+                            <p
+                                class="leading-relaxed whitespace-pre-line text-zinc-300"
+                            >
                                 {{ person.biography }}
                             </p>
                         </div>
@@ -122,14 +127,18 @@ defineProps<Props>();
                     <h2 class="mb-6 text-xl font-semibold text-white">
                         Known For
                     </h2>
-                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    <div
+                        class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                    >
                         <Link
                             v-for="entry in person.known_for"
                             :key="`${entry.movie_id}-${entry.character ?? entry.job ?? ''}`"
                             :href="`/movies/${entry.movie_slug}`"
                             class="group flex flex-col gap-2"
                         >
-                            <div class="overflow-hidden rounded-xl ring-1 ring-zinc-800/70 transition-all hover:ring-zinc-700">
+                            <div
+                                class="overflow-hidden rounded-xl ring-1 ring-zinc-800/70 transition-all hover:ring-zinc-700"
+                            >
                                 <Poster
                                     :src="entry.poster_url"
                                     :alt="entry.movie_title"
@@ -140,7 +149,9 @@ defineProps<Props>();
                                 />
                             </div>
                             <div class="min-w-0">
-                                <span class="block truncate text-sm font-medium text-white group-hover:text-red-400">
+                                <span
+                                    class="block truncate text-sm font-medium text-white group-hover:text-red-400"
+                                >
                                     {{ entry.movie_title }}
                                 </span>
                                 <span
@@ -169,14 +180,17 @@ defineProps<Props>();
                 <!-- Filmography: Cast -->
                 <section
                     v-if="
-                        person.filmography_cast && person.filmography_cast.length > 0
+                        person.filmography_cast &&
+                        person.filmography_cast.length > 0
                     "
                     class="mt-12"
                 >
                     <h2 class="mb-4 text-xl font-semibold text-white">
                         Acting
                     </h2>
-                    <ul class="divide-y divide-zinc-800/70 rounded-xl ring-1 ring-zinc-800/70">
+                    <ul
+                        class="divide-y divide-zinc-800/70 rounded-xl ring-1 ring-zinc-800/70"
+                    >
                         <li
                             v-for="entry in person.filmography_cast"
                             :key="`cast-${entry.movie_id}-${entry.character ?? ''}`"
@@ -207,14 +221,15 @@ defineProps<Props>();
                 <!-- Filmography: Crew -->
                 <section
                     v-if="
-                        person.filmography_crew && person.filmography_crew.length > 0
+                        person.filmography_crew &&
+                        person.filmography_crew.length > 0
                     "
                     class="mt-12"
                 >
-                    <h2 class="mb-4 text-xl font-semibold text-white">
-                        Crew
-                    </h2>
-                    <ul class="divide-y divide-zinc-800/70 rounded-xl ring-1 ring-zinc-800/70">
+                    <h2 class="mb-4 text-xl font-semibold text-white">Crew</h2>
+                    <ul
+                        class="divide-y divide-zinc-800/70 rounded-xl ring-1 ring-zinc-800/70"
+                    >
                         <li
                             v-for="entry in person.filmography_crew"
                             :key="`crew-${entry.movie_id}-${entry.job ?? ''}`"

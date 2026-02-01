@@ -21,9 +21,11 @@ export function getLanguageName(isoCode: string): string {
     if (!isoCode) return isoCode;
     try {
         if (typeof Intl !== 'undefined' && Intl.DisplayNames) {
-            return new Intl.DisplayNames(['en'], { type: 'language' }).of(
-                isoCode,
-            ) ?? isoCode;
+            return (
+                new Intl.DisplayNames(['en'], { type: 'language' }).of(
+                    isoCode,
+                ) ?? isoCode
+            );
         }
     } catch {
         // Fallback to raw code if Intl fails

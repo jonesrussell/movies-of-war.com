@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Movie } from '@/types';
-import { formatCurrency, getLanguageName } from '@/utils/format';
 
 import {
     Calendar,
@@ -13,6 +12,8 @@ import {
     Star,
     User,
 } from 'lucide-vue-next';
+
+import { formatCurrency, getLanguageName } from '@/utils/format';
 
 defineProps<{ movie: Movie }>();
 </script>

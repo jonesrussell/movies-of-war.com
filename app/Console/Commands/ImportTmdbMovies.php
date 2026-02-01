@@ -232,6 +232,7 @@ class ImportTmdbMovies extends Command
             'poster_path' => $posterPath,
             'poster_url' => $posterUrl,
             'trailer_url' => $trailerUrl,
+            'tmdb_last_synced_at' => now(),
         ]));
 
         // Only set status to draft if this is a new movie

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Data\Tmdb\TmdbMovieData;
 use App\Enums\MovieStatus;
 use App\Enums\TagType;
 use App\Http\Requests\ImportTmdbMoviesRequest;
@@ -123,80 +124,90 @@ class DashboardController extends Controller
             'tmdb_id' => 'required|integer',
         ]);
 
-        $tmdbId = $request->input('tmdb_id');
+        $tmdbId = (int) $request->input('tmdb_id');
 
-        // Check if already imported
         if (Movie::where('tmdb_id', $tmdbId)->exists()) {
             return redirect()->route('dashboard.tmdb.search')->with('error', 'This movie has already been imported.');
         }
 
-        // Get movie details from TMDB
-        $movieData = $this->tmdbService->getMovieDetails($tmdbId);
+        $dto = $this->tmdbService->getMovieDetailsAsDto($tmdbId);
 
-        if (! $movieData) {
+        if ($dto === null) {
             return redirect()->route('dashboard.tmdb.search')->with('error', 'Could not fetch movie details from TMDB.');
         }
 
-        // Download poster and get URLs
         $posterPath = null;
         $posterUrl = null;
-
-        if (! empty($movieData['poster_path'])) {
-            $posterPath = $this->tmdbService->downloadPoster($movieData['poster_path']);
-            $posterUrl = $this->tmdbService->getPosterUrl($movieData['poster_path']);
+        if ($dto->posterPath) {
+            $posterPath = $this->tmdbService->downloadPoster($dto->posterPath);
+            $posterUrl = $this->tmdbService->getPosterUrl($dto->posterPath);
         }
 
-        // Get trailer URL
-        $trailerUrl = $this->tmdbService->getYoutubeTrailerUrl($movieData['videos'] ?? null);
+        $slug = $this->resolveUniqueSlugForImport($dto);
 
-        // Determine if upcoming
-        $releaseDate = $movieData['release_date'] ?? null;
-        $isUpcoming = $releaseDate && now()->lt($releaseDate);
-
-        // Generate unique slug
-        $baseSlug = Str::slug($movieData['title']);
-        $slug = $baseSlug;
-        $releaseYear = $releaseDate ? (int) substr($releaseDate, 0, 4) : null;
-
-        // If slug exists, append year to make it unique
-        if (Movie::where('slug', $slug)->exists()) {
-            $slug = $releaseYear ? "{$baseSlug}-{$releaseYear}" : "{$baseSlug}-{$movieData['id']}";
-
-            // If still not unique, append TMDB ID
-            if (Movie::where('slug', $slug)->exists()) {
-                $slug = "{$baseSlug}-{$movieData['id']}";
-            }
-        }
-
-        // Create movie with MovieStatus enum
-        $movie = Movie::create([
-            'tmdb_id' => $movieData['id'],
-            'title' => $movieData['title'],
+        $attributes = array_merge($dto->toMovieAttributes(), [
             'slug' => $slug,
-            'release_year' => $releaseDate ? (int) substr($releaseDate, 0, 4) : null,
-            'release_date' => $releaseDate,
-            'synopsis' => $movieData['overview'] ?? null,
-            'runtime' => $movieData['runtime'] ?? null,
             'poster_path' => $posterPath,
             'poster_url' => $posterUrl,
-            'trailer_url' => $trailerUrl,
-            'imdb_id' => $movieData['imdb_id'] ?? null,
-            'is_upcoming' => $isUpcoming,
+            'trailer_url' => $dto->getTrailerUrl(),
             'status' => MovieStatus::Draft,
+            'tmdb_last_synced_at' => now(),
         ]);
 
-        // Attach genre tags using TagType enum
-        if (! empty($movieData['genres'])) {
-            foreach ($movieData['genres'] as $genre) {
+        $movie = Movie::create($attributes);
+
+        $this->syncTagsFromTmdbDto($movie, $dto);
+
+        return redirect()->route('dashboard.tmdb.search')->with('success', "'{$movie->title}' has been imported as a draft.");
+    }
+
+    /**
+     * Generate a unique slug for a movie being imported from TMDB.
+     */
+    private function resolveUniqueSlugForImport(TmdbMovieData $dto): string
+    {
+        $baseSlug = Str::slug($dto->title);
+        $releaseYear = $dto->getReleaseYear();
+
+        if (! Movie::where('slug', $baseSlug)->exists()) {
+            return $baseSlug;
+        }
+
+        $slugWithYear = $releaseYear ? "{$baseSlug}-{$releaseYear}" : "{$baseSlug}-{$dto->id}";
+        if (! Movie::where('slug', $slugWithYear)->exists()) {
+            return $slugWithYear;
+        }
+
+        return "{$baseSlug}-{$dto->id}";
+    }
+
+    /**
+     * Sync movie tags from TMDB DTO (genres + era from keywords).
+     */
+    private function syncTagsFromTmdbDto(Movie $movie, TmdbMovieData $dto): void
+    {
+        $tagIds = collect();
+
+        foreach ($dto->genres as $genre) {
+            $tag = Tag::firstOrCreate(
+                ['slug' => Str::slug($genre->name)],
+                ['name' => $genre->name, 'type' => TagType::Genre]
+            );
+            $tagIds->push($tag->id);
+        }
+
+        foreach ($dto->keywords as $keyword) {
+            $matchedEra = $keyword->matchEra();
+            if ($matchedEra !== null) {
                 $tag = Tag::firstOrCreate(
-                    ['name' => $genre['name'], 'type' => TagType::Genre],
-                    ['name' => $genre['name'], 'type' => TagType::Genre]
+                    ['slug' => Str::slug($matchedEra)],
+                    ['name' => $matchedEra, 'type' => TagType::Era]
                 );
-                $movie->tags()->attach($tag);
+                $tagIds->push($tag->id);
             }
         }
 
-        return redirect()->route('dashboard.tmdb.search')->with('success', "'{$movie->title}' has been imported as a draft.");
+        $movie->tags()->sync($tagIds->unique()->values()->all());
     }
 
     public function publishMovie(Movie $movie): RedirectResponse

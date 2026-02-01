@@ -120,3 +120,54 @@ test('movie scopes filter by status correctly', function () {
         ->and(Movie::draft()->count())->toBe(2)
         ->and(Movie::archived()->count())->toBe(1);
 });
+
+test('staleForTmdbRefresh includes never-synced movies', function () {
+    $withTmdb = Movie::factory()->create([
+        'tmdb_id' => 1,
+        'tmdb_last_synced_at' => null,
+    ]);
+    Movie::factory()->create(['tmdb_id' => null]);
+
+    $stale = Movie::staleForTmdbRefresh(10)->get();
+
+    expect($stale->pluck('id')->toArray())->toContain($withTmdb->id)
+        ->and($stale->count())->toBe(1);
+});
+
+test('staleForTmdbRefresh includes popular movie synced more than cadence days ago', function () {
+    $popularStale = Movie::factory()->create([
+        'tmdb_id' => 1,
+        'tmdb_vote_count' => 15_000,
+        'tmdb_last_synced_at' => now()->subDays(10),
+    ]);
+    Movie::factory()->create([
+        'tmdb_id' => 2,
+        'tmdb_vote_count' => 15_000,
+        'tmdb_last_synced_at' => now()->subDays(3),
+    ]);
+
+    $stale = Movie::staleForTmdbRefresh(10)->get();
+
+    expect($stale->pluck('id')->toArray())->toContain($popularStale->id)
+        ->and($stale->count())->toBe(1);
+});
+
+test('staleForTmdbRefresh includes movie older than max age', function () {
+    $old = Movie::factory()->create([
+        'tmdb_id' => 1,
+        'tmdb_vote_count' => 500,
+        'tmdb_last_synced_at' => now()->subDays(150),
+    ]);
+
+    $stale = Movie::staleForTmdbRefresh(10)->get();
+
+    expect($stale->pluck('id')->toArray())->toContain($old->id);
+});
+
+test('staleForTmdbRefresh excludes movie with null tmdb_id', function () {
+    Movie::factory()->create(['tmdb_id' => null, 'tmdb_last_synced_at' => null]);
+
+    $stale = Movie::staleForTmdbRefresh(10)->get();
+
+    expect($stale)->toHaveCount(0);
+});

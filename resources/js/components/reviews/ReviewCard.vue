@@ -2,7 +2,7 @@
 import type { Review } from '@/types/models';
 
 import { Link } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import { StarRating } from '@/components/primitives';
 import ReviewContent from '@/components/reviews/ReviewContent.vue';
@@ -32,26 +32,12 @@ const emit = defineEmits<{
 }>();
 
 const spoilerRevealed = ref(false);
-const contentExpanded = ref(false);
-
-onMounted(() => {
-    if (props.defaultExpanded) {
-        contentExpanded.value = true;
-    }
-});
 
 const isSpoilerBlurred = computed(
     () =>
         props.review.has_spoilers &&
         !props.hideSpoilerBlur &&
         !spoilerRevealed.value,
-);
-
-const hasMoreContent = computed(
-    () =>
-        !contentExpanded.value &&
-        props.review.content_excerpt.length > 0 &&
-        props.review.content_excerpt.endsWith('…'),
 );
 
 function revealSpoilers() {
@@ -103,7 +89,7 @@ function revealSpoilers() {
         </h3>
 
         <div
-            class="relative text-sm text-zinc-300"
+            class="relative text-zinc-300"
             :class="[
                 isSpoilerBlurred &&
                     'blur-md transition-all duration-300 select-none [user-select:none]',
@@ -112,7 +98,7 @@ function revealSpoilers() {
             <ReviewContent
                 :content-html="review.content_html"
                 :content-excerpt="review.content_excerpt"
-                :collapsed="!contentExpanded && !compact"
+                :collapsed="false"
                 size="sm"
             />
             <div
@@ -128,15 +114,6 @@ function revealSpoilers() {
                 </button>
             </div>
         </div>
-
-        <button
-            v-if="hasMoreContent && !isSpoilerBlurred"
-            type="button"
-            class="mt-2 text-sm font-medium text-red-500 hover:underline focus:ring-2 focus:ring-red-500 focus:outline-none"
-            @click="contentExpanded = true"
-        >
-            Read more
-        </button>
 
         <footer
             class="mt-4 flex flex-wrap items-center gap-3 border-t border-zinc-800 pt-3"

@@ -14,6 +14,10 @@
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
+    /* Serif reading font for long-form content (reviews, articles) */
+    --font-reading:
+        Georgia, Cambria, 'Times New Roman', Times, 'Liberation Serif', serif;
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
@@ -173,6 +177,16 @@
 }
 
 @layer components {
+    /* Review body text: serif reading font, relaxed line-length, paragraph spacing */
+    .review-content {
+        font-family: var(--font-reading);
+        line-height: 1.75;
+        max-width: 65ch;
+    }
+    .review-content p + p {
+        margin-top: 1.25em;
+    }
+
     /* Definition list grid - sr-only dt elements don't affect grid layout */
     dl.grid > dt.sr-only {
         display: contents;

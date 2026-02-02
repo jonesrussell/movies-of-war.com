@@ -26,14 +26,21 @@ Route::get('/', function () {
     $pickOfWeekReview = null;
     if ($pickOfWeekMovie) {
         $curatorUserId = config('app.curator_user_id');
+        $curatorReview = null;
         if ($curatorUserId > 0) {
             $curatorReview = $pickOfWeekMovie->reviews()
                 ->where('user_id', $curatorUserId)
                 ->published()
                 ->first();
-            if ($curatorReview !== null) {
-                $pickOfWeekReview = (new ReviewResource($curatorReview))->resolve(request());
-            }
+        }
+        if ($curatorReview === null) {
+            $curatorReview = $pickOfWeekMovie->reviews()
+                ->published()
+                ->orderByDesc('created_at')
+                ->first();
+        }
+        if ($curatorReview !== null) {
+            $pickOfWeekReview = (new ReviewResource($curatorReview))->resolve(request());
         }
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Movie;
+use App\Models\Review;
 use App\Models\User;
 
 test('guests cannot access admin routes', function () {
@@ -39,6 +41,55 @@ test('admin users can access admin featured slots page', function () {
     $response = $this->actingAs($user)->get('/dashboard/featured-slots');
 
     $response->assertOk();
+});
+
+test('admin users can access admin reviews page', function () {
+    $user = User::factory()->create(['is_admin' => true]);
+
+    $response = $this->actingAs($user)->get('/dashboard/reviews');
+
+    $response->assertOk();
+});
+
+test('regular users cannot access admin reviews page', function () {
+    $user = User::factory()->create(['is_admin' => false]);
+
+    $response = $this->actingAs($user)->get('/dashboard/reviews');
+
+    $response->assertForbidden();
+});
+
+test('admin can delete any review', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $movie = Movie::factory()->create();
+    $review = Review::factory()->create(['movie_id' => $movie->id]);
+
+    $response = $this->actingAs($admin)->delete("/dashboard/reviews/{$review->id}");
+
+    $response->assertRedirect();
+    expect(Review::find($review->id))->toBeNull();
+});
+
+test('admin can toggle review published status', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $movie = Movie::factory()->create();
+    $review = Review::factory()->create(['movie_id' => $movie->id, 'is_published' => true]);
+
+    $response = $this->actingAs($admin)->post("/dashboard/reviews/{$review->id}/toggle-published");
+
+    $response->assertRedirect();
+    expect($review->fresh()->is_published)->toBeFalse();
+});
+
+test('regular user cannot delete review via admin route', function () {
+    $user = User::factory()->create(['is_admin' => false]);
+    $movie = Movie::factory()->create();
+    $review = Review::factory()->create(['movie_id' => $movie->id]);
+
+    $response = $this->actingAs($user)->delete("/dashboard/reviews/{$review->id}");
+
+    $response->assertForbidden();
+    expect(Review::find($review->id))->not->toBeNull();
 });
 
 test('regular users cannot create movies', function () {

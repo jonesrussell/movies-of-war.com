@@ -3,6 +3,7 @@ import type { Movie } from '@/types/models';
 
 import { Link } from '@inertiajs/vue3';
 import { Archive, CheckCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 import { Poster } from '@/components/primitives';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,9 @@ const emit = defineEmits<{
     (e: 'archive', movie: Movie): void;
 }>();
 
-const detailsUrl = `/dashboard/movies/${props.movie.id}?from=imports`;
+const detailsUrl = computed(
+    () => `/dashboard/movies/${props.movie.id}?from=imports`,
+);
 
 function handlePublish(e: MouseEvent) {
     e.preventDefault();

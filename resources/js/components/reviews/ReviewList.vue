@@ -13,10 +13,7 @@ interface Props {
         meta: PaginationMeta;
         links: { url: string | null; label: string; active: boolean }[];
     };
-    queryParams?: {
-        show_spoilers?: boolean;
-        sort?: string;
-    };
+    queryParams?: { show_spoilers?: boolean; sort?: string } | undefined;
     movieSlug?: string;
 }
 

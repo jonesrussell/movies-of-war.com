@@ -149,9 +149,10 @@ describe('Movies/Index', () => {
     }
 
     describe('page header', () => {
-        it('renders page title', () => {
+        it('renders page title and kicker', () => {
             const wrapper = mountMoviesIndex();
-            expect(wrapper.text()).toContain('Browse War Films');
+            expect(wrapper.text()).toContain('Browse');
+            expect(wrapper.text()).toContain('War Films');
         });
 
         it('displays total movie count', () => {

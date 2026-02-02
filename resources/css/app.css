@@ -313,6 +313,37 @@
         }
     }
 
+    /* Staggered movie card enter animation (opacity/transform only for focus order) */
+    @keyframes movie-card-fade {
+        from {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .movie-card-enter {
+        animation: movie-card-fade 0.4s var(--ease-cinematic) both;
+        animation-delay: var(--delay);
+    }
+
+    /* Empty state fade-in (disabled in reduced-motion) */
+    @keyframes empty-state-fade {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .empty-state-enter {
+        animation: empty-state-fade 0.4s var(--ease-cinematic) both;
+    }
+
     /* :has() selector for form validation */
     .form-group:has([aria-invalid="true"]) input,
     .form-group:has([aria-invalid="true"]) select,
@@ -364,6 +395,14 @@
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+
+    .movie-card-enter {
+        animation: none !important;
+    }
+
+    .empty-state-enter {
+        animation: none !important;
     }
 }
 

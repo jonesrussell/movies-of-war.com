@@ -139,9 +139,29 @@ function resetMovies() {
     currentPage.value = props.movies.meta.current_page;
 }
 
+// Apply enter animation only when list was replaced (filter or initial load), not when appended
+const shouldAnimateCards = ref(true);
+
 const currentSortOption = computed(() => {
     const found = sortOptions.find((opt) => opt.value === selectedSort.value);
     return found ?? sortOptions[0]!;
+});
+
+const recentDecadeStart = computed(() => {
+    const years = props.filters.years;
+    if (!years?.length) {
+        return null;
+    }
+    const maxYear = Math.max(...years);
+    return Math.floor(maxYear / 10) * 10;
+});
+
+const recentDecadeLabel = computed(() => {
+    const start = recentDecadeStart.value;
+    if (start == null) {
+        return '';
+    }
+    return `${start}s`;
 });
 
 const debouncedFilter = useDebounceFn(() => {
@@ -167,6 +187,7 @@ const debouncedFilter = useDebounceFn(() => {
             onFinish: () => {
                 isFiltering.value = false;
                 resetMovies();
+                shouldAnimateCards.value = true;
             },
         },
     );
@@ -307,6 +328,7 @@ async function loadMoreMovies() {
                 ).data;
                 allMovies.value = [...allMovies.value, ...newMovies];
                 currentPage.value = nextPage;
+                shouldAnimateCards.value = false;
             },
             onFinish: () => {
                 isLoadingMore.value = false;
@@ -330,22 +352,109 @@ const displayedMovies = computed(() => {
     }
     return props.movies.data;
 });
+
+const firstPageLength = computed(() => props.movies.data.length);
+
+function cardEnterClass(index: number) {
+    return shouldAnimateCards.value && index < firstPageLength.value
+        ? 'movie-card-enter'
+        : '';
+}
+
+function cardEnterStyle(index: number) {
+    return shouldAnimateCards.value && index < firstPageLength.value
+        ? { '--delay': `${index * 40}ms` }
+        : undefined;
+}
 </script>
 
 <template>
     <PublicLayout>
         <Head title="Browse Movies - Movies of War" />
 
-        <PublicSection spacing="md">
-            <PublicContainer class="flex flex-col gap-8">
+        <PublicSection
+            spacing="md"
+            class="relative overflow-hidden pt-10 md:pt-14 lg:pt-20"
+        >
+            <div
+                class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:20px_20px] opacity-[0.04]"
+                aria-hidden="true"
+            />
+            <PublicContainer class="relative flex flex-col gap-8">
                 <SectionHeader
-                    title="Browse War Films"
+                    kicker="Browse"
+                    title="War Films"
                     description="Filter by conflict, country, year, and tags—then save films you want to watch."
                 />
 
+                <!-- Quick filter pills -->
+                <div
+                    v-if="
+                        filters.conflicts.length > 0 || filters.years.length > 0
+                    "
+                    aria-label="Quick filters"
+                    class="scrollbar-none flex snap-x snap-mandatory items-center gap-2 overflow-x-auto pb-1 whitespace-nowrap"
+                >
+                    <span
+                        class="shrink-0 snap-start text-xs font-medium tracking-wider text-zinc-500 uppercase"
+                    >
+                        Quick filters
+                    </span>
+                    <button
+                        v-for="conflict in filters.conflicts.slice(0, 5)"
+                        :key="conflict"
+                        type="button"
+                        :aria-pressed="selectedConflict === conflict"
+                        :class="[
+                            'shrink-0 snap-start rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600',
+                            selectedConflict === conflict
+                                ? 'bg-red-600 text-white'
+                                : 'bg-zinc-800/80 text-zinc-300 ring-1 ring-zinc-700/70 hover:bg-zinc-800 hover:text-white',
+                        ]"
+                        @click="
+                            selectedConflict =
+                                selectedConflict === conflict ? '' : conflict
+                        "
+                    >
+                        {{ conflict }}
+                    </button>
+                    <template
+                        v-if="
+                            filters.years.length >= 2 &&
+                            recentDecadeStart != null
+                        "
+                    >
+                        <span
+                            class="mx-1 h-1 w-1 shrink-0 rounded-full bg-zinc-600"
+                            aria-hidden="true"
+                        />
+                        <button
+                            type="button"
+                            :aria-pressed="
+                                selectedYear === String(recentDecadeStart)
+                            "
+                            :class="[
+                                'shrink-0 snap-start rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600',
+                                selectedYear === String(recentDecadeStart)
+                                    ? 'bg-red-600 text-white'
+                                    : 'bg-zinc-800/80 text-zinc-300 ring-1 ring-zinc-700/70 hover:bg-zinc-800 hover:text-white',
+                            ]"
+                            @click="
+                                selectedYear =
+                                    selectedYear === String(recentDecadeStart)
+                                        ? ''
+                                        : String(recentDecadeStart)
+                            "
+                        >
+                            {{ recentDecadeLabel }}
+                        </button>
+                    </template>
+                </div>
+
                 <div class="flex flex-col gap-4">
-                    <div
-                        class="flex flex-col gap-3 lg:flex-row lg:items-center"
+                    <nav
+                        aria-label="Movie browsing controls"
+                        class="flex flex-col gap-3 rounded-2xl bg-zinc-950/60 p-4 ring-1 ring-zinc-800/70 backdrop-blur-sm lg:flex-row lg:items-center lg:gap-4"
                     >
                         <div class="relative w-full lg:flex-1">
                             <Search
@@ -359,11 +468,15 @@ const displayedMovies = computed(() => {
                             />
                         </div>
 
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <!-- Sort dropdown -->
                             <DropdownMenu>
                                 <DropdownMenuTrigger as-child>
-                                    <Button variant="outline" class="gap-2">
+                                    <Button
+                                        variant="outline"
+                                        class="gap-2"
+                                        aria-label="Sort movies"
+                                    >
                                         <component
                                             :is="currentSortOption.icon"
                                             class="size-4"
@@ -396,6 +509,8 @@ const displayedMovies = computed(() => {
 
                             <!-- View mode toggle -->
                             <div
+                                role="group"
+                                aria-label="View mode"
                                 class="hidden items-center rounded-lg border border-zinc-800 p-1 sm:flex"
                             >
                                 <Button
@@ -512,7 +627,7 @@ const displayedMovies = computed(() => {
                                 Clear
                             </Button>
                         </div>
-                    </div>
+                    </nav>
 
                     <MoviesFiltersPanel
                         v-if="showFilters"
@@ -539,12 +654,17 @@ const displayedMovies = computed(() => {
                         />
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <p class="text-sm text-zinc-300">
+                    <div
+                        class="flex items-center justify-between border-t border-zinc-800/60 pt-4"
+                    >
+                        <p
+                            class="text-xs font-medium tracking-wide text-zinc-400 uppercase"
+                        >
+                            <span class="sr-only">Results count:</span>
                             {{ movies.meta?.total ?? 0 }} films
                         </p>
                         <label
-                            class="flex cursor-pointer items-center gap-2 text-sm text-zinc-400"
+                            class="flex cursor-pointer items-center gap-2 text-xs font-medium tracking-wide text-zinc-400 uppercase"
                         >
                             <input
                                 v-model="useInfiniteScrollMode"
@@ -562,9 +682,13 @@ const displayedMovies = computed(() => {
                     <!-- Grid view -->
                     <MovieGrid v-else-if="isGridView">
                         <MovieCard
-                            v-for="movie in displayedMovies"
+                            v-for="(movie, index) in displayedMovies"
                             :key="movie.id"
                             :movie="movie"
+                            :class="cardEnterClass(index)"
+                            :style="
+                                cardEnterStyle(index) as Record<string, string>
+                            "
                         >
                             <template #overlay>
                                 <MovieCardActions
@@ -581,10 +705,14 @@ const displayedMovies = computed(() => {
                     <!-- List view -->
                     <div v-else class="flex flex-col gap-3">
                         <MovieListItem
-                            v-for="movie in displayedMovies"
+                            v-for="(movie, index) in displayedMovies"
                             :key="movie.id"
                             :movie="movie"
                             :is-watchlisted="isMovieWatchlisted(movie.id)"
+                            :class="cardEnterClass(index)"
+                            :style="
+                                cardEnterStyle(index) as Record<string, string>
+                            "
                             @preview="openPreview(movie)"
                         />
                     </div>
@@ -631,7 +759,7 @@ const displayedMovies = computed(() => {
                     </div>
                 </div>
 
-                <div v-else class="py-16 text-center">
+                <div v-else class="empty-state-enter py-16 text-center">
                     <img
                         src="/images/illustrations/no-movies-found.png"
                         alt="No movies found"

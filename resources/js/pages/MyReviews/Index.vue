@@ -30,12 +30,16 @@ const reviewsList = computed(() => props.reviews?.data ?? []);
 
         <div class="w-full px-4 py-8 sm:px-6 lg:px-8">
             <div class="mb-8">
-                <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                <h1
+                    class="text-2xl font-bold tracking-tight text-white sm:text-3xl"
+                >
                     My Reviews
                 </h1>
                 <p class="mt-1 text-zinc-300">
                     {{ reviews?.meta?.total ?? 0 }}
-                    {{ (reviews?.meta?.total ?? 0) === 1 ? 'review' : 'reviews' }}
+                    {{
+                        (reviews?.meta?.total ?? 0) === 1 ? 'review' : 'reviews'
+                    }}
                 </p>
             </div>
 
@@ -132,9 +136,7 @@ const reviewsList = computed(() => props.reviews?.data ?? []);
                             <Star class="size-6 text-zinc-500" />
                         </div>
                         <div class="min-w-0 flex-1">
-                            <p
-                                class="truncate font-medium text-white"
-                            >
+                            <p class="truncate font-medium text-white">
                                 {{ review.movie?.title }}
                             </p>
                             <p class="text-sm text-zinc-400">
@@ -149,10 +151,7 @@ const reviewsList = computed(() => props.reviews?.data ?? []);
                     </Link>
                 </div>
 
-                <Pagination
-                    v-if="reviews?.meta"
-                    :meta="reviews.meta"
-                />
+                <Pagination v-if="reviews?.meta" :meta="reviews.meta" />
             </div>
 
             <div
@@ -168,7 +167,9 @@ const reviewsList = computed(() => props.reviews?.data ?? []);
                     >
                         <Star class="size-8 text-amber-400" />
                     </div>
-                    <h2 class="text-2xl font-semibold tracking-tight text-balance text-white">
+                    <h2
+                        class="text-2xl font-semibold tracking-tight text-balance text-white"
+                    >
                         No reviews yet
                     </h2>
                     <p class="mx-auto mt-3 max-w-lg text-zinc-400">

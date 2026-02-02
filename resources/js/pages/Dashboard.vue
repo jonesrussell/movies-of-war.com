@@ -179,7 +179,11 @@ const firstName = computed(() => {
                         :icon="Star"
                         href="/my-reviews"
                         :trend="null"
-                        :variant="(userStats?.reviews_count ?? 0) > 0 ? 'success' : 'default'"
+                        :variant="
+                            (userStats?.reviews_count ?? 0) > 0
+                                ? 'success'
+                                : 'default'
+                        "
                     />
                     <DashboardStatCard
                         title="My Watchlist"
@@ -217,9 +221,7 @@ const firstName = computed(() => {
                             class="rounded-xl bg-zinc-900 p-5 ring-1 ring-zinc-800/70"
                         >
                             <div class="flex items-center justify-between">
-                                <h3
-                                    class="text-base font-semibold text-white"
-                                >
+                                <h3 class="text-base font-semibold text-white">
                                     My Recent Reviews
                                 </h3>
                                 <Link
@@ -405,8 +407,8 @@ const firstName = computed(() => {
                                     <p class="text-sm text-zinc-400">
                                         {{ userStats?.watchlist_count ?? 0 }}
                                         {{
-                                            (userStats?.watchlist_count ?? 0) ===
-                                            1
+                                            (userStats?.watchlist_count ??
+                                                0) === 1
                                                 ? 'movie'
                                                 : 'movies'
                                         }}

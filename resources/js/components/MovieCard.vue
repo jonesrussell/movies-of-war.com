@@ -4,7 +4,7 @@ import type { Movie } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-import { Poster } from '@/components/primitives';
+import { Poster, StarRating } from '@/components/primitives';
 import { formatReleaseDate } from '@/utils/format';
 
 interface Props {
@@ -93,6 +93,24 @@ const displayedTags = computed(() => {
                     >
                         {{ tag.name }}
                     </span>
+                </div>
+
+                <div
+                    v-if="movie.user_review"
+                    class="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-zinc-300"
+                >
+                    <span class="text-zinc-500">Your rating:</span>
+                    <StarRating
+                        :rating="movie.user_review.rating"
+                        :max-stars="4"
+                        size="sm"
+                    />
+                    <Link
+                        :href="`/movies/${movie.slug}#reviews`"
+                        class="font-medium text-red-500 transition-colors hover:text-red-400"
+                    >
+                        Your review
+                    </Link>
                 </div>
             </div>
         </div>

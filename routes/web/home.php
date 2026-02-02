@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Resources\MovieResource;
 use App\Http\Resources\ReviewResource;
 use App\Models\FeaturedSlot;
 use App\Models\Movie;
+use App\Support\UserReviewEnrichment;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -51,12 +53,62 @@ Route::get('/', function () {
         ->limit(12)
         ->get();
 
+    $allMovies = collect()
+        ->push($heroSlot?->movie)
+        ->push($pickOfWeekMovie)
+        ->merge($latestMovies)
+        ->merge($upcomingMovies)
+        ->filter()
+        ->unique('id')
+        ->values();
+    $userReviewMap = UserReviewEnrichment::userReviewMapForMovies($allMovies);
+
+    $pickOfWeekUserReview = $pickOfWeekMovie && isset($userReviewMap[$pickOfWeekMovie->id])
+        ? $userReviewMap[$pickOfWeekMovie->id]
+        : null;
+
+    $heroMovie = $heroSlot?->movie;
+    $heroMoviePayload = null;
+    if ($heroMovie) {
+        $heroMoviePayload = (new MovieResource($heroMovie))->resolve(request());
+        if (isset($userReviewMap[$heroMovie->id])) {
+            $heroMoviePayload['user_review'] = $userReviewMap[$heroMovie->id];
+        }
+    }
+
+    $latestPayload = $latestMovies->map(function (Movie $movie) use ($userReviewMap) {
+        $arr = (new MovieResource($movie))->resolve(request());
+        if (isset($userReviewMap[$movie->id])) {
+            $arr['user_review'] = $userReviewMap[$movie->id];
+        }
+
+        return $arr;
+    })->values()->all();
+
+    $upcomingPayload = $upcomingMovies->map(function (Movie $movie) use ($userReviewMap) {
+        $arr = (new MovieResource($movie))->resolve(request());
+        if (isset($userReviewMap[$movie->id])) {
+            $arr['user_review'] = $userReviewMap[$movie->id];
+        }
+
+        return $arr;
+    })->values()->all();
+
+    $pickOfWeekMoviePayload = $pickOfWeekMovie
+        ? (new MovieResource($pickOfWeekMovie))->resolve(request()) + (
+            isset($userReviewMap[$pickOfWeekMovie->id])
+                ? ['user_review' => $userReviewMap[$pickOfWeekMovie->id]]
+                : []
+        )
+        : null;
+
     return Inertia::render('Welcome', [
         'canRegister' => Features::enabled(Features::registration()),
-        'heroMovie' => $heroSlot?->movie,
-        'pickOfWeekMovie' => $pickOfWeekMovie,
+        'heroMovie' => $heroMoviePayload,
+        'pickOfWeekMovie' => $pickOfWeekMoviePayload,
         'pickOfWeekReview' => $pickOfWeekReview,
-        'latestMovies' => $latestMovies,
-        'upcomingMovies' => $upcomingMovies,
+        'pickOfWeekUserReview' => $pickOfWeekUserReview,
+        'latestMovies' => $latestPayload,
+        'upcomingMovies' => $upcomingPayload,
     ]);
 })->name('home');

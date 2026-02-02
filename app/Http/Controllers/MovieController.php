@@ -9,6 +9,7 @@ use App\Http\Resources\ReviewResource;
 use App\Http\Resources\TagResource;
 use App\Models\Movie;
 use App\Services\MovieFilterService;
+use App\Support\UserReviewEnrichment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -69,12 +70,20 @@ class MovieController extends Controller
             $watchlistedIds = auth()->user()->watchlist()->pluck('movie_id')->toArray();
         }
 
+        $userReviewMap = UserReviewEnrichment::userReviewMapForMovies($movies->getCollection());
+        $moviesPayload = MovieResource::collection($movies)->additional([
+            'watchlisted_ids' => $watchlistedIds,
+        ])->resolve(request());
+        foreach ($moviesPayload['data'] ?? [] as $i => $item) {
+            if (isset($item['id'], $userReviewMap[$item['id']])) {
+                $moviesPayload['data'][$i]['user_review'] = $userReviewMap[$item['id']];
+            }
+        }
+
         $filterOptions = $this->filterService->getFilterOptions();
 
         return Inertia::render('Movies/Index', [
-            'movies' => MovieResource::collection($movies)->additional([
-                'watchlisted_ids' => $watchlistedIds,
-            ]),
+            'movies' => $moviesPayload,
             'filters' => [
                 'countries' => $filterOptions['countries'],
                 'conflicts' => $filterOptions['conflicts'],

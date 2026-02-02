@@ -4,7 +4,7 @@ import type { Movie } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { Info, Play } from 'lucide-vue-next';
 
-import { Poster } from '@/components/primitives';
+import { Poster, StarRating } from '@/components/primitives';
 
 interface Props {
     movie: Movie;
@@ -61,6 +61,24 @@ const posterImage =
                     >
                         {{ tag.name }}
                     </span>
+                </div>
+
+                <div
+                    v-if="movie.user_review"
+                    class="mb-4 flex flex-wrap items-center gap-2 text-sm text-zinc-300"
+                >
+                    <span class="text-zinc-500">Your rating:</span>
+                    <StarRating
+                        :rating="movie.user_review.rating"
+                        :max-stars="4"
+                        size="sm"
+                    />
+                    <Link
+                        :href="`/movies/${movie.slug}#reviews`"
+                        class="font-medium text-red-500 transition-colors hover:text-red-400"
+                    >
+                        Your review
+                    </Link>
                 </div>
 
                 <div class="flex flex-wrap gap-2">

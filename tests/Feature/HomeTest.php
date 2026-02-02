@@ -66,3 +66,48 @@ test('home page does not include pick of week review when curator has not review
         ->where('pickOfWeekReview', null)
     );
 });
+
+test('home page includes pick of week user review when authenticated user has reviewed', function () {
+    $user = User::factory()->create();
+    $movie = Movie::factory()->published()->released()->create(['slug' => 'my-pick']);
+    FeaturedSlot::factory()->for($movie)->create(['slot' => 'pick_of_week']);
+    Review::factory()->for($user)->for($movie)->create([
+        'rating' => 2.0,
+        'content' => 'My take on this film.',
+        'is_published' => true,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('home'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Welcome')
+        ->has('pickOfWeekUserReview')
+        ->where('pickOfWeekUserReview.rating', 2.0)
+        ->where('pickOfWeekUserReview.movie.slug', 'my-pick')
+    );
+});
+
+test('guest users never receive user_review on home page', function () {
+    $movie = Movie::factory()->published()->released()->create(['slug' => 'latest-one']);
+    FeaturedSlot::factory()->for($movie)->create(['slot' => 'pick_of_week']);
+
+    $response = $this->get(route('home'));
+
+    $response->assertOk();
+    $page = $response->original->getData()['page'];
+    $props = $page['props'] ?? [];
+
+    foreach ($props['latestMovies'] ?? [] as $m) {
+        expect($m)->not->toHaveKey('user_review');
+    }
+    foreach ($props['upcomingMovies'] ?? [] as $m) {
+        expect($m)->not->toHaveKey('user_review');
+    }
+    if (isset($props['heroMovie']) && $props['heroMovie'] !== null) {
+        expect($props['heroMovie'])->not->toHaveKey('user_review');
+    }
+    if (isset($props['pickOfWeekMovie']) && $props['pickOfWeekMovie'] !== null) {
+        expect($props['pickOfWeekMovie'])->not->toHaveKey('user_review');
+    }
+});

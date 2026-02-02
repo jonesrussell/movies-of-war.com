@@ -18,6 +18,12 @@ export interface CrewMember {
     slug?: string;
 }
 
+export interface UserReviewSummary {
+    id: number;
+    rating: number;
+    movie: { slug: string };
+}
+
 export interface Movie {
     id: number;
     tmdb_id: number | null;
@@ -49,6 +55,7 @@ export interface Movie {
     updated_at: string;
     tags?: Tag[];
     is_watchlisted?: boolean;
+    user_review?: UserReviewSummary | null;
 }
 
 export interface FilmographyEntry {

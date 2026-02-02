@@ -429,6 +429,27 @@ const keyCrew = computed(() => {
                                 :movie="movie"
                             />
 
+                            <!-- Your rating and review (when user has reviewed) -->
+                            <div
+                                v-if="reviewsData.user_review"
+                                class="mb-6 flex flex-wrap items-center gap-3 text-sm text-zinc-300"
+                            >
+                                <span class="font-medium text-zinc-400"
+                                    >Your rating:</span
+                                >
+                                <StarRating
+                                    :rating="reviewsData.user_review.rating"
+                                    :max-stars="4"
+                                    size="md"
+                                />
+                                <Link
+                                    href="#reviews"
+                                    class="font-medium text-red-500 transition-colors hover:text-red-400"
+                                >
+                                    Your review
+                                </Link>
+                            </div>
+
                             <!-- Tags with entrance animation and hover effects -->
                             <div
                                 v-if="movie.tags && movie.tags.length > 0"
@@ -643,7 +664,7 @@ const keyCrew = computed(() => {
         </PublicSection>
 
         <!-- Reviews section -->
-        <PublicSection spacing="md">
+        <PublicSection id="reviews" spacing="md">
             <PublicContainer class="flex flex-col gap-6">
                 <SectionHeader title="Reviews" :level="2" />
 

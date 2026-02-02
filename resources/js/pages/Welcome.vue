@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Movie, Review } from '@/types';
+import type { Movie, Review, UserReviewSummary } from '@/types';
 
 import { Head, Link } from '@inertiajs/vue3';
 
@@ -17,6 +17,7 @@ interface Props {
     heroMovie?: Movie;
     pickOfWeekMovie?: Movie;
     pickOfWeekReview?: Pick<Review, 'rating' | 'content_excerpt'> | null;
+    pickOfWeekUserReview?: UserReviewSummary | null;
     latestMovies: Movie[];
     upcomingMovies: Movie[];
 }
@@ -34,6 +35,7 @@ defineProps<Props>();
             :movie="pickOfWeekMovie"
             subtitle="Pick of the Week"
             :review="pickOfWeekReview ?? null"
+            :user-review="pickOfWeekUserReview ?? null"
         />
 
         <!-- Featured Upcoming Release (card style) -->

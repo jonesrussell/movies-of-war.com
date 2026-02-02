@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Movie, Review } from '@/types';
+import type { Movie, Review, UserReviewSummary } from '@/types';
 
 import { Link } from '@inertiajs/vue3';
 import { ArrowRight, Info, Play } from 'lucide-vue-next';
@@ -25,6 +25,8 @@ interface Props {
     subtitle?: string;
     /** Curator's review for Pick of the Week: shows rating, excerpt, and link to full review */
     review?: Pick<Review, 'rating' | 'content_excerpt'> | null;
+    /** Current user's review for this movie: shows rating and link to "Your review" */
+    userReview?: UserReviewSummary | null;
 }
 
 const props = defineProps<Props>();
@@ -206,6 +208,23 @@ onMounted(() => {
                             :max-stars="4"
                             size="md"
                         />
+                        <span
+                            v-if="userReview"
+                            class="flex items-center gap-2 text-sm text-zinc-300"
+                        >
+                            <span class="text-zinc-500">Your rating:</span>
+                            <StarRating
+                                :rating="userReview.rating"
+                                :max-stars="4"
+                                size="md"
+                            />
+                            <Link
+                                :href="`/movies/${movie.slug}#reviews`"
+                                class="font-medium text-red-500 transition-colors hover:text-red-400"
+                            >
+                                Your review
+                            </Link>
+                        </span>
                     </div>
 
                     <p

@@ -26,7 +26,7 @@ class FeaturedSlotController extends Controller
 
     public function create(): Response
     {
-        $movies = Movie::orderBy('title')->get(['id', 'title']);
+        $movies = Movie::orderBy('title')->get(['id', 'title', 'release_year']);
 
         return Inertia::render('Admin/FeaturedSlots/Create', [
             'movies' => $movies,
@@ -49,7 +49,7 @@ class FeaturedSlotController extends Controller
     public function edit(FeaturedSlot $featuredSlot): Response
     {
         $featuredSlot->load('movie');
-        $movies = Movie::orderBy('title')->get(['id', 'title']);
+        $movies = Movie::orderBy('title')->get(['id', 'title', 'release_year']);
 
         return Inertia::render('Admin/FeaturedSlots/Edit', [
             'slot' => $featuredSlot,

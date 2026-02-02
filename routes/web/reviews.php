@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\MarkdownPreviewController;
 use App\Http\Controllers\ReviewCommentController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/markdown/preview', MarkdownPreviewController::class)->name('markdown.preview');
 
 Route::post('/movies/{movie:slug}/reviews', [ReviewController::class, 'store'])
     ->middleware('throttle:5,60')

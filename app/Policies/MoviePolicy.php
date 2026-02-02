@@ -102,4 +102,13 @@ final class MoviePolicy
     {
         return ($user->is_admin ?? false) === true && $movie->isPublished();
     }
+
+    /**
+     * Determine if the user can create a review for this movie.
+     * Authenticated users can create one review per movie.
+     */
+    public function createReview(User $user, Movie $movie): bool
+    {
+        return ! $user->reviews()->where('movie_id', $movie->id)->exists();
+    }
 }

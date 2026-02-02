@@ -40,6 +40,8 @@ use Illuminate\Support\Str;
  * @property array|null $crew
  * @property \Illuminate\Support\Carbon|null $tmdb_last_synced_at
  * @property bool $is_upcoming
+ * @property-read float|null $user_rating_average
+ * @property-read int $user_rating_count
  */
 class Movie extends Model
 {
@@ -142,6 +144,29 @@ class Movie extends Model
         return $this->belongsToMany(Person::class, 'movie_person')
             ->withTimestamps()
             ->withPivot('job', 'character', 'department', 'cast_order');
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Average rating from published user reviews (0–4 scale).
+     */
+    public function getUserRatingAverageAttribute(): ?float
+    {
+        $avg = $this->reviews()->published()->avg('rating');
+
+        return $avg !== null ? (float) $avg : null;
+    }
+
+    /**
+     * Count of published user reviews.
+     */
+    public function getUserRatingCountAttribute(): int
+    {
+        return $this->reviews()->published()->count();
     }
 
     // =========================================================================

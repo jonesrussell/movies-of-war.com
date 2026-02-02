@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             TagSeeder::class,
             MovieSeeder::class,
+            ReviewSeeder::class,
         ]);
 
         User::factory()->create([

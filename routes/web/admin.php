@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\FeaturedSlotController;
 use App\Http\Controllers\Admin\MovieController as AdminMovieController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\XAnalyticsController;
 use App\Http\Controllers\Admin\XAutoReplyController;
 use App\Http\Controllers\Admin\XContentDiscoveryController;
@@ -34,6 +35,11 @@ Route::middleware('admin')->group(function () {
     // Featured slots
     Route::get('/dashboard/featured-slots', [FeaturedSlotController::class, 'index'])->name('dashboard.featured-slots');
     Route::resource('featured-slots', FeaturedSlotController::class)->except(['index']);
+
+    // Reviews (moderation)
+    Route::get('/dashboard/reviews', [AdminReviewController::class, 'index'])->name('dashboard.reviews');
+    Route::delete('/dashboard/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+    Route::post('/dashboard/reviews/{review}/toggle-published', [AdminReviewController::class, 'togglePublished'])->name('admin.reviews.toggle-published');
 
     // X OAuth 2.0
     Route::get('/x-oauth2/redirect', [XOAuth2Controller::class, 'redirect'])->name('admin.x-oauth2.redirect');

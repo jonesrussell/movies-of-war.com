@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Resources\MovieResource;
+use App\Http\Resources\ReviewResource;
 use App\Http\Resources\TagResource;
 use App\Models\Movie;
 use App\Services\MovieFilterService;
@@ -111,9 +112,36 @@ class MovieController extends Controller
             ->limit(6)
             ->get();
 
+        $userReview = null;
+        if (auth()->check()) {
+            $userReview = $movie->reviews()
+                ->published()
+                ->where('user_id', auth()->id())
+                ->with('user')
+                ->first();
+        }
+
+        $recentReviews = $movie->reviews()
+            ->published()
+            ->withoutSpoilers()
+            ->with('user')
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+
+        $reviewsSummary = [
+            'user_rating_average' => $movie->user_rating_average,
+            'user_rating_count' => $movie->user_rating_count,
+        ];
+
         return Inertia::render('Movies/Show', [
             'movie' => (new MovieResource($movie))->resolve(request()),
             'relatedMovies' => array_values(MovieResource::collection($relatedMovies)->resolve(request())),
+            'reviews' => [
+                'summary' => $reviewsSummary,
+                'user_review' => $userReview ? (new ReviewResource($userReview))->resolve(request()) : null,
+                'recent' => ReviewResource::collection($recentReviews)->resolve(request()),
+            ],
         ]);
     }
 }

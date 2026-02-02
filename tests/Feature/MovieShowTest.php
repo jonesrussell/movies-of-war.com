@@ -38,7 +38,6 @@ test('movie show page does not break when tmdb rating director and writers are n
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
         ->component('Movies/Show')
-        ->has('movie')
         ->where('movie.slug', 'minimal-movie')
     );
 });

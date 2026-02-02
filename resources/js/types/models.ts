@@ -89,6 +89,63 @@ export interface Tag {
     updated_at: string;
 }
 
+export interface ReviewAuthor {
+    id: number;
+    name: string;
+}
+
+export interface ReviewMovie {
+    id: number;
+    slug: string;
+    title: string;
+}
+
+export interface Review {
+    id: number;
+    user_id: number;
+    movie_id: number;
+    movie?: ReviewMovie;
+    rating: number;
+    title: string | null;
+    content: string;
+    has_spoilers: boolean;
+    is_published: boolean;
+    helpful_count: number;
+    comments_count: number;
+    created_at: string;
+    updated_at: string;
+    stars: string;
+    is_edited: boolean;
+    formatted_date: string;
+    user?: ReviewAuthor;
+    can_edit: boolean;
+    can_delete: boolean;
+    comments?: ReviewComment[];
+}
+
+export interface ReviewComment {
+    id: number;
+    review_id: number;
+    user_id: number;
+    content: string;
+    created_at: string;
+    updated_at: string;
+    user?: ReviewAuthor;
+    can_edit: boolean;
+    can_delete: boolean;
+}
+
+export interface ReviewsSummary {
+    user_rating_average: number | null;
+    user_rating_count: number;
+}
+
+export interface MovieReviewsData {
+    summary: ReviewsSummary;
+    user_review: Review | null;
+    recent: Review[];
+}
+
 export interface FeaturedSlot {
     id: number;
     movie_id: number;

@@ -10,6 +10,7 @@ interface Props {
 defineProps<Props>();
 
 const emit = defineEmits<{
+    (e: 'preview', movie: Movie): void;
     (e: 'publish', movie: Movie): void;
     (e: 'archive', movie: Movie): void;
 }>();
@@ -24,6 +25,7 @@ const emit = defineEmits<{
             v-for="movie in movies"
             :key="movie.id"
             :movie="movie"
+            @preview="emit('preview', $event)"
             @publish="emit('publish', $event)"
             @archive="emit('archive', $event)"
         />

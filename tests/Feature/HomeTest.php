@@ -69,7 +69,7 @@ test('home page does not include pick of week review when curator has not review
 
 test('home page includes pick of week user review when authenticated user has reviewed', function () {
     $user = User::factory()->create();
-    $movie = Movie::factory()->published()->released()->create(['slug' => 'my-pick']);
+    $movie = Movie::factory()->published()->create(['slug' => 'my-pick', 'is_upcoming' => false]);
     FeaturedSlot::factory()->for($movie)->create(['slot' => 'pick_of_week']);
     Review::factory()->for($user)->for($movie)->create([
         'rating' => 2.0,
@@ -89,14 +89,13 @@ test('home page includes pick of week user review when authenticated user has re
 });
 
 test('guest users never receive user_review on home page', function () {
-    $movie = Movie::factory()->published()->released()->create(['slug' => 'latest-one']);
+    $movie = Movie::factory()->published()->create(['slug' => 'latest-one', 'is_upcoming' => false]);
     FeaturedSlot::factory()->for($movie)->create(['slot' => 'pick_of_week']);
 
     $response = $this->get(route('home'));
 
     $response->assertOk();
-    $page = $response->original->getData()['page'];
-    $props = $page['props'] ?? [];
+    $props = $response->original->getData()['page']['props'] ?? [];
 
     foreach ($props['latestMovies'] ?? [] as $m) {
         expect($m)->not->toHaveKey('user_review');

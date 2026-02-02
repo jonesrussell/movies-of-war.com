@@ -82,3 +82,22 @@ test('movie show page includes curator review and is_curator when curator is con
         ->where('reviews.curator_review.user.name', 'Russell Jones')
     );
 });
+
+test('movie show page includes user review in main content when user has reviewed', function () {
+    $user = User::factory()->create();
+    $movie = Movie::factory()->published()->create(['slug' => 'user-reviewed-movie']);
+    Review::factory()->for($user)->for($movie)->create([
+        'rating' => 2.0,
+        'content' => 'My review of this film.',
+        'is_published' => true,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('movies.show', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Show')
+        ->has('reviews.user_review')
+        ->where('reviews.user_review.rating', 2)
+    );
+});

@@ -7,7 +7,7 @@ import type {
     Tag,
 } from '@/types';
 
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { useDebounceFn, useStorage } from '@vueuse/core';
 import {
     ArrowDownAZ,
@@ -68,6 +68,16 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const page = usePage();
+const appUrl = computed(() => (page.props.appUrl as string) ?? '');
+const canonicalUrl = computed(() =>
+    appUrl.value && page.url ? `${appUrl.value}${page.url}` : '',
+);
+const defaultOgImage = computed(() =>
+    appUrl.value ? `${appUrl.value}/images/branding/hero-bg.png` : '',
+);
+const indexDescription =
+    'Browse and explore a curated collection of war films from throughout cinema history. Filter by conflict, country, year, and tags.';
 
 // View mode
 const { isGridView, isListView, setGridView, setListView } = useViewMode();
@@ -370,7 +380,20 @@ function cardEnterStyle(index: number) {
 
 <template>
     <PublicLayout>
-        <Head title="Browse Movies - Movies of War" />
+        <Head title="Browse Movies">
+            <meta head-key="description" name="description" :content="indexDescription" />
+            <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
+            <meta property="og:type" content="website" />
+            <meta property="og:title" content="Browse Movies" />
+            <meta property="og:description" :content="indexDescription" />
+            <meta property="og:image" :content="defaultOgImage" />
+            <meta property="og:url" :content="canonicalUrl" />
+            <meta property="og:site_name" content="Movies of War" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content="Browse Movies" />
+            <meta name="twitter:description" :content="indexDescription" />
+            <meta name="twitter:image" :content="defaultOgImage" />
+        </Head>
 
         <PublicSection
             spacing="md"

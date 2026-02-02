@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Movie, Review, UserReviewSummary } from '@/types';
 
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 import FeaturedMovie from '@/components/FeaturedMovie.vue';
 import MovieCard from '@/components/MovieCard.vue';
@@ -10,6 +11,7 @@ import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import XFeedWidget from '@/components/public/XFeedWidget.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
@@ -23,11 +25,43 @@ interface Props {
 }
 
 defineProps<Props>();
+
+const page = usePage();
+const appUrl = computed(() => (page.props.appUrl as string) ?? '');
+const canonicalUrl = computed(() => (appUrl.value ? `${appUrl.value}/` : ''));
+const defaultOgImage = computed(() =>
+    appUrl.value ? `${appUrl.value}/images/branding/hero-bg.png` : '',
+);
+const defaultDescription =
+    'Discover and explore a curated collection of war films from throughout cinema history.';
+const jsonLdWebSite = computed(() =>
+    JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Movies of War',
+        url: canonicalUrl.value,
+        description: defaultDescription,
+    }),
+);
 </script>
 
 <template>
     <PublicLayout>
-        <Head title="Movies of War - Curated War Films Database" />
+        <Head title="Curated War Films Database">
+            <meta head-key="description" name="description" :content="defaultDescription" />
+            <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
+            <meta property="og:type" content="website" />
+            <meta property="og:title" content="Curated War Films Database" />
+            <meta property="og:description" :content="defaultDescription" />
+            <meta property="og:image" :content="defaultOgImage" />
+            <meta property="og:url" :content="canonicalUrl" />
+            <meta property="og:site_name" content="Movies of War" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content="Curated War Films Database" />
+            <meta name="twitter:description" :content="defaultDescription" />
+            <meta name="twitter:image" :content="defaultOgImage" />
+            <JsonLdScript head-key="jsonld-website" :content="jsonLdWebSite" />
+        </Head>
 
         <!-- Pick of the Week first (curator's featured review, hero style) -->
         <MovieHero

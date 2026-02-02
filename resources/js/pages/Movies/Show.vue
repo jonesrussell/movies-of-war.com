@@ -5,6 +5,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, ArrowRight, Check, Play, Plus } from 'lucide-vue-next';
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import MovieCard from '@/components/MovieCard.vue';
 import { Poster, StarRating } from '@/components/primitives';
 import MovieFacts from '@/components/public/MovieFacts.vue';
@@ -137,19 +138,22 @@ const toggleWatchlist = () => {
     }
 };
 
-const siteUrl = 'https://movies-of-war.com';
+const appUrl = computed(() => (page.props.appUrl as string) ?? '');
+const siteUrl = computed(() => appUrl.value || '');
 
 const posterImage = computed(
     () =>
         props.movie.poster_url || '/images/placeholders/poster-placeholder.png',
 );
 
-const pageUrl = computed(() => `${siteUrl}/movies/${props.movie.slug}`);
+const pageUrl = computed(() =>
+    siteUrl.value ? `${siteUrl.value}/movies/${props.movie.slug}` : '',
+);
 
 const ogImage = computed(() =>
     props.movie.poster_url?.startsWith('http')
         ? props.movie.poster_url
-        : `${siteUrl}${props.movie.poster_url || '/images/placeholders/poster-placeholder.png'}`,
+        : `${siteUrl.value}${props.movie.poster_url || '/images/placeholders/poster-placeholder.png'}`,
 );
 
 const ogDescription = computed(() => {
@@ -230,12 +234,69 @@ const keyCrew = computed(() => {
         })
         .slice(0, 10);
 });
+
+const jsonLdMovie = computed(() => {
+    const m = props.movie;
+    const movieUrl = pageUrl.value;
+    const imageUrl = ogImage.value;
+    const base: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+        '@type': 'Movie',
+        name: m.title,
+        image: imageUrl,
+        datePublished: m.release_year?.toString() ?? undefined,
+        description: ogDescription.value,
+        url: movieUrl,
+    };
+    const count = reviewsData.value.summary.user_rating_count ?? 0;
+    const avg = reviewsData.value.summary.user_rating_average;
+    if (count > 1 && avg != null) {
+        base.aggregateRating = {
+            '@type': 'AggregateRating',
+            ratingValue: avg,
+            reviewCount: count,
+            bestRating: 4,
+        };
+    }
+    const curator = reviewsData.value.curator_review;
+    if (curator) {
+        base.review = {
+            '@type': 'Review',
+            author: { '@type': 'Person', name: curator.user?.name ?? 'Curator' },
+            reviewRating: {
+                '@type': 'Rating',
+                ratingValue: curator.rating,
+                bestRating: 4,
+            },
+            reviewBody: curator.content_excerpt || undefined,
+        };
+    }
+    return JSON.stringify(base);
+});
+
+const jsonLdBreadcrumb = computed(() =>
+    JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${appUrl.value}/` },
+            { '@type': 'ListItem', position: 2, name: 'Movies', item: `${appUrl.value}/movies` },
+            {
+                '@type': 'ListItem',
+                position: 3,
+                name: props.movie.title,
+                item: pageUrl.value,
+            },
+        ],
+    }),
+);
 </script>
 
 <template>
     <PublicLayout>
-        <Head :title="`${movie.title} (${movie.release_year}) - Movies of War`">
-            <meta name="description" :content="ogDescription" />
+        <Head :title="`${movie.title} (${movie.release_year})`">
+            <meta head-key="description" name="description" :content="ogDescription" />
+            <link head-key="canonical" rel="canonical" :href="pageUrl" />
             <meta property="og:type" content="video.movie" />
             <meta
                 property="og:title"
@@ -252,6 +313,8 @@ const keyCrew = computed(() => {
             />
             <meta name="twitter:description" :content="ogDescription" />
             <meta name="twitter:image" :content="ogImage" />
+            <JsonLdScript head-key="jsonld-movie" :content="jsonLdMovie" />
+            <JsonLdScript head-key="jsonld-breadcrumb-movie" :content="jsonLdBreadcrumb" />
         </Head>
 
         <div class="relative overflow-hidden bg-zinc-950">

@@ -6,6 +6,7 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import { Poster } from '@/components/primitives';
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
@@ -37,6 +38,44 @@ const page = usePage<AppPageProps & Props>();
 const auth = page.props.auth;
 const showReviewForm = ref(false);
 
+const appUrl = computed(() => (page.props.appUrl as string) ?? '');
+const canonicalUrl = computed(() =>
+    appUrl.value && props.movie.slug
+        ? `${appUrl.value}/movies/${props.movie.slug}/reviews`
+        : '',
+);
+const reviewsDescription = computed(
+    () => `Curator and user reviews for ${props.movie.title}`,
+);
+const ogImage = computed(() => {
+    const url = props.movie.poster_url;
+    if (!url) return appUrl.value ? `${appUrl.value}/images/placeholders/poster-placeholder.png` : '';
+    return url.startsWith('http') ? url : `${appUrl.value}${url}`;
+});
+
+const jsonLdBreadcrumb = computed(() =>
+    JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${appUrl.value}/` },
+            { '@type': 'ListItem', position: 2, name: 'Movies', item: `${appUrl.value}/movies` },
+            {
+                '@type': 'ListItem',
+                position: 3,
+                name: props.movie.title,
+                item: appUrl.value ? `${appUrl.value}/movies/${props.movie.slug}` : '',
+            },
+            {
+                '@type': 'ListItem',
+                position: 4,
+                name: 'Reviews',
+                item: canonicalUrl.value,
+            },
+        ],
+    }),
+);
+
 const hasCuratorReview = computed(() => Boolean(props.curator_review));
 const hasUserReviews = computed(() => (props.reviews?.data?.length ?? 0) > 0);
 const hasNoReviews = computed(
@@ -59,7 +98,21 @@ const loginUrl = computed(
 
 <template>
     <PublicLayout>
-        <Head :title="`Reviews – ${movie.title}`" />
+        <Head :title="`Reviews for ${movie.title}`">
+            <meta head-key="description" name="description" :content="reviewsDescription" />
+            <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
+            <meta property="og:type" content="website" />
+            <meta property="og:title" :content="`Reviews for ${movie.title}`" />
+            <meta property="og:description" :content="reviewsDescription" />
+            <meta property="og:image" :content="ogImage" />
+            <meta property="og:url" :content="canonicalUrl" />
+            <meta property="og:site_name" content="Movies of War" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" :content="`Reviews for ${movie.title}`" />
+            <meta name="twitter:description" :content="reviewsDescription" />
+            <meta name="twitter:image" :content="ogImage" />
+            <JsonLdScript head-key="jsonld-breadcrumb-reviews" :content="jsonLdBreadcrumb" />
+        </Head>
 
         <PublicSection spacing="md">
             <PublicContainer class="flex flex-col gap-6">

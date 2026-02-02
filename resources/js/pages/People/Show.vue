@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { Person } from '@/types';
 
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, Calendar, MapPin } from 'lucide-vue-next';
+import { computed } from 'vue';
 
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import { Poster } from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
@@ -13,20 +15,75 @@ interface Props {
     person: Person;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+const page = usePage();
+const appUrl = computed(() => (page.props.appUrl as string) ?? '');
+const canonicalUrl = computed(() =>
+    appUrl.value && props.person.slug
+        ? `${appUrl.value}/people/${props.person.slug}`
+        : '',
+);
+const personDescription = computed(() =>
+    props.person.biography
+        ? props.person.biography.slice(0, 200) + '...'
+        : `Filmography and biographical information for ${props.person.name}`,
+);
+const ogImage = computed(() =>
+    props.person.profile_path
+        ? getProfileImageUrl(props.person.profile_path, 'w500')
+        : appUrl.value
+          ? `${appUrl.value}/images/placeholders/poster-placeholder.png`
+          : '',
+);
+
+const jsonLdPerson = computed(() =>
+    JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: props.person.name,
+        image: ogImage.value,
+        url: canonicalUrl.value,
+        description: personDescription.value,
+    }),
+);
+
+const jsonLdBreadcrumb = computed(() =>
+    appUrl.value && props.person.slug
+        ? JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                  { '@type': 'ListItem', position: 1, name: 'Home', item: `${appUrl.value}/` },
+                  { '@type': 'ListItem', position: 2, name: 'Movies', item: `${appUrl.value}/movies` },
+                  {
+                      '@type': 'ListItem',
+                      position: 3,
+                      name: props.person.name,
+                      item: canonicalUrl.value,
+                  },
+              ],
+          })
+        : '{}',
+);
 </script>
 
 <template>
     <PublicLayout>
-        <Head :title="`${person.name} - Movies of War`">
-            <meta
-                name="description"
-                :content="
-                    person.biography
-                        ? person.biography.slice(0, 200) + '...'
-                        : `Filmography and biographical information for ${person.name}`
-                "
-            />
+        <Head :title="person.name">
+            <meta head-key="description" name="description" :content="personDescription" />
+            <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
+            <meta property="og:type" content="profile" />
+            <meta property="og:title" :content="person.name" />
+            <meta property="og:description" :content="personDescription" />
+            <meta property="og:image" :content="ogImage" />
+            <meta property="og:url" :content="canonicalUrl" />
+            <meta property="og:site_name" content="Movies of War" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" :content="person.name" />
+            <meta name="twitter:description" :content="personDescription" />
+            <meta name="twitter:image" :content="ogImage" />
+            <JsonLdScript head-key="jsonld-person" :content="jsonLdPerson" />
+            <JsonLdScript head-key="jsonld-breadcrumb-person" :content="jsonLdBreadcrumb" />
         </Head>
 
         <div class="min-h-screen bg-zinc-950">

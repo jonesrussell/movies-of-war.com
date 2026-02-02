@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Review } from '@/types/models';
+import type { Review } from '@/types.models';
 
-import { Head, Link } from '@inertiajs/vue3';
-import { usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import { StarRating } from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
@@ -22,6 +22,81 @@ const props = defineProps<Props>();
 const page = usePage();
 const auth = page.props.auth;
 
+const appUrl = computed(() => (page.props.appUrl as string) ?? '');
+const canonicalUrl = computed(() =>
+    appUrl.value && page.url ? `${appUrl.value}${page.url}` : '',
+);
+const reviewDescription = computed(
+    () =>
+        props.review.content_excerpt ||
+        `Review of ${props.review.movie?.title ?? 'film'}`,
+);
+const ogImage = computed(() => {
+    const url = props.review.movie?.poster_url;
+    if (!url) return appUrl.value ? `${appUrl.value}/images/placeholders/poster-placeholder.png` : '';
+    return url.startsWith('http') ? url : `${appUrl.value}${url}`;
+});
+const ogTitle = computed(() =>
+    props.review.title
+        ? `Review: ${props.review.title}`
+        : `Review of ${props.review.movie?.title ?? 'film'}`,
+);
+
+const jsonLdReview = computed(() => {
+    const r = props.review;
+    const movie = r.movie;
+    const movieUrl =
+        appUrl.value && movie?.slug
+            ? `${appUrl.value}/movies/${movie.slug}`
+            : '';
+    return JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Review',
+        itemReviewed: movie
+            ? {
+                  '@type': 'Movie',
+                  name: movie.title,
+                  url: movieUrl,
+              }
+            : undefined,
+        author: {
+            '@type': 'Person',
+            name: r.user?.name ?? 'Curator',
+        },
+        reviewRating: {
+            '@type': 'Rating',
+            ratingValue: r.rating,
+            bestRating: 4,
+        },
+        reviewBody: r.content_excerpt || undefined,
+    });
+});
+
+const jsonLdBreadcrumb = computed(() => {
+    const movie = props.review.movie;
+    if (!appUrl.value || !movie?.slug) return '{}';
+    return JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${appUrl.value}/` },
+            { '@type': 'ListItem', position: 2, name: 'Movies', item: `${appUrl.value}/movies` },
+            {
+                '@type': 'ListItem',
+                position: 3,
+                name: movie.title,
+                item: `${appUrl.value}/movies/${movie.slug}`,
+            },
+            {
+                '@type': 'ListItem',
+                position: 4,
+                name: 'Review',
+                item: canonicalUrl.value,
+            },
+        ],
+    });
+});
+
 const spoilerRevealed = ref(false);
 
 const isSpoilerBlurred = computed(
@@ -35,7 +110,28 @@ function revealSpoilers() {
 
 <template>
     <PublicLayout>
-        <Head :title="`Review: ${review.title ?? 'Review'}`" />
+        <Head
+            :title="
+                review.title
+                    ? `Review: ${review.title}`
+                    : `Review of ${review.movie?.title ?? 'film'}`
+            "
+        >
+            <meta head-key="description" name="description" :content="reviewDescription" />
+            <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
+            <meta property="og:type" content="article" />
+            <meta property="og:title" :content="ogTitle" />
+            <meta property="og:description" :content="reviewDescription" />
+            <meta property="og:image" :content="ogImage" />
+            <meta property="og:url" :content="canonicalUrl" />
+            <meta property="og:site_name" content="Movies of War" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" :content="ogTitle" />
+            <meta name="twitter:description" :content="reviewDescription" />
+            <meta name="twitter:image" :content="ogImage" />
+            <JsonLdScript head-key="jsonld-review" :content="jsonLdReview" />
+            <JsonLdScript head-key="jsonld-breadcrumb-review" :content="jsonLdBreadcrumb" />
+        </Head>
 
         <PublicSection spacing="md">
             <PublicContainer class="flex flex-col gap-6">

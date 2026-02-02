@@ -181,3 +181,53 @@ test('validation requires rating and min content length', function () {
 
     $response->assertSessionHasErrors(['rating', 'content']);
 });
+
+test('review with markdown stores raw content and show returns content_html', function () {
+    $user = User::factory()->create();
+    $movie = Movie::factory()->published()->create(['slug' => 'test-movie']);
+    $content = 'This is **bold** and [a link](https://example.com). '.str_repeat('More text. ', 5);
+
+    $this->actingAs($user)->post(route('movies.reviews.store', $movie->slug), [
+        'rating' => 3,
+        'title' => 'Markdown review',
+        'content' => $content,
+        'has_spoilers' => false,
+    ]);
+
+    $review = Review::query()->where('movie_id', $movie->id)->where('user_id', $user->id)->first();
+    expect($review)->not->toBeNull();
+    expect($review->content)->toContain('**bold**');
+
+    $response = $this->get(route('reviews.show', $review));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Reviews/Show')
+        ->has('review')
+    );
+    $reviewProps = $response->original->getData()['page']['props']['review'];
+    expect($reviewProps['content'])->toContain('**bold**');
+    expect($reviewProps['content_html'])->toContain('<strong>bold</strong>')
+        ->and($reviewProps['content_html'])->toContain('href="https://example.com"');
+});
+
+test('markdown preview endpoint returns rendered html', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->postJson(route('markdown.preview'), [
+        'markdown' => '**Bold** and *italic*.',
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonStructure(['html']);
+    $html = $response->json('html');
+    expect($html)->toContain('<strong>Bold</strong>');
+});
+
+test('guest cannot access markdown preview', function () {
+    $response = $this->postJson(route('markdown.preview'), [
+        'markdown' => 'Hello',
+    ]);
+
+    $response->assertUnauthorized();
+});

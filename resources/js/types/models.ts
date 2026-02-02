@@ -98,6 +98,7 @@ export interface ReviewMovie {
     id: number;
     slug: string;
     title: string;
+    poster_url?: string | null;
 }
 
 export interface Review {

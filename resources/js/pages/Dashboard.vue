@@ -73,8 +73,13 @@ const auth = page.props.auth;
 const isAdmin = computed(() => auth.user?.is_admin);
 
 const userStats = computed(() => {
-    const s = page.props.stats as UserStats;
-    return 'reviews_count' in s ? s : null;
+    const s = page.props.stats;
+    return 'reviews_count' in s ? (s as UserStats) : null;
+});
+
+const adminStats = computed(() => {
+    const s = page.props.stats;
+    return 'reviews_count' in s ? null : (s as AdminStats);
 });
 
 const greeting = computed(() => {
@@ -118,12 +123,12 @@ const firstName = computed(() => {
 
                 <!-- Admin Stats Grid -->
                 <div
-                    v-if="isAdmin"
+                    v-if="isAdmin && adminStats"
                     class="dashboard-stats-grid mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
                 >
                     <DashboardStatCard
                         title="Published"
-                        :value="stats.movies"
+                        :value="adminStats.movies"
                         :icon="Film"
                         href="/movies"
                         :trend="null"
@@ -131,7 +136,7 @@ const firstName = computed(() => {
                     />
                     <DashboardStatCard
                         title="Drafts"
-                        :value="stats.drafts"
+                        :value="adminStats.drafts"
                         :icon="FileEdit"
                         href="/dashboard/tmdb/imports"
                         :trend="null"
@@ -139,7 +144,7 @@ const firstName = computed(() => {
                     />
                     <DashboardStatCard
                         title="Archived"
-                        :value="stats.archived"
+                        :value="adminStats.archived"
                         :icon="Archive"
                         :href="null"
                         :trend="null"
@@ -147,7 +152,7 @@ const firstName = computed(() => {
                     />
                     <DashboardStatCard
                         title="Tags"
-                        :value="stats.tags"
+                        :value="adminStats.tags"
                         :icon="Tags"
                         :href="null"
                         :trend="null"
@@ -155,7 +160,7 @@ const firstName = computed(() => {
                     />
                     <DashboardStatCard
                         title="Featured"
-                        :value="stats.activeFeatures"
+                        :value="adminStats.activeFeatures"
                         :icon="Star"
                         href="/featured-slots"
                         :trend="null"
@@ -163,11 +168,11 @@ const firstName = computed(() => {
                     />
                     <DashboardStatCard
                         title="TMDB Queue"
-                        :value="stats.tmdbDrafts"
+                        :value="adminStats.tmdbDrafts"
                         :icon="Database"
                         href="/dashboard/tmdb/imports"
                         :trend="null"
-                        :variant="stats.tmdbDrafts > 0 ? 'warning' : 'default'"
+                        :variant="adminStats.tmdbDrafts > 0 ? 'warning' : 'default'"
                     />
                 </div>
 
@@ -285,7 +290,7 @@ const firstName = computed(() => {
                     </div>
 
                     <!-- Admin: TMDB Import Card -->
-                    <div v-if="isAdmin">
+                    <div v-if="isAdmin && adminStats">
                         <Link
                             href="/dashboard/tmdb/imports"
                             class="group block rounded-xl bg-zinc-900 p-5 ring-1 ring-zinc-800/70 transition-all hover:bg-zinc-800/70 hover:ring-zinc-700/70"
@@ -303,9 +308,9 @@ const firstName = computed(() => {
                                         TMDB Imports
                                     </h3>
                                     <p class="text-sm text-zinc-400">
-                                        {{ stats.tmdbDrafts }}
+                                        {{ adminStats.tmdbDrafts }}
                                         {{
-                                            stats.tmdbDrafts === 1
+                                            adminStats.tmdbDrafts === 1
                                                 ? 'movie'
                                                 : 'movies'
                                         }}
@@ -360,7 +365,7 @@ const firstName = computed(() => {
 
                     <!-- Admin: X Platform Section -->
                     <div v-if="isAdmin" class="lg:col-span-2">
-                        <AdminQuickLinks :x-stats="xStats" />
+                        <AdminQuickLinks :x-stats="xStats ?? null" />
                     </div>
 
                     <!-- Regular User: Quick Actions -->
@@ -450,7 +455,7 @@ const firstName = computed(() => {
                 </div>
 
                 <!-- Admin: Featured Slots Management -->
-                <div v-if="isAdmin" class="mt-6">
+                <div v-if="isAdmin && adminStats" class="mt-6">
                     <Link
                         href="/featured-slots"
                         class="group block rounded-xl bg-gradient-to-r from-red-600/20 via-red-500/10 to-transparent p-5 ring-1 ring-red-500/20 transition-all hover:ring-red-500/40"
@@ -469,7 +474,7 @@ const firstName = computed(() => {
                                         Featured Slots
                                     </h3>
                                     <p class="text-sm text-zinc-400">
-                                        {{ stats.activeFeatures }} active
+                                        {{ adminStats.activeFeatures }} active
                                         features on homepage
                                     </p>
                                 </div>

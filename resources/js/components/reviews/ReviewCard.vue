@@ -65,7 +65,7 @@ function revealSpoilers() {
             <div class="flex flex-wrap items-center gap-2">
                 <span
                     v-if="isCuratorPick"
-                    class="rounded bg-red-600/90 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-white dark:bg-red-500/90"
+                    class="rounded bg-red-600/90 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-white uppercase dark:bg-red-500/90"
                 >
                     Curator's pick
                 </span>

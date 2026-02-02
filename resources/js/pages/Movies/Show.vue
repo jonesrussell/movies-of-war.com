@@ -62,8 +62,8 @@ const reviewsData = computed(
         },
 );
 
-const hasCuratorReview = computed(
-    () => Boolean(reviewsData.value.curator_review),
+const hasCuratorReview = computed(() =>
+    Boolean(reviewsData.value.curator_review),
 );
 
 const canWriteReview = computed(
@@ -745,8 +745,9 @@ const keyCrew = computed(() => {
                         id="curator-review-heading"
                         class="text-xl font-semibold text-white"
                     >
-                        {{ reviewsData.curator_review.user?.name ?? 'Curator' }}'s
-                        review
+                        {{
+                            reviewsData.curator_review.user?.name ?? 'Curator'
+                        }}'s review
                     </h2>
                     <ReviewCard
                         :review="reviewsData.curator_review"

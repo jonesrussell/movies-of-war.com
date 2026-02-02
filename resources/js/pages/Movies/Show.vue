@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import type { AppPageProps, Movie } from '@/types';
+import type { AppPageProps, Movie, MovieReviewsData } from '@/types';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, Check, Play, Plus } from 'lucide-vue-next';
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';
-import { Poster } from '@/components/primitives';
+import { Poster, StarRating } from '@/components/primitives';
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
+import ReviewCard from '@/components/reviews/ReviewCard.vue';
+import ReviewForm from '@/components/reviews/ReviewForm.vue';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import {
@@ -25,11 +27,13 @@ import {
 interface Props {
     movie: Movie;
     relatedMovies: Movie[];
+    reviews?: MovieReviewsData;
 }
 
 interface PageProps extends AppPageProps {
     movie: Movie;
     relatedMovies: Movie[];
+    reviews?: MovieReviewsData;
 }
 
 const props = defineProps<Props>();
@@ -37,10 +41,32 @@ const page = usePage<PageProps>();
 
 const auth = page.props.auth;
 
+// Show/hide write review form
+const showReviewForm = ref(false);
+// Show/hide edit review form (when user has already reviewed)
+const showEditReviewForm = ref(false);
+
 // Entrance animation state
 const isVisible = ref(false);
 const relatedVisible = ref(false);
 const relatedSection = ref<HTMLElement | null>(null);
+
+const reviewsData = computed(
+    () =>
+        props.reviews ?? {
+            summary: { user_rating_average: null, user_rating_count: 0 },
+            user_review: null,
+            recent: [],
+        },
+);
+
+const canWriteReview = computed(
+    () => auth.user && !reviewsData.value.user_review,
+);
+
+const hasUserRatings = computed(
+    () => (reviewsData.value.summary.user_rating_count ?? 0) > 0,
+);
 let observer: IntersectionObserver | null = null;
 
 onMounted(() => {
@@ -599,6 +625,114 @@ const keyCrew = computed(() => {
                     </MovieGrid>
                 </PublicContainer>
             </div>
+        </PublicSection>
+
+        <!-- Reviews section -->
+        <PublicSection spacing="md">
+            <PublicContainer class="flex flex-col gap-6">
+                <SectionHeader title="Reviews" :level="2" />
+
+                <!-- Rating summary -->
+                <div
+                    class="flex flex-wrap items-center gap-6 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4"
+                >
+                    <div v-if="hasUserRatings" class="flex items-center gap-2">
+                        <StarRating
+                            :rating="
+                                reviewsData.summary.user_rating_average ?? 0
+                            "
+                            :max-stars="4"
+                            size="md"
+                        />
+                        <span class="text-sm text-zinc-400">
+                            {{ reviewsData.summary.user_rating_count }} review{{
+                                reviewsData.summary.user_rating_count !== 1
+                                    ? 's'
+                                    : ''
+                            }}
+                        </span>
+                    </div>
+                    <div
+                        v-if="movie.tmdb_vote_average != null"
+                        class="flex items-center gap-2 text-sm text-zinc-400"
+                    >
+                        <span
+                            >TMDB:
+                            {{ movie.tmdb_vote_average.toFixed(1) }}/10</span
+                        >
+                        <span v-if="movie.tmdb_vote_count != null">
+                            ({{ movie.tmdb_vote_count.toLocaleString() }} votes)
+                        </span>
+                    </div>
+                    <Link
+                        v-if="movie.slug"
+                        :href="`/movies/${movie.slug}/reviews`"
+                        class="text-sm font-medium text-red-500 hover:underline"
+                    >
+                        View all reviews
+                    </Link>
+                </div>
+
+                <!-- Write review CTA / form -->
+                <div v-if="canWriteReview" class="space-y-4">
+                    <Button
+                        v-if="!showReviewForm"
+                        variant="outline"
+                        class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                        @click="showReviewForm = true"
+                    >
+                        Write a review
+                    </Button>
+                    <div
+                        v-else
+                        class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                    >
+                        <h3 class="mb-4 text-lg font-semibold text-white">
+                            Write a review
+                        </h3>
+                        <ReviewForm :movie="movie" :existing-review="null" />
+                    </div>
+                </div>
+
+                <!-- User's own review -->
+                <div v-if="reviewsData.user_review" class="space-y-4">
+                    <h3 class="text-lg font-semibold text-white">
+                        Your review
+                    </h3>
+                    <ReviewCard
+                        :review="reviewsData.user_review"
+                        :hide-spoiler-blur="true"
+                        @edit="showEditReviewForm = true"
+                    />
+                    <div
+                        v-if="showEditReviewForm"
+                        class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                    >
+                        <h4 class="mb-4 text-base font-semibold text-white">
+                            Edit your review
+                        </h4>
+                        <ReviewForm
+                            :movie="movie"
+                            :existing-review="reviewsData.user_review"
+                        />
+                    </div>
+                </div>
+
+                <!-- Recent reviews -->
+                <div v-if="reviewsData.recent.length > 0" class="space-y-4">
+                    <h3 class="text-lg font-semibold text-white">
+                        Recent reviews
+                    </h3>
+                    <div class="flex flex-col gap-4">
+                        <ReviewCard
+                            v-for="review in reviewsData.recent"
+                            :key="review.id"
+                            :review="review"
+                            :hide-spoiler-blur="false"
+                        />
+                    </div>
+                </div>
+            </PublicContainer>
         </PublicSection>
     </PublicLayout>
 </template>

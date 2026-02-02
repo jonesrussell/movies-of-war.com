@@ -71,6 +71,11 @@ const mainNavItems = computed<NavItem[]>(() => [
                   icon: Star,
               },
               {
+                  title: 'Reviews',
+                  href: '/dashboard/reviews',
+                  icon: BookOpen,
+              },
+              {
                   title: 'TMDB',
                   icon: Database,
                   items: [

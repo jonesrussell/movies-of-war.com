@@ -172,7 +172,9 @@ const firstName = computed(() => {
                         :icon="Database"
                         href="/dashboard/tmdb/imports"
                         :trend="null"
-                        :variant="adminStats.tmdbDrafts > 0 ? 'warning' : 'default'"
+                        :variant="
+                            adminStats.tmdbDrafts > 0 ? 'warning' : 'default'
+                        "
                     />
                 </div>
 

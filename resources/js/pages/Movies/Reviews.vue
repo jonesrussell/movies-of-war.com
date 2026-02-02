@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Movie } from '@/types';
+import type { AppPageProps, Movie } from '@/types';
 import type { PaginationMeta, Review } from '@/types/models';
 
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import { Poster } from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
@@ -14,6 +14,7 @@ import ReviewForm from '@/components/reviews/ReviewForm.vue';
 import ReviewList from '@/components/reviews/ReviewList.vue';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/PublicLayout.vue';
+import { login, register } from '@/routes';
 
 interface Props {
     movie: Movie;
@@ -28,9 +29,17 @@ interface Props {
     };
 }
 
-defineProps<Props>();
-
+const props = defineProps<Props>();
+const page = usePage<AppPageProps & Props>();
+const auth = page.props.auth;
 const showReviewForm = ref(false);
+
+const hasNoReviews = computed(() => (props.reviews?.data?.length ?? 0) === 0);
+const loginUrl = computed(
+    () =>
+        login({ query: { redirect: `/movies/${props.movie.slug}/reviews` } })
+            .url,
+);
 </script>
 
 <template>
@@ -87,8 +96,33 @@ const showReviewForm = ref(false);
                     </div>
                 </div>
 
-                <!-- Write review -->
-                <div class="space-y-4">
+                <!-- Guest empty state: no reviews, prompt to log in or sign up -->
+                <div
+                    v-if="hasNoReviews && !auth.user"
+                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 text-center"
+                >
+                    <p class="mb-4 text-zinc-300">Be the first to review</p>
+                    <div
+                        class="flex flex-wrap items-center justify-center gap-3"
+                    >
+                        <Link
+                            :href="loginUrl"
+                            class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                        >
+                            Log in to review
+                        </Link>
+                        <span class="text-sm text-zinc-500">or</span>
+                        <Link
+                            :href="register().url"
+                            class="text-sm font-medium text-red-500 hover:underline"
+                        >
+                            Sign up
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Write review (authenticated only) -->
+                <div v-if="auth.user" class="space-y-4">
                     <Button
                         v-if="!showReviewForm"
                         variant="outline"

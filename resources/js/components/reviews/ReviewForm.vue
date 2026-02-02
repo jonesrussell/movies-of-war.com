@@ -74,7 +74,7 @@ const submitLabel = computed(() =>
                 name="title"
                 :default-value="existingReview?.title ?? ''"
                 maxlength="255"
-                placeholder="e.g. Midway (1976) — ★★"
+                placeholder="e.g. Midway (1976)"
                 class="bg-zinc-900 text-white dark:bg-zinc-900 dark:text-white"
             />
             <InputError :message="errors.title" />

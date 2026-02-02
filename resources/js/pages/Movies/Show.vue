@@ -16,6 +16,7 @@ import ReviewCard from '@/components/reviews/ReviewCard.vue';
 import ReviewForm from '@/components/reviews/ReviewForm.vue';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/PublicLayout.vue';
+import { login, register } from '@/routes';
 import {
     extractPosterPath,
     getProfileImageUrl,
@@ -67,6 +68,15 @@ const canWriteReview = computed(
 const hasUserRatings = computed(
     () => (reviewsData.value.summary.user_rating_count ?? 0) > 0,
 );
+
+const hasNoReviews = computed(
+    () => (reviewsData.value.summary.user_rating_count ?? 0) === 0,
+);
+
+const loginUrl = computed(
+    () => login({ query: { redirect: `/movies/${props.movie.slug}` } }).url,
+);
+
 let observer: IntersectionObserver | null = null;
 
 onMounted(() => {
@@ -671,6 +681,31 @@ const keyCrew = computed(() => {
                     >
                         View all reviews
                     </Link>
+                </div>
+
+                <!-- Guest empty state: no reviews, prompt to log in or sign up -->
+                <div
+                    v-if="hasNoReviews && !auth.user"
+                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 text-center"
+                >
+                    <p class="mb-4 text-zinc-300">Be the first to review</p>
+                    <div
+                        class="flex flex-wrap items-center justify-center gap-3"
+                    >
+                        <Link
+                            :href="loginUrl"
+                            class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                        >
+                            Log in to review
+                        </Link>
+                        <span class="text-sm text-zinc-500">or</span>
+                        <Link
+                            :href="register().url"
+                            class="text-sm font-medium text-red-500 hover:underline"
+                        >
+                            Sign up
+                        </Link>
+                    </div>
                 </div>
 
                 <!-- Write review CTA / form -->

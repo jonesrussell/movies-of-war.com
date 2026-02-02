@@ -41,3 +41,18 @@ test('movie show page does not break when tmdb rating director and writers are n
         ->where('movie.slug', 'minimal-movie')
     );
 });
+
+test('movie show page with no reviews returns reviews data for guest empty state', function () {
+    $movie = Movie::factory()->published()->create(['slug' => 'no-reviews-movie']);
+
+    $response = $this->get(route('movies.show', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Show')
+        ->has('movie')
+        ->has('reviews')
+        ->where('reviews.summary.user_rating_count', 0)
+        ->has('auth')
+    );
+});

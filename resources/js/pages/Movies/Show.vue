@@ -2,7 +2,7 @@
 import type { AppPageProps, Movie, MovieReviewsData } from '@/types';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { ArrowLeft, Check, Play, Plus } from 'lucide-vue-next';
+import { ArrowLeft, ArrowRight, Check, Play, Plus } from 'lucide-vue-next';
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 import MovieCard from '@/components/MovieCard.vue';
@@ -12,8 +12,6 @@ import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
-import ReviewCard from '@/components/reviews/ReviewCard.vue';
-import ReviewForm from '@/components/reviews/ReviewForm.vue';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { login, register } from '@/routes';
@@ -41,11 +39,6 @@ const props = defineProps<Props>();
 const page = usePage<PageProps>();
 
 const auth = page.props.auth;
-
-// Show/hide write review form
-const showReviewForm = ref(false);
-// Show/hide edit review form (when user has already reviewed)
-const showEditReviewForm = ref(false);
 
 // Entrance animation state
 const isVisible = ref(false);
@@ -76,6 +69,15 @@ const hasUserRatings = computed(
 
 const hasNoReviews = computed(
     () => (reviewsData.value.summary.user_rating_count ?? 0) === 0,
+);
+
+const totalReviewCount = computed(
+    () => reviewsData.value.summary.user_rating_count ?? 0,
+);
+const showOneLineReviewSummary = computed(
+    () =>
+        totalReviewCount.value === 1 &&
+        Boolean(reviewsData.value.curator_review),
 );
 
 const loginUrl = computed(
@@ -668,8 +670,23 @@ const keyCrew = computed(() => {
             <PublicContainer class="flex flex-col gap-6">
                 <SectionHeader title="Reviews" :level="2" />
 
-                <!-- Rating summary -->
+                <!-- One-line summary when only curator review -->
                 <div
+                    v-if="showOneLineReviewSummary && movie.slug"
+                    class="flex flex-wrap items-center gap-2 text-sm text-zinc-400"
+                >
+                    <span>1 review</span>
+                    <Link
+                        :href="`/movies/${movie.slug}/reviews`"
+                        class="font-medium text-red-500 hover:underline"
+                    >
+                        Read full review
+                    </Link>
+                </div>
+
+                <!-- Full rating summary when multiple reviews -->
+                <div
+                    v-else-if="totalReviewCount > 1"
                     class="flex flex-wrap items-center gap-6 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4"
                 >
                     <div v-if="hasUserRatings" class="flex items-center gap-2">
@@ -681,11 +698,7 @@ const keyCrew = computed(() => {
                             size="md"
                         />
                         <span class="text-sm text-zinc-400">
-                            {{ reviewsData.summary.user_rating_count }} review{{
-                                reviewsData.summary.user_rating_count !== 1
-                                    ? 's'
-                                    : ''
-                            }}
+                            {{ totalReviewCount }} reviews
                         </span>
                     </div>
                     <div
@@ -714,7 +727,7 @@ const keyCrew = computed(() => {
                     </Link>
                 </div>
 
-                <!-- Guest empty state: no reviews, prompt to log in or sign up -->
+                <!-- Guest empty state: no reviews -->
                 <div
                     v-if="hasNoReviews && !auth.user"
                     class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 text-center"
@@ -739,110 +752,59 @@ const keyCrew = computed(() => {
                     </div>
                 </div>
 
-                <!-- Write review CTA / form -->
-                <div v-if="canWriteReview" class="space-y-4">
-                    <Button
-                        v-if="!showReviewForm"
-                        variant="outline"
-                        class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-                        @click="showReviewForm = true"
-                    >
-                        Write a review
-                    </Button>
-                    <div
-                        v-else
-                        class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
-                    >
-                        <h3 class="mb-4 text-lg font-semibold text-white">
-                            Write a review
-                        </h3>
-                        <ReviewForm :movie="movie" :existing-review="null" />
-                    </div>
-                </div>
-
-                <!-- Curator's review (Russell Jones / site curator) -->
+                <!-- Curator review teaser (excerpt + link to full review) -->
                 <div
                     v-if="hasCuratorReview && reviewsData.curator_review"
-                    class="space-y-4"
+                    class="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
                     role="region"
-                    aria-labelledby="curator-review-heading"
+                    aria-label="Curator review"
                 >
-                    <h2
-                        id="curator-review-heading"
-                        class="text-xl font-semibold text-white"
-                    >
-                        {{
-                            reviewsData.curator_review.user?.name ?? 'Curator'
-                        }}'s review
-                    </h2>
-                    <ReviewCard
-                        :review="reviewsData.curator_review"
-                        :hide-spoiler-blur="true"
-                        :is-curator-pick="true"
-                        @edit="showEditReviewForm = true"
-                    />
-                    <div
-                        v-if="
-                            showEditReviewForm &&
-                            reviewsData.user_review?.id ===
-                                reviewsData.curator_review?.id
-                        "
-                        class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
-                    >
-                        <h3 class="mb-4 text-base font-semibold text-white">
-                            Edit your review
-                        </h3>
-                        <ReviewForm
-                            :movie="movie"
-                            :existing-review="reviewsData.curator_review"
+                    <div class="flex flex-wrap items-center gap-2">
+                        <StarRating
+                            :rating="reviewsData.curator_review.rating"
+                            :max-stars="4"
+                            size="md"
                         />
+                        <span class="text-sm text-zinc-400">
+                            {{
+                                reviewsData.curator_review.user?.name ??
+                                'Curator'
+                            }}'s review
+                        </span>
+                    </div>
+                    <p
+                        v-if="reviewsData.curator_review.content_excerpt"
+                        class="line-clamp-3 text-zinc-300"
+                    >
+                        {{ reviewsData.curator_review.content_excerpt }}
+                    </p>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <Link
+                            v-if="movie.slug"
+                            :href="`/movies/${movie.slug}/reviews`"
+                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-red-500 transition-colors hover:text-red-400"
+                        >
+                            Read full review
+                            <ArrowRight class="size-4" />
+                        </Link>
+                        <Link
+                            v-if="movie.slug && totalReviewCount > 1"
+                            :href="`/movies/${movie.slug}/reviews`"
+                            class="text-sm font-medium text-red-500 hover:underline"
+                        >
+                            View all reviews
+                        </Link>
                     </div>
                 </div>
 
-                <!-- User's own review (when not the curator's review) -->
-                <div
-                    v-if="
-                        reviewsData.user_review &&
-                        reviewsData.user_review.id !==
-                            reviewsData.curator_review?.id
-                    "
-                    class="space-y-4"
-                >
-                    <h3 class="text-lg font-semibold text-white">
-                        Your review
-                    </h3>
-                    <ReviewCard
-                        :review="reviewsData.user_review"
-                        :hide-spoiler-blur="true"
-                        @edit="showEditReviewForm = true"
-                    />
-                    <div
-                        v-if="showEditReviewForm"
-                        class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                <!-- Write a review (link to reviews page) -->
+                <div v-if="canWriteReview">
+                    <Link
+                        :href="`/movies/${movie.slug}/reviews`"
+                        class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-800 hover:text-white"
                     >
-                        <h4 class="mb-4 text-base font-semibold text-white">
-                            Edit your review
-                        </h4>
-                        <ReviewForm
-                            :movie="movie"
-                            :existing-review="reviewsData.user_review"
-                        />
-                    </div>
-                </div>
-
-                <!-- Recent reviews -->
-                <div v-if="reviewsData.recent.length > 0" class="space-y-4">
-                    <h3 class="text-lg font-semibold text-white">
-                        Recent reviews
-                    </h3>
-                    <div class="flex flex-col gap-4">
-                        <ReviewCard
-                            v-for="review in reviewsData.recent"
-                            :key="review.id"
-                            :review="review"
-                            :hide-spoiler-blur="false"
-                        />
-                    </div>
+                        Write a review
+                    </Link>
                 </div>
             </PublicContainer>
         </PublicSection>

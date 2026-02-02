@@ -32,9 +32,23 @@ class ReviewController extends Controller
 
     public function index(Request $request, Movie $movie): Response
     {
+        $curatorUserId = config('app.curator_user_id');
+        $curatorReview = null;
+        if ($curatorUserId > 0) {
+            $curatorReview = $movie->reviews()
+                ->published()
+                ->where('user_id', $curatorUserId)
+                ->with('user')
+                ->first();
+        }
+
         $query = $movie->reviews()
             ->published()
             ->with('user');
+
+        if ($curatorReview !== null) {
+            $query->where('id', '!=', $curatorReview->id);
+        }
 
         if (! $request->boolean('show_spoilers')) {
             $query->withoutSpoilers();
@@ -52,6 +66,9 @@ class ReviewController extends Controller
 
         return Inertia::render('Movies/Reviews', [
             'movie' => (new MovieResource($movie->load('tags')))->resolve($request),
+            'curator_review' => $curatorReview !== null
+                ? (new ReviewResource($curatorReview))->resolve($request)
+                : null,
             'reviews' => ReviewResource::collection($reviews),
             'queryParams' => $request->only(['show_spoilers', 'sort']),
         ]);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Movie;
 use App\Models\Review;
 use App\Models\User;
+use Illuminate\Support\Facades\Config;
 
 test('guest can view reviews index for a published movie', function () {
     $movie = Movie::factory()->published()->create(['slug' => 'test-movie']);
@@ -15,8 +16,94 @@ test('guest can view reviews index for a published movie', function () {
     $response->assertInertia(fn ($page) => $page
         ->component('Movies/Reviews')
         ->has('movie')
+        ->has('curator_review')
         ->has('reviews')
     );
+});
+
+test('reviews index includes curator_review and excludes it from paginated list when curator configured', function () {
+    $curator = User::factory()->create(['name' => 'Curator']);
+    Config::set('app.curator_user_id', $curator->id);
+
+    $movie = Movie::factory()->published()->create(['slug' => 'curator-movie']);
+    $curatorReview = Review::factory()->for($curator)->for($movie)->create([
+        'content' => str_repeat('Curator review. ', 10),
+    ]);
+    $otherUser = User::factory()->create();
+    Review::factory()->for($otherUser)->for($movie)->create([
+        'content' => str_repeat('Other review. ', 10),
+    ]);
+
+    $response = $this->get(route('movies.reviews.index', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Reviews')
+        ->has('curator_review')
+        ->where('curator_review.id', $curatorReview->id)
+        ->where('curator_review.is_curator', true)
+    );
+    $reviewsData = $response->original->getData()['page']['props']['reviews']['data'];
+    $ids = array_column($reviewsData, 'id');
+    expect($ids)->not->toContain($curatorReview->id);
+    expect($reviewsData)->toHaveCount(1);
+});
+
+test('reviews index sort works when curator review is excluded from list', function () {
+    $curator = User::factory()->create();
+    Config::set('app.curator_user_id', $curator->id);
+
+    $movie = Movie::factory()->published()->create(['slug' => 'sort-movie']);
+    Review::factory()->for($curator)->for($movie)->create([
+        'rating' => 2,
+        'content' => str_repeat('Curator. ', 10),
+    ]);
+    $userA = User::factory()->create();
+    $userB = User::factory()->create();
+    Review::factory()->for($userA)->for($movie)->withoutSpoilers()->create([
+        'rating' => 4,
+        'content' => str_repeat('High rating. ', 10),
+    ]);
+    Review::factory()->for($userB)->for($movie)->withoutSpoilers()->create([
+        'rating' => 1,
+        'content' => str_repeat('Low rating. ', 10),
+    ]);
+
+    $response = $this->get(route('movies.reviews.index', [
+        'movie' => $movie->slug,
+        'sort' => 'rating_high',
+    ]));
+
+    $response->assertOk();
+    $reviewsData = $response->original->getData()['page']['props']['reviews']['data'];
+    expect($reviewsData)->toHaveCount(2);
+    expect((float) $reviewsData[0]['rating'])->toBe(4.0);
+    expect((float) $reviewsData[1]['rating'])->toBe(1.0);
+});
+
+test('reviews index pagination counts exclude curator review', function () {
+    $curator = User::factory()->create();
+    Config::set('app.curator_user_id', $curator->id);
+
+    $movie = Movie::factory()->published()->create(['slug' => 'pagination-movie']);
+    Review::factory()->for($curator)->for($movie)->create([
+        'content' => str_repeat('Curator. ', 10),
+    ]);
+    foreach (range(1, 10) as $i) {
+        Review::factory()
+            ->for(User::factory()->create())
+            ->for($movie)
+            ->withoutSpoilers()
+            ->create(['content' => str_repeat("Review {$i}. ", 10)]);
+    }
+
+    $response = $this->get(route('movies.reviews.index', $movie->slug));
+
+    $response->assertOk();
+    $reviews = $response->original->getData()['page']['props']['reviews'];
+    expect($reviews['data'])->toHaveCount(10);
+    expect($reviews['meta']['total'])->toBe(10);
+    expect($reviews['meta']['last_page'])->toBe(1);
 });
 
 test('index excludes spoiler reviews when show_spoilers is not set', function () {

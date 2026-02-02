@@ -219,7 +219,7 @@ onMounted(() => {
                                 size="md"
                             />
                             <Link
-                                :href="`/movies/${movie.slug}#reviews`"
+                                :href="`/movies/${movie.slug}/reviews`"
                                 class="font-medium text-red-500 transition-colors hover:text-red-400"
                             >
                                 Your review
@@ -241,7 +241,7 @@ onMounted(() => {
                             {{ review.content_excerpt }}
                         </p>
                         <Link
-                            :href="`/movies/${movie.slug}#curator-review-heading`"
+                            :href="`/movies/${movie.slug}/reviews`"
                             class="inline-flex items-center gap-1.5 text-sm font-semibold text-red-500 transition-colors hover:text-red-400"
                         >
                             Read full review

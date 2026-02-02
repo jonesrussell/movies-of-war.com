@@ -15,9 +15,13 @@ interface Props {
     };
     queryParams?: { show_spoilers?: boolean; sort?: string } | undefined;
     movieSlug?: string;
+    /** Override empty state message (e.g. "No other reviews yet" when curator is pinned above). */
+    emptyMessage?: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    emptyMessage: 'No reviews yet. Be the first to share your thoughts!',
+});
 
 const emit = defineEmits<{
     edit: [review: Review];
@@ -134,9 +138,7 @@ function buildReviewsUrl(
             v-else
             class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-12 text-center"
         >
-            <p class="text-zinc-400">
-                No reviews yet. Be the first to share your thoughts!
-            </p>
+            <p class="text-zinc-400">{{ emptyMessage }}</p>
         </div>
 
         <Pagination

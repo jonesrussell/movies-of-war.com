@@ -180,13 +180,25 @@ describe('MovieHero', () => {
                 .find((a) => a.text().includes('Read full review'));
             expect(readMoreLink).toBeDefined();
             expect(readMoreLink?.attributes('href')).toBe(
-                `/movies/${defaultMovie.slug}#curator-review-heading`,
+                `/movies/${defaultMovie.slug}/reviews`,
             );
         });
 
         it('does not render review block when review not provided', () => {
             const wrapper = mountMovieHero();
             expect(wrapper.text()).not.toContain('Read full review');
+        });
+
+        it('links "Your review" to movie reviews page when userReview provided', () => {
+            const userReview = { rating: 3 };
+            const wrapper = mountMovieHero({ userReview });
+            const yourReviewLink = wrapper
+                .findAll('a')
+                .find((a) => a.text().includes('Your review'));
+            expect(yourReviewLink).toBeDefined();
+            expect(yourReviewLink?.attributes('href')).toBe(
+                `/movies/${defaultMovie.slug}/reviews`,
+            );
         });
     });
 

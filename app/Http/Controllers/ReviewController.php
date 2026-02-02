@@ -17,6 +17,19 @@ use Inertia\Response;
 
 class ReviewController extends Controller
 {
+    public function myReviews(Request $request): Response
+    {
+        $reviews = $request->user()
+            ->reviews()
+            ->with(['movie:id,title,slug,poster_path,poster_url'])
+            ->latest()
+            ->paginate(15);
+
+        return Inertia::render('MyReviews/Index', [
+            'reviews' => ReviewResource::collection($reviews),
+        ]);
+    }
+
     public function index(Request $request, Movie $movie): Response
     {
         $query = $movie->reviews()

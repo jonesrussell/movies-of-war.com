@@ -9,6 +9,7 @@ use App\Enums\MovieStatus;
 use App\Enums\TagType;
 use App\Http\Requests\ImportTmdbMoviesRequest;
 use App\Http\Resources\MovieResource;
+use App\Http\Resources\ReviewResource;
 use App\Jobs\ImportTmdbMoviesJob;
 use App\Models\Movie;
 use App\Models\Tag;
@@ -32,28 +33,38 @@ class DashboardController extends Controller
 
     public function index(Request $request): Response
     {
-        $user = auth()->user();
+        $user = $request->user();
 
-        // Get stats from cache-optimized service
-        $stats = $user->is_admin
-            ? $this->statsService->getAdminStats()
-            : $this->statsService->getUserStats();
+        if (! $user->is_admin) {
+            $recentReviews = $user->reviews()
+                ->with('movie:id,title,slug')
+                ->latest()
+                ->take(5)
+                ->get();
 
-        // Recent movies for the dashboard (latest 6 published)
+            return Inertia::render('Dashboard', [
+                'stats' => $this->statsService->getUserStats($user),
+                'recentMovies' => MovieResource::collection(
+                    Movie::query()
+                        ->published()
+                        ->with('tags')
+                        ->latest('updated_at')
+                        ->limit(6)
+                        ->get()
+                ),
+                'recentReviews' => ReviewResource::collection($recentReviews)->resolve(),
+            ]);
+        }
+
+        $stats = $this->statsService->getAdminStats();
         $recentMovies = Movie::query()
             ->published()
             ->with('tags')
             ->latest('updated_at')
             ->limit(6)
             ->get();
-
-        // User's watchlist count
         $watchlistCount = $user->watchlist()->count();
-
-        // Get X stats for admins
-        $xStats = $user->is_admin
-            ? $this->statsService->getXStats()
-            : null;
+        $xStats = $this->statsService->getXStats();
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,

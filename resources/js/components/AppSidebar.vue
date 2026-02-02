@@ -5,6 +5,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import {
     Archive,
     BarChart3,
+    Bookmark,
     BookOpen,
     Database,
     Download,
@@ -128,21 +129,29 @@ const mainNavItems = computed<NavItem[]>(() => [
                   ],
               },
           ]
-        : []),
+        : [
+              { title: 'Browse Movies', href: '/movies', icon: Film },
+              { title: 'My Watchlist', href: '/watchlist', icon: Bookmark },
+              { title: 'My Reviews', href: '/my-reviews', icon: Star },
+          ]),
 ]);
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
+const footerNavItems = computed<NavItem[]>(() =>
+    auth?.user?.is_admin
+        ? [
+              {
+                  title: 'Github Repo',
+                  href: 'https://github.com/laravel/vue-starter-kit',
+                  icon: Folder,
+              },
+              {
+                  title: 'Documentation',
+                  href: 'https://laravel.com/docs/starter-kits#vue',
+                  icon: BookOpen,
+              },
+          ]
+        : [],
+);
 </script>
 
 <template>
@@ -164,7 +173,7 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
+            <NavFooter v-if="footerNavItems.length" :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
         <SidebarRail />

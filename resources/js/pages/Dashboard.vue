@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AppPageProps, Movie } from '@/types';
+import type { AppPageProps, Movie, Review } from '@/types';
 
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
@@ -12,11 +12,13 @@ import {
     Star,
     Tags,
 } from 'lucide-vue-next';
+import { ArrowRight } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import AdminQuickLinks from '@/components/dashboard/AdminQuickLinks.vue';
 import DashboardStatCard from '@/components/dashboard/DashboardStatCard.vue';
 import RecentMoviesCard from '@/components/dashboard/RecentMoviesCard.vue';
+import { StarRating } from '@/components/primitives';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface XStats {
@@ -28,30 +30,40 @@ interface XStats {
     engagement_rate: number;
 }
 
+interface AdminStats {
+    movies: number;
+    drafts: number;
+    archived: number;
+    tags: number;
+    activeFeatures: number;
+    tmdbDrafts: number;
+    x_published_posts?: number;
+    x_scheduled_posts?: number;
+    x_failed_posts?: number;
+    x_total_impressions?: number;
+    x_active_keywords?: number;
+}
+
+interface UserStats {
+    movies_total: number;
+    watchlist_count: number;
+    reviews_count: number;
+}
+
 interface Props {
-    stats: {
-        movies: number;
-        drafts: number;
-        archived: number;
-        tags: number;
-        activeFeatures: number;
-        tmdbDrafts: number;
-        x_published_posts?: number;
-        x_scheduled_posts?: number;
-        x_failed_posts?: number;
-        x_total_impressions?: number;
-        x_active_keywords?: number;
-    };
+    stats: AdminStats | UserStats;
     recentMovies: Movie[];
-    watchlistCount: number;
-    xStats: XStats | null;
+    watchlistCount?: number;
+    xStats?: XStats | null;
+    recentReviews?: Review[];
 }
 
 interface PageProps extends AppPageProps {
     stats: Props['stats'];
     recentMovies: Movie[];
-    watchlistCount: number;
-    xStats: XStats | null;
+    watchlistCount?: number;
+    xStats?: XStats | null;
+    recentReviews?: Review[];
 }
 
 defineProps<Props>();
@@ -59,6 +71,11 @@ const page = usePage<PageProps>();
 
 const auth = page.props.auth;
 const isAdmin = computed(() => auth.user?.is_admin);
+
+const userStats = computed(() => {
+    const s = page.props.stats as UserStats;
+    return 'reviews_count' in s ? s : null;
+});
 
 const greeting = computed(() => {
     const hour = new Date().getHours();
@@ -157,25 +174,25 @@ const firstName = computed(() => {
                 <!-- Regular User Stats -->
                 <div v-else class="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
                     <DashboardStatCard
-                        title="Movies"
-                        :value="stats.movies"
-                        :icon="Film"
-                        href="/movies"
+                        title="My Reviews"
+                        :value="userStats?.reviews_count ?? 0"
+                        :icon="Star"
+                        href="/my-reviews"
                         :trend="null"
-                        variant="default"
+                        :variant="(userStats?.reviews_count ?? 0) > 0 ? 'success' : 'default'"
                     />
                     <DashboardStatCard
                         title="My Watchlist"
-                        :value="watchlistCount"
+                        :value="userStats?.watchlist_count ?? 0"
                         :icon="Bookmark"
                         href="/watchlist"
                         :trend="null"
                         variant="success"
                     />
                     <DashboardStatCard
-                        title="Tags"
-                        :value="stats.tags"
-                        :icon="Tags"
+                        title="Movies Available"
+                        :value="userStats?.movies_total ?? 0"
+                        :icon="Film"
                         href="/movies"
                         :trend="null"
                         variant="default"
@@ -192,6 +209,77 @@ const firstName = computed(() => {
                                 isAdmin ? 'Recently Updated' : 'Recently Added'
                             "
                         />
+                    </div>
+
+                    <!-- Non-Admin: My Recent Reviews -->
+                    <div v-if="!isAdmin" class="lg:col-span-2">
+                        <div
+                            class="rounded-xl bg-zinc-900 p-5 ring-1 ring-zinc-800/70"
+                        >
+                            <div class="flex items-center justify-between">
+                                <h3
+                                    class="text-base font-semibold text-white"
+                                >
+                                    My Recent Reviews
+                                </h3>
+                                <Link
+                                    href="/my-reviews"
+                                    class="flex items-center gap-1 text-sm font-medium text-red-500 transition-colors hover:text-red-400"
+                                >
+                                    View all
+                                    <ArrowRight class="size-3.5" />
+                                </Link>
+                            </div>
+
+                            <div
+                                v-if="
+                                    page.props.recentReviews &&
+                                    page.props.recentReviews.length > 0
+                                "
+                                class="mt-4 flex flex-col gap-3"
+                            >
+                                <Link
+                                    v-for="review in page.props.recentReviews"
+                                    :key="review.id"
+                                    :href="`/reviews/${review.id}`"
+                                    class="flex items-center justify-between gap-4 rounded-lg bg-zinc-800/50 p-3 ring-1 ring-zinc-700/50 transition-colors hover:bg-zinc-800/70 hover:ring-zinc-600/50"
+                                >
+                                    <div class="min-w-0 flex-1">
+                                        <p
+                                            class="truncate font-medium text-white"
+                                        >
+                                            {{ review.movie?.title }}
+                                        </p>
+                                        <p class="text-sm text-zinc-400">
+                                            {{ review.formatted_date }}
+                                        </p>
+                                    </div>
+                                    <div class="shrink-0">
+                                        <StarRating
+                                            :rating="review.rating"
+                                            :max-stars="4"
+                                            size="sm"
+                                        />
+                                    </div>
+                                </Link>
+                            </div>
+
+                            <div
+                                v-else
+                                class="mt-4 flex flex-col items-center justify-center gap-4 rounded-lg bg-zinc-800/50 py-10"
+                            >
+                                <p class="text-center text-sm text-zinc-500">
+                                    You haven't written any reviews yet. Browse
+                                    movies to get started.
+                                </p>
+                                <Link
+                                    href="/movies"
+                                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-500"
+                                >
+                                    Browse movies
+                                </Link>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Admin: TMDB Import Card -->
@@ -315,13 +403,43 @@ const firstName = computed(() => {
                                         My Watchlist
                                     </h3>
                                     <p class="text-sm text-zinc-400">
-                                        {{ watchlistCount }}
+                                        {{ userStats?.watchlist_count ?? 0 }}
                                         {{
-                                            watchlistCount === 1
+                                            (userStats?.watchlist_count ?? 0) ===
+                                            1
                                                 ? 'movie'
                                                 : 'movies'
                                         }}
                                         saved
+                                    </p>
+                                </div>
+                            </div>
+                        </Link>
+
+                        <Link
+                            href="/my-reviews"
+                            class="group block rounded-xl bg-zinc-900 p-5 ring-1 ring-zinc-800/70 transition-all hover:bg-zinc-800/70 hover:ring-zinc-700/70"
+                        >
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="flex size-12 items-center justify-center rounded-xl bg-amber-500/10"
+                                >
+                                    <Star class="size-6 text-amber-400" />
+                                </div>
+                                <div class="flex-1">
+                                    <h3
+                                        class="text-base font-semibold text-white"
+                                    >
+                                        My Reviews
+                                    </h3>
+                                    <p class="text-sm text-zinc-400">
+                                        {{ userStats?.reviews_count ?? 0 }}
+                                        {{
+                                            (userStats?.reviews_count ?? 0) ===
+                                            1
+                                                ? 'review'
+                                                : 'reviews'
+                                        }}
                                     </p>
                                 </div>
                             </div>

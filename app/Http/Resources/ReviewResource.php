@@ -45,6 +45,7 @@ class ReviewResource extends JsonResource
                 'id' => $this->movie->id,
                 'slug' => $this->movie->slug,
                 'title' => $this->movie->title,
+                'poster_url' => $this->movie->poster_url ?? null,
             ]),
             'can_edit' => $user ? $user->can('update', $this->resource) : false,
             'can_delete' => $user ? $user->can('delete', $this->resource) : false,

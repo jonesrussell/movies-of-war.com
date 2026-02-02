@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\FeaturedSlot;
 use App\Models\Movie;
 use App\Models\Tag;
+use App\Models\User;
 use App\Models\XPost;
 use App\Models\XTrendKeyword;
 use Illuminate\Support\Facades\Cache;
@@ -114,17 +115,19 @@ class DashboardStatsService
     }
 
     /**
-     * Get basic stats for non-admin users.
+     * Get stats for non-admin users.
      *
-     * @return array<string, mixed>
+     * @return array{movies_total: int, watchlist_count: int, reviews_count: int}
      */
-    public function getUserStats(): array
+    public function getUserStats(User $user): array
     {
         $movieStats = $this->getMovieStats();
 
-        return array_merge($movieStats, [
-            'tmdbDrafts' => 0,
-        ]);
+        return [
+            'movies_total' => $movieStats['movies'],
+            'watchlist_count' => $user->watchlist()->count(),
+            'reviews_count' => $user->reviews()->count(),
+        ];
     }
 
     /**

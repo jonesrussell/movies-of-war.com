@@ -8,6 +8,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     require __DIR__.'/web/dashboard.php';
     require __DIR__.'/web/watchlist.php';
     require __DIR__.'/web/reviews.php';
+    require __DIR__.'/web/my-reviews.php';
     require __DIR__.'/web/admin.php';
 });
 

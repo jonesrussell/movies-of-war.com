@@ -71,14 +71,18 @@ class MovieController extends Controller
         }
 
         $userReviewMap = UserReviewEnrichment::userReviewMapForMovies($movies->getCollection());
-        $moviesPayload = MovieResource::collection($movies)->additional([
-            'watchlisted_ids' => $watchlistedIds,
-        ])->resolve(request());
-        foreach ($moviesPayload['data'] ?? [] as $i => $item) {
-            if (isset($item['id'], $userReviewMap[$item['id']])) {
-                $moviesPayload['data'][$i]['user_review'] = $userReviewMap[$item['id']];
+        $data = $movies->getCollection()->map(function (Movie $movie) use ($userReviewMap) {
+            $arr = (new MovieResource($movie))->resolve(request());
+            if (isset($userReviewMap[$movie->id])) {
+                $arr['user_review'] = $userReviewMap[$movie->id];
             }
-        }
+
+            return $arr;
+        })->values()->all();
+        $moviesPayload = array_merge($movies->toArray(), [
+            'data' => $data,
+            'watchlisted_ids' => $watchlistedIds,
+        ]);
 
         $filterOptions = $this->filterService->getFilterOptions();
 

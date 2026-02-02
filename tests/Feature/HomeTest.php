@@ -83,7 +83,7 @@ test('home page includes pick of week user review when authenticated user has re
     $response->assertInertia(fn ($page) => $page
         ->component('Welcome')
         ->has('pickOfWeekUserReview')
-        ->where('pickOfWeekUserReview.rating', 2.0)
+        ->where('pickOfWeekUserReview.rating', 2)
         ->where('pickOfWeekUserReview.movie.slug', 'my-pick')
     );
 });

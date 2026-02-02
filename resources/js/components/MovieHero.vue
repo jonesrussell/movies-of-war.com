@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import type { Movie } from '@/types';
+import type { Movie, Review } from '@/types';
 
 import { Link } from '@inertiajs/vue3';
-import { Info, Play } from 'lucide-vue-next';
+import { ArrowRight, Info, Play } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
-import { DotPattern, GradientOverlay, Poster } from '@/components/primitives';
+import {
+    DotPattern,
+    GradientOverlay,
+    Poster,
+    StarRating,
+} from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import {
     extractPosterPath,
@@ -18,6 +23,8 @@ interface Props {
     movie: Movie;
     title?: string;
     subtitle?: string;
+    /** Curator's review for Pick of the Week: shows rating, excerpt, and link to full review */
+    review?: Pick<Review, 'rating' | 'content_excerpt'> | null;
 }
 
 const props = defineProps<Props>();
@@ -81,7 +88,10 @@ onMounted(() => {
 </script>
 
 <template>
-    <section class="relative overflow-hidden bg-zinc-950">
+    <section
+        data-testid="movie-hero"
+        class="relative overflow-hidden bg-zinc-950"
+    >
         <!-- Background layers -->
         <div class="absolute inset-0">
             <!-- Blurred poster background with scale animation -->
@@ -190,6 +200,12 @@ onMounted(() => {
                         >
                             {{ movie.conflict }}
                         </span>
+                        <StarRating
+                            v-if="review"
+                            :rating="review.rating"
+                            :max-stars="4"
+                            size="md"
+                        />
                     </div>
 
                     <p
@@ -197,6 +213,22 @@ onMounted(() => {
                     >
                         {{ movie.synopsis }}
                     </p>
+
+                    <div
+                        v-if="review?.content_excerpt"
+                        class="mb-8 rounded-lg border border-zinc-800/80 bg-zinc-900/50 p-6"
+                    >
+                        <p class="mb-4 line-clamp-3 text-zinc-300">
+                            {{ review.content_excerpt }}
+                        </p>
+                        <Link
+                            :href="`/movies/${movie.slug}#curator-review-heading`"
+                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-red-500 transition-colors hover:text-red-400"
+                        >
+                            Read full review
+                            <ArrowRight class="size-4" />
+                        </Link>
+                    </div>
 
                     <div
                         v-if="movie.tags && movie.tags.length > 0"

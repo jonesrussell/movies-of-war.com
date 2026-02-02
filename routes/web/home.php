@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Resources\ReviewResource;
 use App\Models\FeaturedSlot;
 use App\Models\Movie;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,21 @@ Route::get('/', function () {
         ->active()
         ->slot('pick_of_week')
         ->first();
+
+    $pickOfWeekMovie = $pickOfWeekSlot?->movie;
+    $pickOfWeekReview = null;
+    if ($pickOfWeekMovie) {
+        $curatorUserId = config('app.curator_user_id');
+        if ($curatorUserId > 0) {
+            $curatorReview = $pickOfWeekMovie->reviews()
+                ->where('user_id', $curatorUserId)
+                ->published()
+                ->first();
+            if ($curatorReview !== null) {
+                $pickOfWeekReview = (new ReviewResource($curatorReview))->resolve(request());
+            }
+        }
+    }
 
     $latestMovies = Movie::query()
         ->published()
@@ -38,7 +54,8 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canRegister' => Features::enabled(Features::registration()),
         'heroMovie' => $heroSlot?->movie,
-        'pickOfWeekMovie' => $pickOfWeekSlot?->movie,
+        'pickOfWeekMovie' => $pickOfWeekMovie,
+        'pickOfWeekReview' => $pickOfWeekReview,
         'latestMovies' => $latestMovies,
         'upcomingMovies' => $upcomingMovies,
     ]);

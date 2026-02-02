@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Movie } from '@/types';
+import type { Movie, Review } from '@/types';
 
 import { Head, Link } from '@inertiajs/vue3';
 
@@ -16,6 +16,7 @@ import PublicLayout from '@/layouts/PublicLayout.vue';
 interface Props {
     heroMovie?: Movie;
     pickOfWeekMovie?: Movie;
+    pickOfWeekReview?: Pick<Review, 'rating' | 'content_excerpt'> | null;
     latestMovies: Movie[];
     upcomingMovies: Movie[];
 }
@@ -27,23 +28,25 @@ defineProps<Props>();
     <PublicLayout>
         <Head title="Movies of War - Curated War Films Database" />
 
-        <!-- Pick of the Week first (curator's featured review) -->
-        <PublicSection v-if="pickOfWeekMovie" spacing="md">
+        <!-- Pick of the Week first (curator's featured review, hero style) -->
+        <MovieHero
+            v-if="pickOfWeekMovie"
+            :movie="pickOfWeekMovie"
+            subtitle="Pick of the Week"
+            :review="pickOfWeekReview ?? null"
+        />
+
+        <!-- Featured Upcoming Release (card style) -->
+        <PublicSection v-if="heroMovie" spacing="md">
             <PublicContainer class="flex flex-col gap-10 lg:gap-18">
                 <div class="mx-auto w-full max-w-5xl">
                     <FeaturedMovie
-                        :movie="pickOfWeekMovie"
-                        title="Pick of the Week"
+                        :movie="heroMovie"
+                        title="Featured Upcoming Release"
                     />
                 </div>
             </PublicContainer>
         </PublicSection>
-
-        <MovieHero
-            v-if="heroMovie"
-            :movie="heroMovie"
-            subtitle="Featured Upcoming Release"
-        />
 
         <PublicSection v-else spacing="lg" class="relative overflow-hidden">
             <div class="absolute inset-0">

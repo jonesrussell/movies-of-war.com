@@ -30,8 +30,9 @@ vi.mock('@inertiajs/vue3', () => ({
 vi.mock('@/components/MovieHero.vue', () => ({
     default: {
         name: 'MovieHero',
-        template: '<div data-testid="movie-hero">{{ movie.title }}</div>',
-        props: ['movie', 'subtitle'],
+        template:
+            '<div data-testid="movie-hero">{{ movie.title }} - {{ subtitle }}</div>',
+        props: ['movie', 'subtitle', 'review'],
     },
 }));
 
@@ -77,46 +78,44 @@ describe('Welcome', () => {
         });
     }
 
-    describe('hero section', () => {
-        it('renders MovieHero when heroMovie is provided', () => {
-            const heroMovie = createMockMovie({ title: 'Hero Film' });
-            const wrapper = mountWelcome({ heroMovie });
+    describe('pick of week section (hero style)', () => {
+        it('renders MovieHero when pickOfWeekMovie is provided', () => {
+            const pickOfWeekMovie = createMockMovie({ title: 'Weekly Pick' });
+            const wrapper = mountWelcome({ pickOfWeekMovie });
 
             expect(wrapper.find('[data-testid="movie-hero"]').exists()).toBe(
                 true,
             );
-            expect(wrapper.text()).toContain('Hero Film');
+            expect(wrapper.text()).toContain('Weekly Pick');
+            expect(wrapper.text()).toContain('Pick of the Week');
         });
 
-        it('renders fallback when no heroMovie', () => {
+        it('does not render MovieHero when no pickOfWeekMovie', () => {
             const wrapper = mountWelcome();
 
             expect(wrapper.find('[data-testid="movie-hero"]').exists()).toBe(
                 false,
             );
-            expect(wrapper.text()).toContain('Movies of War');
-            expect(wrapper.text()).toContain('A curated database of war films');
         });
     });
 
-    describe('pick of week section', () => {
-        it('renders FeaturedMovie when pickOfWeekMovie is provided', () => {
-            const pickOfWeekMovie = createMockMovie({ title: 'Weekly Pick' });
-            const wrapper = mountWelcome({ pickOfWeekMovie });
+    describe('featured upcoming release section (card style)', () => {
+        it('renders FeaturedMovie when heroMovie is provided', () => {
+            const heroMovie = createMockMovie({ title: 'Upcoming Film' });
+            const wrapper = mountWelcome({ heroMovie });
 
             expect(
                 wrapper.find('[data-testid="featured-movie"]').exists(),
             ).toBe(true);
-            expect(wrapper.text()).toContain('Weekly Pick');
-            expect(wrapper.text()).toContain('Pick of the Week');
+            expect(wrapper.text()).toContain('Upcoming Film');
+            expect(wrapper.text()).toContain('Featured Upcoming Release');
         });
 
-        it('does not render FeaturedMovie when no pickOfWeekMovie', () => {
+        it('renders fallback when no heroMovie and no pickOfWeekMovie', () => {
             const wrapper = mountWelcome();
 
-            expect(
-                wrapper.find('[data-testid="featured-movie"]').exists(),
-            ).toBe(false);
+            expect(wrapper.text()).toContain('Movies of War');
+            expect(wrapper.text()).toContain('A curated database of war films');
         });
     });
 
@@ -215,15 +214,17 @@ describe('Welcome', () => {
                 latestMovies,
             });
 
-            // Hero section
+            // Pick of week (MovieHero, first)
             expect(wrapper.find('[data-testid="movie-hero"]').exists()).toBe(
                 true,
             );
+            expect(wrapper.text()).toContain('Pick Movie');
 
-            // Pick of week
+            // Featured upcoming (FeaturedMovie, second)
             expect(
                 wrapper.find('[data-testid="featured-movie"]').exists(),
             ).toBe(true);
+            expect(wrapper.text()).toContain('Hero Movie');
 
             // Latest movies
             expect(wrapper.findAll('[data-testid="movie-card"]').length).toBe(
@@ -240,7 +241,10 @@ describe('Welcome', () => {
             // Fallback hero
             expect(wrapper.text()).toContain('Movies of War');
 
-            // No featured movie
+            // No pick of week, no featured upcoming
+            expect(wrapper.find('[data-testid="movie-hero"]').exists()).toBe(
+                false,
+            );
             expect(
                 wrapper.find('[data-testid="featured-movie"]').exists(),
             ).toBe(false);

@@ -162,6 +162,34 @@ describe('MovieHero', () => {
         });
     });
 
+    describe('review (pick of week)', () => {
+        it('renders rating and excerpt with read full review link when review provided', () => {
+            const review = {
+                rating: 4,
+                content_excerpt:
+                    'A stellar war film that captures the essence of combat.',
+            };
+            const wrapper = mountMovieHero({ review });
+
+            expect(wrapper.text()).toContain(
+                'A stellar war film that captures the essence of combat.',
+            );
+            expect(wrapper.text()).toContain('Read full review');
+            const readMoreLink = wrapper
+                .findAll('a')
+                .find((a) => a.text().includes('Read full review'));
+            expect(readMoreLink).toBeDefined();
+            expect(readMoreLink?.attributes('href')).toBe(
+                `/movies/${defaultMovie.slug}#curator-review-heading`,
+            );
+        });
+
+        it('does not render review block when review not provided', () => {
+            const wrapper = mountMovieHero();
+            expect(wrapper.text()).not.toContain('Read full review');
+        });
+    });
+
     describe('conditional rendering', () => {
         it('does not render runtime when not provided', () => {
             const movieWithoutRuntime = createMockMovie({ runtime: null });

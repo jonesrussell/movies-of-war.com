@@ -66,7 +66,9 @@ readonly class TmdbMovieData
             title: $data['title'] ?? '',
             originalTitle: $data['original_title'] ?? null,
             overview: $data['overview'] ?? null,
-            releaseDate: $data['release_date'] ?? null,
+            releaseDate: self::normalizeReleaseDate(
+                isset($data['release_date']) && $data['release_date'] !== '' ? (string) $data['release_date'] : null
+            ),
             runtime: isset($data['runtime']) ? (int) $data['runtime'] : null,
             posterPath: $data['poster_path'] ?? null,
             backdropPath: $data['backdrop_path'] ?? null,
@@ -89,6 +91,35 @@ readonly class TmdbMovieData
             cast: $cast,
             crew: $crew,
         );
+    }
+
+    /**
+     * Normalize TMDB release_date to YYYY-MM-DD or null.
+     * TMDB may return partial dates (e.g. "2025", "2025-06") for unreleased films.
+     *
+     * @return string|null Full date (YYYY-MM-DD) or null if invalid/empty
+     */
+    private static function normalizeReleaseDate(?string $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $value = trim($value);
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return $value;
+        }
+
+        if (preg_match('/^\d{4}-\d{2}$/', $value)) {
+            return $value.'-01';
+        }
+
+        if (preg_match('/^\d{4}$/', $value)) {
+            return $value.'-01-01';
+        }
+
+        return null;
     }
 
     /**

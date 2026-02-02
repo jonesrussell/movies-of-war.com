@@ -65,3 +65,23 @@ test('it returns null director and empty writers when credits are absent', funct
     expect($dto->director)->toBeNull()
         ->and($dto->writers)->toBe([]);
 });
+
+test('it normalizes partial TMDB release dates to YYYY-MM-DD', function (string $input, ?string $expected) {
+    $data = [
+        'id' => 1,
+        'title' => 'Test',
+        'release_date' => $input,
+        'genres' => [],
+        'videos' => ['results' => []],
+        'keywords' => ['keywords' => []],
+    ];
+
+    $dto = TmdbMovieData::fromApiResponse($data);
+
+    expect($dto->releaseDate)->toBe($expected);
+})->with([
+    'full date unchanged' => ['2005-11-04', '2005-11-04'],
+    'year only becomes first of year' => ['2025', '2025-01-01'],
+    'year-month becomes first of month' => ['2025-06', '2025-06-01'],
+    'empty string becomes null' => ['', null],
+]);

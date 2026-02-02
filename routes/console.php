@@ -55,6 +55,12 @@ Schedule::command('x:generate-content')
     ->name('generate-war-movie-post')
     ->withoutOverlapping();
 
+// Import new upcoming war films weekly
+Schedule::command('tmdb:import --upcoming --limit=10')
+    ->weeklyOn(1, '03:00')
+    ->name('tmdb-import-upcoming')
+    ->withoutOverlapping();
+
 // Refresh stale TMDB data (cadence + max-age) within a window to spread load
 Schedule::command('tmdb:refresh-stale --limit=50')
     ->everyFifteenMinutes()

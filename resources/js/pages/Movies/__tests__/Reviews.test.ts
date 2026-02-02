@@ -193,13 +193,23 @@ describe('Movies/Reviews', () => {
         expect(allReviewsHeader).toBeDefined();
     });
 
-    it('shows curator review block and "More reviews" when curator_review provided', () => {
+    it('shows curator review block and "More reviews" when curator_review and user reviews exist', () => {
         const curatorReview = createMockReview({
             id: 1,
             content_excerpt: 'Curator excerpt.',
         });
         const wrapper = mountReviews({
             curator_review: curatorReview,
+            reviews: {
+                data: [
+                    createMockReview({
+                        id: 2,
+                        is_curator: false,
+                        user: { id: 2, name: 'Other User' },
+                    }),
+                ],
+                ...defaultPagination,
+            },
         });
         expect(wrapper.text()).toContain("Curator's review");
         expect(wrapper.find('[data-testid="review-card"]').exists()).toBe(true);
@@ -208,6 +218,7 @@ describe('Movies/Reviews', () => {
             (h) => h.text() === 'More reviews',
         );
         expect(moreReviewsHeader).toBeDefined();
+        expect(wrapper.find('[data-testid="review-list"]').exists()).toBe(true);
     });
 
     it('shows guest empty state when no reviews at all', () => {
@@ -216,7 +227,7 @@ describe('Movies/Reviews', () => {
         expect(wrapper.text()).toContain('Log in to review');
     });
 
-    it('renders ReviewList with empty message when only curator review', () => {
+    it('shows CTA block and no "More reviews" or ReviewList when only curator review', () => {
         const curatorReview = createMockReview();
         const wrapper = mountReviews({
             curator_review: curatorReview,
@@ -225,8 +236,17 @@ describe('Movies/Reviews', () => {
                 ...defaultPagination,
             },
         });
-        const reviewList = wrapper.findComponent({ name: 'ReviewList' });
-        expect(reviewList.exists()).toBe(true);
-        expect(reviewList.props('emptyMessage')).toBe('No other reviews yet.');
+        expect(wrapper.text()).toContain(
+            'No user reviews yet. Be the first to share your thoughts!',
+        );
+        const moreReviewsHeader = wrapper
+            .findAll('h2')
+            .find((h) => h.text() === 'More reviews');
+        expect(moreReviewsHeader).toBeUndefined();
+        expect(wrapper.find('[data-testid="review-list"]').exists()).toBe(
+            false,
+        );
+        expect(wrapper.text()).toContain('Log in to review');
+        expect(wrapper.find('a[href*="/register"]').exists()).toBe(true);
     });
 });

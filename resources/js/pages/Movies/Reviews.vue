@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 import { Poster } from '@/components/primitives';
+import MovieFacts from '@/components/public/MovieFacts.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
@@ -37,8 +38,19 @@ const auth = page.props.auth;
 const showReviewForm = ref(false);
 
 const hasCuratorReview = computed(() => Boolean(props.curator_review));
+const hasUserReviews = computed(
+    () => (props.reviews?.data?.length ?? 0) > 0,
+);
 const hasNoReviews = computed(
     () => !hasCuratorReview.value && (props.reviews?.data?.length ?? 0) === 0,
+);
+const onlyCuratorNoUserReviews = computed(
+    () => hasCuratorReview.value && !hasUserReviews.value,
+);
+const showWriteReviewSection = computed(
+    () =>
+        Boolean(auth.user) &&
+        !(hasCuratorReview.value && !hasUserReviews.value),
 );
 const loginUrl = computed(
     () =>
@@ -53,58 +65,122 @@ const loginUrl = computed(
 
         <PublicSection spacing="md">
             <PublicContainer class="flex flex-col gap-6">
+                <h1 class="sr-only">Reviews – {{ movie.title }}</h1>
+
                 <Link
                     :href="`/movies/${movie.slug}`"
-                    class="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-white"
+                    class="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                 >
-                    <ArrowLeft class="size-4" />
+                    <ArrowLeft class="size-4" aria-hidden="true" />
                     Back to {{ movie.title }}
                 </Link>
 
-                <!-- Compact movie context -->
+                <!-- Responsive layout: mobile stacked; desktop grid (main first in DOM, aside second; CSS places aside left, main right) -->
                 <div
-                    class="flex items-center gap-4 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4"
+                    class="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,280px)_1fr] lg:items-start lg:gap-8"
                 >
-                    <Link
-                        :href="`/movies/${movie.slug}`"
-                        class="shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
-                    >
-                        <Poster
-                            :src="movie.poster_url"
-                            :alt="movie.title"
-                            :poster-path="movie.poster_path"
-                            context="grid"
-                            class="rounded-lg"
-                        />
-                    </Link>
-                    <div class="min-w-0 flex-1">
-                        <Link
-                            :href="`/movies/${movie.slug}`"
-                            class="text-lg font-semibold text-white transition-colors hover:text-red-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                    <!-- Main column (curator review when present, or empty so "All reviews" follows; first in DOM for reading order) -->
+                    <div class="min-w-0 lg:col-start-2 lg:row-start-1">
+                        <!-- Mobile: poster first -->
+                        <div class="lg:hidden">
+                            <Link
+                                :href="`/movies/${movie.slug}`"
+                                class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            >
+                                <Poster
+                                    :src="movie.poster_url"
+                                    :alt="movie.title"
+                                    :poster-path="movie.poster_path"
+                                    context="grid"
+                                    class="w-full max-w-[200px] rounded-lg"
+                                />
+                            </Link>
+                            <p class="mt-2 text-lg font-semibold text-white">
+                                <Link
+                                    :href="`/movies/${movie.slug}`"
+                                    class="transition-colors hover:text-red-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                >
+                                    {{ movie.title }}
+                                </Link>
+                                <template v-if="movie.release_year">
+                                    <span class="text-zinc-400">
+                                        ({{ movie.release_year }})
+                                    </span>
+                                </template>
+                            </p>
+                            <p
+                                v-if="
+                                    movie.tmdb_vote_average != null &&
+                                    movie.tmdb_vote_count != null
+                                "
+                                class="mt-0.5 text-sm text-zinc-500"
+                            >
+                                TMDB:
+                                {{ Number(movie.tmdb_vote_average).toFixed(1)
+                                }}/10
+                                ({{
+                                    Number(movie.tmdb_vote_count).toLocaleString()
+                                }}
+                                votes)
+                            </p>
+                        </div>
+
+                        <!-- Curator review (featured; first content after poster on mobile, main column on desktop) -->
+                        <div
+                            v-if="hasCuratorReview && curator_review"
+                            class="mt-6 space-y-3 lg:mt-0"
+                            role="region"
+                            aria-label="Curator's review"
                         >
-                            {{ movie.title }}
-                        </Link>
-                        <p
-                            v-if="movie.release_year"
-                            class="mt-0.5 text-sm text-zinc-400"
-                        >
-                            {{ movie.release_year }}
-                        </p>
-                        <p
-                            v-if="
-                                movie.tmdb_vote_average != null &&
-                                movie.tmdb_vote_count != null
-                            "
-                            class="mt-1 text-sm text-zinc-500"
-                        >
-                            TMDB:
-                            {{ Number(movie.tmdb_vote_average).toFixed(1) }}/10
-                            ({{
-                                Number(movie.tmdb_vote_count).toLocaleString()
-                            }}
-                            votes)
-                        </p>
+                            <h2 class="text-lg font-semibold text-white">
+                                {{ curator_review.user?.name ?? 'Curator' }}'s
+                                review
+                            </h2>
+                            <ReviewCard
+                                :review="curator_review"
+                                :hide-spoiler-blur="true"
+                                :is-curator-pick="true"
+                                :default-expanded="true"
+                            />
+                        </div>
+
+                        <!-- No curator: "All reviews" lives in main column on desktop so grid isn't lopsided -->
+                        <template v-if="!hasCuratorReview && !onlyCuratorNoUserReviews">
+                            <SectionHeader
+                                title="All reviews"
+                                :level="2"
+                                class="mb-4 mt-6 lg:mt-0"
+                            />
+                            <ReviewList
+                                :reviews="reviews"
+                                :query-params="queryParams"
+                                :movie-slug="movie.slug"
+                                empty-message="No reviews yet. Be the first to share your thoughts!"
+                            />
+                        </template>
                     </div>
+
+                    <!-- Sidebar: poster + movie facts (desktop only; second in DOM, placed left via grid) -->
+                    <aside
+                        class="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1"
+                        aria-label="Movie details"
+                    >
+                        <div class="hidden lg:block">
+                            <Link
+                                :href="`/movies/${movie.slug}`"
+                                class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            >
+                                <Poster
+                                    :src="movie.poster_url"
+                                    :alt="movie.title"
+                                    :poster-path="movie.poster_path"
+                                    context="grid"
+                                    class="w-full rounded-lg"
+                                />
+                            </Link>
+                        </div>
+                        <MovieFacts :movie="movie" />
+                    </aside>
                 </div>
 
                 <!-- Guest empty state: no reviews at all -->
@@ -125,37 +201,70 @@ const loginUrl = computed(
                         <span class="text-sm text-zinc-500">or</span>
                         <Link
                             :href="register().url"
-                            class="text-sm font-medium text-red-500 hover:underline"
+                            class="text-sm font-medium text-red-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                         >
                             Sign up
                         </Link>
                     </div>
                 </div>
 
-                <!-- Curator review (featured, always first) -->
+                <!-- Only curator, no user reviews: single CTA block (no "More reviews" section) -->
                 <div
-                    v-if="hasCuratorReview && curator_review"
-                    class="space-y-3"
-                    role="region"
-                    aria-label="Featured review"
+                    v-else-if="onlyCuratorNoUserReviews"
+                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 text-center"
                 >
-                    <h2 class="text-lg font-semibold text-white">
-                        {{ curator_review.user?.name ?? 'Curator' }}'s review
-                    </h2>
-                    <ReviewCard
-                        :review="curator_review"
-                        :hide-spoiler-blur="true"
-                        :is-curator-pick="true"
-                        :default-expanded="true"
-                    />
+                    <p class="mb-4 text-zinc-300">
+                        No user reviews yet. Be the first to share your
+                        thoughts!
+                    </p>
+                    <div
+                        v-if="auth.user"
+                        class="flex flex-wrap items-center justify-center gap-3"
+                    >
+                        <Button
+                            v-if="!showReviewForm"
+                            class="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500"
+                            @click="showReviewForm = true"
+                        >
+                            Write a review
+                        </Button>
+                        <div
+                            v-else
+                            class="w-full rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 text-left"
+                        >
+                            <h2 class="mb-4 text-lg font-semibold text-white">
+                                Write a review
+                            </h2>
+                            <ReviewForm
+                                :movie="movie"
+                                :existing-review="null"
+                            />
+                        </div>
+                    </div>
+                    <div
+                        v-else
+                        class="flex flex-wrap items-center justify-center gap-3"
+                    >
+                        <Link
+                            :href="loginUrl"
+                            class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                        >
+                            Log in to review
+                        </Link>
+                        <span class="text-sm text-zinc-500">or</span>
+                        <Link
+                            :href="register().url"
+                            class="text-sm font-medium text-red-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                        >
+                            Sign up
+                        </Link>
+                    </div>
                 </div>
 
-                <!-- More reviews (or All reviews when no curator) -->
-                <div>
+                <!-- More reviews (below grid when curator present; "All reviews" when no curator is in main column above) -->
+                <div v-else-if="hasCuratorReview">
                     <SectionHeader
-                        :title="
-                            hasCuratorReview ? 'More reviews' : 'All reviews'
-                        "
+                        title="More reviews"
                         :level="2"
                         class="mb-4"
                     />
@@ -163,20 +272,16 @@ const loginUrl = computed(
                         :reviews="reviews"
                         :query-params="queryParams"
                         :movie-slug="movie.slug"
-                        :empty-message="
-                            hasCuratorReview
-                                ? 'No other reviews yet.'
-                                : 'No reviews yet. Be the first to share your thoughts!'
-                        "
+                        empty-message="No other reviews yet."
                     />
                 </div>
 
-                <!-- Write review (authenticated only) -->
-                <div v-if="auth.user" class="space-y-4">
+                <!-- Write review (authenticated only; hidden when only curator + no user reviews, CTA handles it) -->
+                <div v-if="showWriteReviewSection" class="space-y-4">
                     <Button
                         v-if="!showReviewForm"
                         variant="outline"
-                        class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                        class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white focus-visible:ring-red-500"
                         @click="showReviewForm = true"
                     >
                         Write a review

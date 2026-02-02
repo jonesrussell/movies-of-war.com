@@ -8,6 +8,7 @@ use App\Data\Tmdb\TmdbDiscoverResponse;
 use App\Data\Tmdb\TmdbMovieData;
 use App\Data\Tmdb\TmdbPersonData;
 use App\Data\Tmdb\TmdbSearchResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -49,6 +50,64 @@ class TMDBService
         $data = $response->json();
 
         return TmdbSearchResponse::fromApiResponse($data);
+    }
+
+    /**
+     * Search keywords by name. Returns array of {id, name}.
+     *
+     * @return array<int, array{id: int, name: string}>
+     */
+    public function searchKeywords(string $query): array
+    {
+        $response = Http::get("{$this->baseUrl}/search/keyword", [
+            'api_key' => $this->apiKey,
+            'query' => $query,
+        ]);
+
+        if (! $response->successful()) {
+            return [];
+        }
+
+        $data = $response->json();
+
+        return collect($data['results'] ?? [])
+            ->map(fn (array $keyword) => [
+                'id' => $keyword['id'],
+                'name' => $keyword['name'],
+            ])
+            ->all();
+    }
+
+    /**
+     * Resolve keyword names to TMDB keyword IDs with caching.
+     *
+     * @param  array<int, string>  $names
+     * @return array<int, int> Array of keyword IDs
+     */
+    public function resolveKeywordIds(array $names): array
+    {
+        $ttl = config('tmdb.import.keyword_cache_ttl_seconds', 86400);
+        $ids = [];
+
+        foreach ($names as $name) {
+            $cacheKey = 'tmdb_keyword_id:'.md5(strtolower($name));
+
+            $keywordId = Cache::remember($cacheKey, $ttl, function () use ($name) {
+                $results = $this->searchKeywords($name);
+
+                if (empty($results)) {
+                    return null;
+                }
+
+                return $results[0]['id'];
+            });
+
+            if ($keywordId !== null) {
+                $ids[] = $keywordId;
+            }
+        }
+
+        return $ids;
     }
 
     public function getMovieDetails(int $tmdbId): ?array
@@ -135,6 +194,57 @@ class TMDBService
         } else {
             $query['sort_by'] = 'vote_average.desc';
             $query['vote_count.gte'] = 100;
+        }
+
+        $response = Http::get("{$this->baseUrl}/discover/movie", $query);
+
+        $data = $response->json();
+
+        return TmdbDiscoverResponse::fromApiResponse($data);
+    }
+
+    /**
+     * Discover movies with flexible filters.
+     *
+     * @param  array<int, int>  $genreIds
+     * @param  array<int, int>  $keywordIds
+     */
+    public function discoverMoviesAsDto(
+        int $page = 1,
+        ?array $genreIds = null,
+        ?array $keywordIds = null,
+        ?int $minVoteCount = null,
+        ?float $minVoteAverage = null,
+        bool $upcoming = false,
+        string $language = 'en'
+    ): TmdbDiscoverResponse {
+        $query = [
+            'api_key' => $this->apiKey,
+            'with_original_language' => $language,
+            'page' => $page,
+        ];
+
+        if ($genreIds !== null && count($genreIds) > 0) {
+            $query['with_genres'] = implode(',', $genreIds);
+        }
+
+        if ($keywordIds !== null && count($keywordIds) > 0) {
+            $query['with_keywords'] = implode('|', $keywordIds);
+        }
+
+        if ($minVoteCount !== null) {
+            $query['vote_count.gte'] = $minVoteCount;
+        }
+
+        if ($minVoteAverage !== null) {
+            $query['vote_average.gte'] = $minVoteAverage;
+        }
+
+        if ($upcoming) {
+            $query['primary_release_date.gte'] = now()->toDateString();
+            $query['sort_by'] = 'primary_release_date.asc';
+        } else {
+            $query['sort_by'] = 'vote_average.desc';
         }
 
         $response = Http::get("{$this->baseUrl}/discover/movie", $query);

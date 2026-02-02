@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Enums\MovieStatus;
+use App\Jobs\ImportTmdbMovieJob;
 use App\Models\Movie;
-use App\Models\Tag;
-use App\Services\PersonSyncService;
+use App\Services\TmdbImportCandidateFilter;
+use App\Services\TmdbImportGapFiller;
+use App\Services\TmdbMovieImportService;
 use App\Services\TMDBService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class ImportTmdbMovies extends Command
 {
@@ -18,15 +20,21 @@ class ImportTmdbMovies extends Command
                             {--limit=30 : Number of movies to import}
                             {--upcoming : Only upcoming releases}
                             {--force : Re-import existing movies}
-                            {--page=1 : Starting page number}
-                            {--random : Randomize movie selection}
+                            {--sync : Run import synchronously (default: dispatch jobs)}
+                            {--no-gap-fill : Disable gap-filling (use default strategy order)}
+                            {--page=1 : Starting page (legacy strategy only)}
+                            {--random : Randomize candidate order before import}
                             {--debug : Show debug output}';
 
-    protected $description = 'Import war movies from The Movie Database (TMDB)';
+    protected $description = 'Import war movies from The Movie Database (TMDB) using intelligent multi-strategy discovery';
 
     protected TMDBService $tmdb;
 
-    protected PersonSyncService $personSync;
+    protected TmdbImportCandidateFilter $filter;
+
+    protected TmdbImportGapFiller $gapFiller;
+
+    protected TmdbMovieImportService $importService;
 
     protected bool $debug = false;
 
@@ -40,55 +48,226 @@ class ImportTmdbMovies extends Command
         }
 
         $this->tmdb = app(TMDBService::class);
-        $this->personSync = app(PersonSyncService::class);
+        $this->filter = app(TmdbImportCandidateFilter::class);
+        $this->gapFiller = app(TmdbImportGapFiller::class);
+        $this->importService = app(TmdbMovieImportService::class);
+
         $limit = (int) $this->option('limit');
         $upcoming = (bool) $this->option('upcoming');
-        $force = $this->option('force');
-        $startPage = (int) $this->option('page');
-        $random = $this->option('random');
-        $this->debug = $this->option('debug');
+        $force = (bool) $this->option('force');
+        $sync = (bool) $this->option('sync');
+        $noGapFill = (bool) $this->option('no-gap-fill');
+        $this->debug = (bool) $this->option('debug');
 
-        $pageInfo = $startPage > 1 ? " (starting from page {$startPage})" : '';
-        $randomInfo = $random ? ' (randomized)' : '';
         $upcomingInfo = $upcoming ? ' (upcoming only)' : '';
-        $debugInfo = $this->debug ? ' [DEBUG MODE]' : '';
-        $this->info("Fetching war movies from TMDB (limit: {$limit}){$pageInfo}{$randomInfo}{$upcomingInfo}{$debugInfo}...");
+        $syncInfo = $sync ? ' [SYNC MODE]' : ' [JOB MODE]';
+        $gapInfo = $noGapFill ? ' [NO GAP-FILL]' : '';
+        $debugInfo = $this->debug ? ' [DEBUG]' : '';
+        $random = (bool) $this->option('random');
+        $this->info("Discovering war movies from TMDB (limit: {$limit}){$upcomingInfo}{$syncInfo}{$gapInfo}{$debugInfo}...");
 
-        $warMovieIds = $this->getWarMovieIds($limit, $startPage, $random, $upcoming);
+        $candidateIds = $this->discoverCandidateIds($limit, $upcoming, $force, $noGapFill, $random);
 
-        $this->info("Found {$warMovieIds->count()} movies. Importing...");
+        $this->info("Found {$candidateIds->count()} candidate movies after filtering.");
 
-        $progressBar = $this->output->createProgressBar($warMovieIds->count());
+        if ($candidateIds->isEmpty()) {
+            $this->warn('No candidates to import.');
+
+            return self::SUCCESS;
+        }
+
+        if ($sync) {
+            return $this->importSync($candidateIds, $force);
+        } else {
+            return $this->importAsync($candidateIds, $force);
+        }
+    }
+
+    /**
+     * Discover candidate movie IDs using multi-strategy discovery, gap-filling, and filtering.
+     *
+     * @return Collection<int, int>
+     */
+    protected function discoverCandidateIds(int $limit, bool $upcoming, bool $force, bool $noGapFill, bool $random = false): Collection
+    {
+        $strategies = config('tmdb.import.discovery_strategies', []);
+
+        if (empty($strategies)) {
+            return $this->discoverWithLegacyStrategy($limit, $upcoming);
+        }
+
+        if (! $noGapFill) {
+            $strategies = $this->gapFiller->sortStrategiesByGap($strategies);
+        }
+
+        $minVoteCount = config('tmdb.import.min_vote_count');
+        $maxIdsPerStrategy = config('tmdb.import.max_ids_per_strategy', 50);
+        $allResults = collect();
+        $strategyLog = [];
+
+        foreach ($strategies as $strategy) {
+            $key = $strategy['key'] ?? 'unknown';
+            $rawResults = $this->fetchStrategyResults($strategy, $upcoming, $maxIdsPerStrategy);
+            $rawCount = $rawResults->count();
+
+            Log::info('TMDB import strategy', [
+                'strategy' => $key,
+                'raw_count' => $rawCount,
+            ]);
+            $strategyLog[$key] = ['raw' => $rawCount];
+
+            $seenIds = $allResults->pluck('id')->flip()->all();
+            foreach ($rawResults as $movie) {
+                $id = $movie['id'] ?? null;
+                if ($id !== null && ! isset($seenIds[$id])) {
+                    $seenIds[$id] = true;
+                    $allResults->push($movie);
+                }
+            }
+        }
+
+        $mergedCount = $allResults->count();
+        $candidates = $this->filter->filter($allResults);
+        $filteredCount = $candidates->count();
+
+        foreach (array_keys($strategyLog) as $k) {
+            $strategyLog[$k]['after_dedupe'] = $mergedCount;
+            $strategyLog[$k]['filtered'] = $filteredCount;
+        }
+        Log::info('TMDB import discovery summary', $strategyLog);
+
+        $ids = $candidates->values();
+
+        if (! $force) {
+            $existingTmdbIds = Movie::whereIn('tmdb_id', $ids->all())->pluck('tmdb_id');
+            $ids = $ids->reject(fn (int $id) => $existingTmdbIds->contains($id))->values();
+        }
+
+        $ids = $ids->take($limit)->values();
+
+        if ($random) {
+            $ids = $ids->shuffle()->values();
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Fetch discover results for one strategy (genre or keywords).
+     *
+     * @param  array<string, mixed>  $strategy
+     * @return Collection<int, array<string, mixed>>
+     */
+    protected function fetchStrategyResults(array $strategy, bool $upcoming, int $maxPerStrategy): Collection
+    {
+        $results = collect();
+        $page = 1;
+        $minVoteCount = config('tmdb.import.min_vote_count');
+        $minVoteAverage = config('tmdb.import.min_vote_average');
+
+        $genreIds = null;
+        $keywordIds = null;
+
+        if (($strategy['type'] ?? '') === 'genre' && isset($strategy['genre_id'])) {
+            $genreIds = [(int) $strategy['genre_id']];
+        }
+
+        if (($strategy['type'] ?? '') === 'keywords' && ! empty($strategy['names'])) {
+            $keywordIds = $this->tmdb->resolveKeywordIds($strategy['names']);
+            if (empty($keywordIds)) {
+                return $results;
+            }
+        }
+
+        while ($results->count() < $maxPerStrategy) {
+            $response = $this->tmdb->discoverMoviesAsDto(
+                $page,
+                $genreIds,
+                $keywordIds,
+                $minVoteCount,
+                $minVoteAverage,
+                $upcoming
+            );
+
+            if ($response->isEmpty()) {
+                break;
+            }
+
+            foreach ($response->results as $movie) {
+                $results->push($movie);
+                if ($results->count() >= $maxPerStrategy) {
+                    break;
+                }
+            }
+
+            if ($response->results->count() < 20) {
+                break;
+            }
+
+            $page++;
+            usleep(250000);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Legacy single-strategy discovery (War genre only).
+     *
+     * @return Collection<int, int>
+     */
+    protected function discoverWithLegacyStrategy(int $limit, bool $upcoming): Collection
+    {
+        $allResults = collect();
+        $page = 1;
+
+        while ($allResults->count() < $limit * 2) {
+            $response = $this->tmdb->discoverWarMoviesAsDto($page, $upcoming);
+            if ($response->isEmpty()) {
+                break;
+            }
+            foreach ($response->results as $movie) {
+                $allResults->push($movie);
+            }
+            $page++;
+            usleep(250000);
+        }
+
+        $filtered = $this->filter->filter($allResults);
+
+        return $filtered->take($limit)->values();
+    }
+
+    /**
+     * Import candidates synchronously using TmdbMovieImportService.
+     *
+     * @param  Collection<int, int>  $candidateIds
+     */
+    protected function importSync(Collection $candidateIds, bool $force): int
+    {
+        $progressBar = $this->output->createProgressBar($candidateIds->count());
         $created = 0;
         $updated = 0;
         $skipped = 0;
 
-        foreach ($warMovieIds as $tmdbId) {
-            try {
-                // Skip if movie already exists and --force not set
-                if (! $force && Movie::where('tmdb_id', $tmdbId)->exists()) {
-                    $skipped++;
-                    $progressBar->advance();
-
-                    continue;
-                }
-
-                $movieData = $this->tmdb->getMovieDetailsAsDto($tmdbId);
-
-                if ($movieData) {
-                    $result = $this->importMovie($movieData);
-                    if ($result['action'] === 'created') {
-                        $created++;
-                    } else {
-                        $updated++;
-                    }
-                }
-
+        foreach ($candidateIds as $tmdbId) {
+            if (! $force && Movie::where('tmdb_id', $tmdbId)->exists()) {
+                $skipped++;
                 $progressBar->advance();
-                usleep(250000); // Rate limiting: 4 requests per second
-            } catch (\Exception $e) {
-                $this->warn("\nError importing movie ID {$tmdbId}: {$e->getMessage()}");
+
+                continue;
             }
+
+            $result = $this->importService->import($tmdbId, $force);
+            if ($result !== null) {
+                if ($result['action'] === 'created') {
+                    $created++;
+                } else {
+                    $updated++;
+                }
+            }
+            $progressBar->advance();
+            usleep(250000);
         }
 
         $progressBar->finish();
@@ -101,194 +280,34 @@ class ImportTmdbMovies extends Command
         return self::SUCCESS;
     }
 
-    protected function getWarMovieIds(int $limit, int $startPage, bool $random, bool $upcoming): \Illuminate\Support\Collection
+    /**
+     * Dispatch ImportTmdbMovieJob for each candidate with delay for rate limiting.
+     *
+     * @param  Collection<int, int>  $candidateIds
+     */
+    protected function importAsync(Collection $candidateIds, bool $force): int
     {
-        $ids = collect();
+        $dispatched = 0;
+        $skipped = 0;
 
-        if ($random) {
-            // Get total pages available from TMDB
-            $firstPageResponse = $this->tmdb->discoverWarMoviesAsDto(1, $upcoming);
+        foreach ($candidateIds->values() as $index => $tmdbId) {
+            if (! $force && Movie::where('tmdb_id', $tmdbId)->exists()) {
+                $skipped++;
 
-            if ($this->debug) {
-                $this->line("\n=== DEBUG: First Page Response ===");
-                $this->line(json_encode($firstPageResponse->toArray(), JSON_PRETTY_PRINT));
-                $this->line("===================================\n");
+                continue;
             }
 
-            $totalPages = min($firstPageResponse->totalPages, 500); // TMDB limits to 500 pages
+            ImportTmdbMovieJob::dispatch($tmdbId, $force)
+                ->delay(now()->addSeconds((int) (0.25 * $index)));
 
-            $this->line("Total pages available: {$totalPages}");
-
-            // Generate random page numbers to fetch from
-            $pagesToFetch = collect(range(1, $totalPages))
-                ->shuffle()
-                ->take(ceil($limit / 20)) // Each page has ~20 results
-                ->values();
-
-            $this->line('Fetching from random pages: '.implode(', ', $pagesToFetch->take(10)->toArray()).'...');
-
-            foreach ($pagesToFetch as $page) {
-                $response = $this->tmdb->discoverWarMoviesAsDto($page, $upcoming);
-
-                if ($this->debug) {
-                    $this->line("\n=== DEBUG: Page {$page} Response ===");
-                    $this->line('Results count: '.$response->results->count());
-                    $this->line('Total pages: '.$response->totalPages);
-                    $this->line('Total results: '.$response->totalResults);
-                    if ($response->results->isNotEmpty()) {
-                        $this->line('First result: '.json_encode($response->results->first(), JSON_PRETTY_PRINT));
-                    }
-                    $this->line("===================================\n");
-                }
-
-                if ($response->isEmpty()) {
-                    continue;
-                }
-
-                foreach ($response->results as $movie) {
-                    $ids->push($movie['id']);
-
-                    if ($ids->count() >= $limit) {
-                        break 2;
-                    }
-                }
-
-                usleep(250000); // Rate limiting between page fetches
-            }
-        } else {
-            // Sequential fetch starting from specified page
-            $page = $startPage;
-
-            while ($ids->count() < $limit) {
-                $response = $this->tmdb->discoverWarMoviesAsDto($page, $upcoming);
-
-                if ($this->debug) {
-                    $this->line("\n=== DEBUG: Page {$page} Response ===");
-                    $this->line('Results count: '.$response->results->count());
-                    $this->line('Total pages: '.$response->totalPages);
-                    $this->line('Total results: '.$response->totalResults);
-                    if ($response->results->isNotEmpty()) {
-                        $this->line('First result: '.json_encode($response->results->first(), JSON_PRETTY_PRINT));
-                    }
-                    $this->line("===================================\n");
-                }
-
-                if ($response->isEmpty()) {
-                    break;
-                }
-
-                foreach ($response->results as $movie) {
-                    $ids->push($movie['id']);
-
-                    if ($ids->count() >= $limit) {
-                        break;
-                    }
-                }
-
-                $page++;
-            }
+            $dispatched++;
         }
 
-        return $ids;
-    }
-
-    protected function importMovie(\App\Data\Tmdb\TmdbMovieData $movieData): array
-    {
-        if ($this->debug) {
-            $this->line("\n=== DEBUG: Movie Details Response ===");
-            $this->line(json_encode($movieData->toArray(), JSON_PRETTY_PRINT));
-            $this->line("===================================\n");
+        $this->info("Dispatched {$dispatched} import jobs.");
+        if ($skipped > 0) {
+            $this->info("Skipped {$skipped} (already imported).");
         }
 
-        $posterPath = null;
-        $posterUrl = null;
-
-        if ($movieData->posterPath) {
-            $posterPath = $this->tmdb->downloadPoster($movieData->posterPath);
-            $posterUrl = $this->tmdb->getPosterUrl($movieData->posterPath);
-        }
-
-        $trailerUrl = $movieData->getTrailerUrl();
-
-        // First try to find by tmdb_id, then by slug to avoid duplicates
-        $slug = Str::slug($movieData->title);
-
-        $this->line("\nProcessing: {$movieData->title} (TMDB ID: {$movieData->id}, Slug: {$slug})");
-
-        $movieByTmdbId = Movie::where('tmdb_id', $movieData->id)->first();
-        if ($movieByTmdbId) {
-            $this->line("  → Found by TMDB ID: {$movieByTmdbId->id}");
-            $movie = $movieByTmdbId;
-            $action = 'updated';
-        } else {
-            $movieBySlug = Movie::where('slug', $slug)->first();
-            if ($movieBySlug) {
-                $this->line("  → Found by slug: {$movieBySlug->id} (existing tmdb_id: {$movieBySlug->tmdb_id})");
-                $movie = $movieBySlug;
-                $action = 'updated';
-            } else {
-                $this->line('  → Creating new movie');
-                $movie = new Movie(['tmdb_id' => $movieData->id]);
-                $action = 'created';
-            }
-        }
-
-        $movie->fill(array_merge($movieData->toMovieAttributes(), [
-            'slug' => $slug,
-            'poster_path' => $posterPath,
-            'poster_url' => $posterUrl,
-            'trailer_url' => $trailerUrl,
-            'tmdb_last_synced_at' => now(),
-        ]));
-
-        // Only set status to draft if this is a new movie
-        if (! $movie->exists) {
-            $movie->status = MovieStatus::Draft;
-        }
-
-        $this->line('  → Saving (exists: '.($movie->exists ? 'yes' : 'no').')');
-        $movie->save();
-        $this->line("  → Saved as ID: {$movie->id}");
-
-        // Sync people and pivot, update cast/crew JSON with slugs
-        $peopleData = $this->personSync->syncFromMovieDto($movie, $movieData);
-        $movie->update([
-            'cast' => $peopleData['cast'],
-            'crew' => $peopleData['crew'],
-        ]);
-
-        // Tag the movie
-        $this->tagMovie($movie, $movieData);
-
-        return ['action' => $action];
-    }
-
-    protected function tagMovie(Movie $movie, \App\Data\Tmdb\TmdbMovieData $movieData): void
-    {
-        $tags = collect();
-
-        // Add genre tags
-        foreach ($movieData->genres as $genre) {
-            $tag = Tag::firstOrCreate(
-                ['slug' => Str::slug($genre->name)],
-                ['name' => $genre->name, 'type' => 'genre']
-            );
-            $tags->push($tag->id);
-        }
-
-        // Add era tags based on keywords
-        foreach ($movieData->keywords as $keyword) {
-            $matchedEra = $keyword->matchEra();
-
-            if ($matchedEra !== null) {
-                $tag = Tag::firstOrCreate(
-                    ['slug' => Str::slug($matchedEra)],
-                    ['name' => $matchedEra, 'type' => 'era']
-                );
-                $tags->push($tag->id);
-            }
-        }
-
-        $movie->tags()->sync($tags->unique());
+        return self::SUCCESS;
     }
 }

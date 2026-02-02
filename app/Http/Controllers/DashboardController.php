@@ -4,22 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Data\Tmdb\TmdbMovieData;
-use App\Enums\MovieStatus;
-use App\Enums\TagType;
 use App\Http\Requests\ImportTmdbMoviesRequest;
 use App\Http\Resources\MovieResource;
 use App\Http\Resources\ReviewResource;
 use App\Jobs\ImportTmdbMoviesJob;
 use App\Models\Movie;
-use App\Models\Tag;
 use App\Services\DashboardStatsService;
-use App\Services\PersonSyncService;
+use App\Services\TmdbMovieImportService;
 use App\Services\TMDBService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,7 +23,7 @@ class DashboardController extends Controller
     public function __construct(
         protected DashboardStatsService $statsService,
         protected TMDBService $tmdbService,
-        protected PersonSyncService $personSyncService
+        protected TmdbMovieImportService $tmdbMovieImportService
     ) {}
 
     public function index(Request $request): Response
@@ -143,90 +138,13 @@ class DashboardController extends Controller
             return redirect()->route('dashboard.tmdb.search')->with('error', 'This movie has already been imported.');
         }
 
-        $dto = $this->tmdbService->getMovieDetailsAsDto($tmdbId);
+        $result = $this->tmdbMovieImportService->import($tmdbId);
 
-        if ($dto === null) {
+        if ($result === null) {
             return redirect()->route('dashboard.tmdb.search')->with('error', 'Could not fetch movie details from TMDB.');
         }
 
-        $posterPath = null;
-        $posterUrl = null;
-        if ($dto->posterPath) {
-            $posterPath = $this->tmdbService->downloadPoster($dto->posterPath);
-            $posterUrl = $this->tmdbService->getPosterUrl($dto->posterPath);
-        }
-
-        $slug = $this->resolveUniqueSlugForImport($dto);
-
-        $attributes = array_merge($dto->toMovieAttributes(), [
-            'slug' => $slug,
-            'poster_path' => $posterPath,
-            'poster_url' => $posterUrl,
-            'trailer_url' => $dto->getTrailerUrl(),
-            'status' => MovieStatus::Draft,
-            'tmdb_last_synced_at' => now(),
-        ]);
-
-        $movie = Movie::create($attributes);
-
-        $peopleData = $this->personSyncService->syncFromMovieDto($movie, $dto);
-        $movie->update([
-            'cast' => $peopleData['cast'],
-            'crew' => $peopleData['crew'],
-        ]);
-
-        $this->syncTagsFromTmdbDto($movie, $dto);
-
-        return redirect()->route('dashboard.tmdb.search')->with('success', "'{$movie->title}' has been imported as a draft.");
-    }
-
-    /**
-     * Generate a unique slug for a movie being imported from TMDB.
-     */
-    private function resolveUniqueSlugForImport(TmdbMovieData $dto): string
-    {
-        $baseSlug = Str::slug($dto->title);
-        $releaseYear = $dto->getReleaseYear();
-
-        if (! Movie::where('slug', $baseSlug)->exists()) {
-            return $baseSlug;
-        }
-
-        $slugWithYear = $releaseYear ? "{$baseSlug}-{$releaseYear}" : "{$baseSlug}-{$dto->id}";
-        if (! Movie::where('slug', $slugWithYear)->exists()) {
-            return $slugWithYear;
-        }
-
-        return "{$baseSlug}-{$dto->id}";
-    }
-
-    /**
-     * Sync movie tags from TMDB DTO (genres + era from keywords).
-     */
-    private function syncTagsFromTmdbDto(Movie $movie, TmdbMovieData $dto): void
-    {
-        $tagIds = collect();
-
-        foreach ($dto->genres as $genre) {
-            $tag = Tag::firstOrCreate(
-                ['slug' => Str::slug($genre->name)],
-                ['name' => $genre->name, 'type' => TagType::Genre]
-            );
-            $tagIds->push($tag->id);
-        }
-
-        foreach ($dto->keywords as $keyword) {
-            $matchedEra = $keyword->matchEra();
-            if ($matchedEra !== null) {
-                $tag = Tag::firstOrCreate(
-                    ['slug' => Str::slug($matchedEra)],
-                    ['name' => $matchedEra, 'type' => TagType::Era]
-                );
-                $tagIds->push($tag->id);
-            }
-        }
-
-        $movie->tags()->sync($tagIds->unique()->values()->all());
+        return redirect()->route('dashboard.tmdb.search')->with('success', "'{$result['movie']->title}' has been imported as a draft.");
     }
 
     public function publishMovie(Movie $movie): RedirectResponse

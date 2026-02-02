@@ -78,9 +78,21 @@ test('tag casts type to TagType enum', function () {
 });
 
 test('tag type enum values are correct', function () {
-    $genreTag = Tag::factory()->create(['type' => TagType::Genre]);
-    $themeTag = Tag::factory()->create(['type' => TagType::Theme]);
-    $eraTag = Tag::factory()->create(['type' => TagType::Era]);
+    $genreTag = Tag::factory()->create([
+        'type' => TagType::Genre,
+        'name' => 'Genre Type',
+        'slug' => 'genre-type',
+    ]);
+    $themeTag = Tag::factory()->create([
+        'type' => TagType::Theme,
+        'name' => 'Theme Type',
+        'slug' => 'theme-type',
+    ]);
+    $eraTag = Tag::factory()->create([
+        'type' => TagType::Era,
+        'name' => 'Era Type',
+        'slug' => 'era-type',
+    ]);
 
     expect($genreTag->type->value)->toBe('genre')
         ->and($themeTag->type->value)->toBe('theme')

@@ -25,6 +25,7 @@ withDefaults(defineProps<Props>(), {
         <div v-if="collapsed && contentExcerpt" class="whitespace-pre-wrap">
             {{ contentExcerpt }}
         </div>
+        <!-- eslint-disable-next-line vue/no-v-html -- contentHtml is server-rendered Markdown (MarkdownRenderer with html_input strip, no raw HTML) -->
         <div v-else v-html="contentHtml" />
     </div>
 </template>

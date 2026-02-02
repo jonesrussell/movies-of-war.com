@@ -34,7 +34,7 @@ onMounted(() => {
 
 watch(activeTab, (tab) => {
     if (tab === 'preview' && contentRef.value) {
-        fetchPreview(contentRef.value.value);
+        void fetchPreview(contentRef.value.value);
     }
 });
 

@@ -49,7 +49,10 @@ const reviewsDescription = computed(
 );
 const ogImage = computed(() => {
     const url = props.movie.poster_url;
-    if (!url) return appUrl.value ? `${appUrl.value}/images/placeholders/poster-placeholder.png` : '';
+    if (!url)
+        return appUrl.value
+            ? `${appUrl.value}/images/placeholders/poster-placeholder.png`
+            : '';
     return url.startsWith('http') ? url : `${appUrl.value}${url}`;
 });
 
@@ -58,13 +61,25 @@ const jsonLdBreadcrumb = computed(() =>
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: `${appUrl.value}/` },
-            { '@type': 'ListItem', position: 2, name: 'Movies', item: `${appUrl.value}/movies` },
+            {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: `${appUrl.value}/`,
+            },
+            {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Movies',
+                item: `${appUrl.value}/movies`,
+            },
             {
                 '@type': 'ListItem',
                 position: 3,
                 name: props.movie.title,
-                item: appUrl.value ? `${appUrl.value}/movies/${props.movie.slug}` : '',
+                item: appUrl.value
+                    ? `${appUrl.value}/movies/${props.movie.slug}`
+                    : '',
             },
             {
                 '@type': 'ListItem',
@@ -99,7 +114,11 @@ const loginUrl = computed(
 <template>
     <PublicLayout>
         <Head :title="`Reviews for ${movie.title}`">
-            <meta head-key="description" name="description" :content="reviewsDescription" />
+            <meta
+                head-key="description"
+                name="description"
+                :content="reviewsDescription"
+            />
             <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
             <meta property="og:type" content="website" />
             <meta property="og:title" :content="`Reviews for ${movie.title}`" />
@@ -108,10 +127,16 @@ const loginUrl = computed(
             <meta property="og:url" :content="canonicalUrl" />
             <meta property="og:site_name" content="Movies of War" />
             <meta name="twitter:card" content="summary_large_image" />
-            <meta name="twitter:title" :content="`Reviews for ${movie.title}`" />
+            <meta
+                name="twitter:title"
+                :content="`Reviews for ${movie.title}`"
+            />
             <meta name="twitter:description" :content="reviewsDescription" />
             <meta name="twitter:image" :content="ogImage" />
-            <JsonLdScript head-key="jsonld-breadcrumb-reviews" :content="jsonLdBreadcrumb" />
+            <JsonLdScript
+                head-key="jsonld-breadcrumb-reviews"
+                :content="jsonLdBreadcrumb"
+            />
         </Head>
 
         <PublicSection spacing="md">

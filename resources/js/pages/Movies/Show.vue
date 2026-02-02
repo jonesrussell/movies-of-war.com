@@ -262,7 +262,10 @@ const jsonLdMovie = computed(() => {
     if (curator) {
         base.review = {
             '@type': 'Review',
-            author: { '@type': 'Person', name: curator.user?.name ?? 'Curator' },
+            author: {
+                '@type': 'Person',
+                name: curator.user?.name ?? 'Curator',
+            },
             reviewRating: {
                 '@type': 'Rating',
                 ratingValue: curator.rating,
@@ -279,8 +282,18 @@ const jsonLdBreadcrumb = computed(() =>
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: `${appUrl.value}/` },
-            { '@type': 'ListItem', position: 2, name: 'Movies', item: `${appUrl.value}/movies` },
+            {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: `${appUrl.value}/`,
+            },
+            {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Movies',
+                item: `${appUrl.value}/movies`,
+            },
             {
                 '@type': 'ListItem',
                 position: 3,
@@ -295,7 +308,11 @@ const jsonLdBreadcrumb = computed(() =>
 <template>
     <PublicLayout>
         <Head :title="`${movie.title} (${movie.release_year})`">
-            <meta head-key="description" name="description" :content="ogDescription" />
+            <meta
+                head-key="description"
+                name="description"
+                :content="ogDescription"
+            />
             <link head-key="canonical" rel="canonical" :href="pageUrl" />
             <meta property="og:type" content="video.movie" />
             <meta
@@ -314,7 +331,10 @@ const jsonLdBreadcrumb = computed(() =>
             <meta name="twitter:description" :content="ogDescription" />
             <meta name="twitter:image" :content="ogImage" />
             <JsonLdScript head-key="jsonld-movie" :content="jsonLdMovie" />
-            <JsonLdScript head-key="jsonld-breadcrumb-movie" :content="jsonLdBreadcrumb" />
+            <JsonLdScript
+                head-key="jsonld-breadcrumb-movie"
+                :content="jsonLdBreadcrumb"
+            />
         </Head>
 
         <div class="relative overflow-hidden bg-zinc-950">

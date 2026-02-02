@@ -53,8 +53,18 @@ const jsonLdBreadcrumb = computed(() =>
               '@context': 'https://schema.org',
               '@type': 'BreadcrumbList',
               itemListElement: [
-                  { '@type': 'ListItem', position: 1, name: 'Home', item: `${appUrl.value}/` },
-                  { '@type': 'ListItem', position: 2, name: 'Movies', item: `${appUrl.value}/movies` },
+                  {
+                      '@type': 'ListItem',
+                      position: 1,
+                      name: 'Home',
+                      item: `${appUrl.value}/`,
+                  },
+                  {
+                      '@type': 'ListItem',
+                      position: 2,
+                      name: 'Movies',
+                      item: `${appUrl.value}/movies`,
+                  },
                   {
                       '@type': 'ListItem',
                       position: 3,
@@ -70,7 +80,11 @@ const jsonLdBreadcrumb = computed(() =>
 <template>
     <PublicLayout>
         <Head :title="person.name">
-            <meta head-key="description" name="description" :content="personDescription" />
+            <meta
+                head-key="description"
+                name="description"
+                :content="personDescription"
+            />
             <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
             <meta property="og:type" content="profile" />
             <meta property="og:title" :content="person.name" />
@@ -83,7 +97,10 @@ const jsonLdBreadcrumb = computed(() =>
             <meta name="twitter:description" :content="personDescription" />
             <meta name="twitter:image" :content="ogImage" />
             <JsonLdScript head-key="jsonld-person" :content="jsonLdPerson" />
-            <JsonLdScript head-key="jsonld-breadcrumb-person" :content="jsonLdBreadcrumb" />
+            <JsonLdScript
+                head-key="jsonld-breadcrumb-person"
+                :content="jsonLdBreadcrumb"
+            />
         </Head>
 
         <div class="min-h-screen bg-zinc-950">

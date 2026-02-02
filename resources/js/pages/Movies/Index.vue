@@ -381,7 +381,11 @@ function cardEnterStyle(index: number) {
 <template>
     <PublicLayout>
         <Head title="Browse Movies">
-            <meta head-key="description" name="description" :content="indexDescription" />
+            <meta
+                head-key="description"
+                name="description"
+                :content="indexDescription"
+            />
             <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
             <meta property="og:type" content="website" />
             <meta property="og:title" content="Browse Movies" />

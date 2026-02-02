@@ -33,7 +33,10 @@ const reviewDescription = computed(
 );
 const ogImage = computed(() => {
     const url = props.review.movie?.poster_url;
-    if (!url) return appUrl.value ? `${appUrl.value}/images/placeholders/poster-placeholder.png` : '';
+    if (!url)
+        return appUrl.value
+            ? `${appUrl.value}/images/placeholders/poster-placeholder.png`
+            : '';
     return url.startsWith('http') ? url : `${appUrl.value}${url}`;
 });
 const ogTitle = computed(() =>
@@ -79,8 +82,18 @@ const jsonLdBreadcrumb = computed(() => {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: `${appUrl.value}/` },
-            { '@type': 'ListItem', position: 2, name: 'Movies', item: `${appUrl.value}/movies` },
+            {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Home',
+                item: `${appUrl.value}/`,
+            },
+            {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Movies',
+                item: `${appUrl.value}/movies`,
+            },
             {
                 '@type': 'ListItem',
                 position: 3,
@@ -117,7 +130,11 @@ function revealSpoilers() {
                     : `Review of ${review.movie?.title ?? 'film'}`
             "
         >
-            <meta head-key="description" name="description" :content="reviewDescription" />
+            <meta
+                head-key="description"
+                name="description"
+                :content="reviewDescription"
+            />
             <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
             <meta property="og:type" content="article" />
             <meta property="og:title" :content="ogTitle" />
@@ -130,7 +147,10 @@ function revealSpoilers() {
             <meta name="twitter:description" :content="reviewDescription" />
             <meta name="twitter:image" :content="ogImage" />
             <JsonLdScript head-key="jsonld-review" :content="jsonLdReview" />
-            <JsonLdScript head-key="jsonld-breadcrumb-review" :content="jsonLdBreadcrumb" />
+            <JsonLdScript
+                head-key="jsonld-breadcrumb-review"
+                :content="jsonLdBreadcrumb"
+            />
         </Head>
 
         <PublicSection spacing="md">

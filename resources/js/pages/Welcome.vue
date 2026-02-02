@@ -5,13 +5,13 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 import FeaturedMovie from '@/components/FeaturedMovie.vue';
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import MovieCard from '@/components/MovieCard.vue';
 import MovieHero from '@/components/MovieHero.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
-import JsonLdScript from '@/components/JsonLdScript.vue';
 import XFeedWidget from '@/components/public/XFeedWidget.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
@@ -48,7 +48,11 @@ const jsonLdWebSite = computed(() =>
 <template>
     <PublicLayout>
         <Head title="Curated War Films Database">
-            <meta head-key="description" name="description" :content="defaultDescription" />
+            <meta
+                head-key="description"
+                name="description"
+                :content="defaultDescription"
+            />
             <link head-key="canonical" rel="canonical" :href="canonicalUrl" />
             <meta property="og:type" content="website" />
             <meta property="og:title" content="Curated War Films Database" />

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Services\MarkdownRenderer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,6 +21,7 @@ class ReviewResource extends JsonResource
     public function toArray(Request $request): array
     {
         $user = $request->user();
+        $renderer = app(MarkdownRenderer::class);
 
         return [
             'id' => $this->id,
@@ -28,6 +30,8 @@ class ReviewResource extends JsonResource
             'rating' => (float) $this->rating,
             'title' => $this->title,
             'content' => $this->content,
+            'content_html' => $renderer->toHtml($this->content),
+            'content_excerpt' => $renderer->toExcerpt($this->content, 200),
             'has_spoilers' => $this->has_spoilers,
             'is_published' => $this->is_published,
             'helpful_count' => $this->helpful_count,

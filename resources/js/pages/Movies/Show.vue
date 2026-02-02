@@ -694,10 +694,15 @@ const keyCrew = computed(() => {
                     >
                         <span
                             >TMDB:
-                            {{ movie.tmdb_vote_average.toFixed(1) }}/10</span
+                            {{
+                                Number(movie.tmdb_vote_average).toFixed(1)
+                            }}/10</span
                         >
                         <span v-if="movie.tmdb_vote_count != null">
-                            ({{ movie.tmdb_vote_count.toLocaleString() }} votes)
+                            ({{
+                                Number(movie.tmdb_vote_count).toLocaleString()
+                            }}
+                            votes)
                         </span>
                     </div>
                     <Link

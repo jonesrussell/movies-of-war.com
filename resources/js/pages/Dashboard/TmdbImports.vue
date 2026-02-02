@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import Pagination from '@/components/Pagination.vue';
 import SearchInput from '@/components/SearchInput.vue';
 import TmdbMovieGrid from '@/components/TmdbMovieGrid.vue';
+import TmdbMoviePreviewDialog from '@/components/TmdbMoviePreviewDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -42,6 +43,8 @@ const pendingAction = ref<{ type: 'publish' | 'archive'; movie: Movie } | null>(
     null,
 );
 const dialogOpen = ref(false);
+const previewOpen = ref(false);
+const previewMovie = ref<Movie | null>(null);
 
 const form = useForm({
     limit: 30,
@@ -62,12 +65,19 @@ function handleSearchUpdate(value: string) {
     );
 }
 
+function openPreview(movie: Movie) {
+    previewMovie.value = movie;
+    previewOpen.value = true;
+}
+
 function publishMovie(movie: Movie) {
+    previewOpen.value = false;
     pendingAction.value = { type: 'publish', movie };
     confirmDialogOpen.value = true;
 }
 
 function archiveMovie(movie: Movie) {
+    previewOpen.value = false;
     pendingAction.value = { type: 'archive', movie };
     confirmDialogOpen.value = true;
 }
@@ -219,6 +229,7 @@ function handleImport() {
                 >
                     <TmdbMovieGrid
                         :movies="props.tmdbDrafts.data"
+                        @preview="openPreview"
                         @publish="publishMovie"
                         @archive="archiveMovie"
                     />
@@ -248,6 +259,14 @@ function handleImport() {
                 </div>
             </div>
         </div>
+
+        <!-- Preview Dialog -->
+        <TmdbMoviePreviewDialog
+            v-model:open="previewOpen"
+            :movie="previewMovie"
+            @publish="publishMovie"
+            @archive="archiveMovie"
+        />
 
         <!-- Confirm Dialog -->
         <ConfirmDialog

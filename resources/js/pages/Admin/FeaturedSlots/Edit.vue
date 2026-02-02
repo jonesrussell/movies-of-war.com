@@ -8,7 +8,7 @@ import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
     slot: FeaturedSlot;
-    movies: { id: number; title: string }[];
+    movies: { id: number; title: string; release_year: number | null }[];
 }
 
 const props = defineProps<Props>();
@@ -62,7 +62,7 @@ function submit() {
                             :key="movie.id"
                             :value="movie.id"
                         >
-                            {{ movie.title }}
+                            {{ movie.release_year ? `${movie.title} (${movie.release_year})` : movie.title }}
                         </option>
                     </select>
                     <div

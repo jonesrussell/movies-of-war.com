@@ -4,7 +4,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
-    movies: { id: number; title: string }[];
+    movies: { id: number; title: string; release_year: number | null }[];
 }
 
 defineProps<Props>();
@@ -55,7 +55,7 @@ function submit() {
                             :key="movie.id"
                             :value="movie.id"
                         >
-                            {{ movie.title }}
+                            {{ movie.release_year ? `${movie.title} (${movie.release_year})` : movie.title }}
                         </option>
                     </select>
                     <div

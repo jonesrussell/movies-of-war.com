@@ -10,6 +10,7 @@ import {
     Trash2,
     XCircle,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,18 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const fromImports = computed(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('from') === 'imports';
+});
+
+const backHref = computed(() =>
+    fromImports.value ? '/dashboard/tmdb/imports' : '/dashboard/movies',
+);
+const backLabel = computed(() =>
+    fromImports.value ? 'Back to TMDB Imports' : 'Back to Movies',
+);
 
 function publishMovie() {
     router.post(
@@ -79,10 +92,10 @@ const posterImage =
             <div class="mb-6 flex items-center justify-between">
                 <div>
                     <Link
-                        href="/dashboard/movies"
+                        :href="backHref"
                         class="text-sm text-zinc-400 transition-colors hover:text-white"
                     >
-                        ← Back to Movies
+                        ← {{ backLabel }}
                     </Link>
                     <h1 class="mt-2 text-3xl font-bold text-white">
                         {{ movie.title }}

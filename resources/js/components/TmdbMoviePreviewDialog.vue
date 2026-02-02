@@ -153,7 +153,7 @@ function openTrailer(movie: Movie) {
                         <Button
                             variant="outline"
                             size="sm"
-                            class="border-zinc-700 text-zinc-200 hover:bg-red-950/50 hover:border-red-900 hover:text-red-400"
+                            class="border-zinc-700 text-zinc-200 hover:border-red-900 hover:bg-red-950/50 hover:text-red-400"
                             @click="emit('archive', movie)"
                         >
                             <Archive class="mr-2 size-4" />

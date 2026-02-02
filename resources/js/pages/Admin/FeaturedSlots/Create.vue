@@ -55,7 +55,11 @@ function submit() {
                             :key="movie.id"
                             :value="movie.id"
                         >
-                            {{ movie.release_year ? `${movie.title} (${movie.release_year})` : movie.title }}
+                            {{
+                                movie.release_year
+                                    ? `${movie.title} (${movie.release_year})`
+                                    : movie.title
+                            }}
                         </option>
                     </select>
                     <div

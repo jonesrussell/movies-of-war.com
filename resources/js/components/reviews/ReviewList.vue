@@ -20,6 +20,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    queryParams: () => ({}),
+    movieSlug: undefined,
     emptyMessage: 'No reviews yet. Be the first to share your thoughts!',
 });
 

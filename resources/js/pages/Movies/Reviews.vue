@@ -98,8 +98,11 @@ const loginUrl = computed(
                             class="mt-1 text-sm text-zinc-500"
                         >
                             TMDB:
-                            {{ movie.tmdb_vote_average.toFixed(1) }}/10
-                            ({{ movie.tmdb_vote_count.toLocaleString() }} votes)
+                            {{ Number(movie.tmdb_vote_average).toFixed(1) }}/10
+                            ({{
+                                Number(movie.tmdb_vote_count).toLocaleString()
+                            }}
+                            votes)
                         </p>
                     </div>
                 </div>
@@ -137,21 +140,22 @@ const loginUrl = computed(
                     aria-label="Featured review"
                 >
                     <h2 class="text-lg font-semibold text-white">
-                        {{
-                            curator_review.user?.name ?? 'Curator'
-                        }}'s review
+                        {{ curator_review.user?.name ?? 'Curator' }}'s review
                     </h2>
                     <ReviewCard
                         :review="curator_review"
                         :hide-spoiler-blur="true"
                         :is-curator-pick="true"
+                        :default-expanded="true"
                     />
                 </div>
 
                 <!-- More reviews (or All reviews when no curator) -->
                 <div>
                     <SectionHeader
-                        :title="hasCuratorReview ? 'More reviews' : 'All reviews'"
+                        :title="
+                            hasCuratorReview ? 'More reviews' : 'All reviews'
+                        "
                         :level="2"
                         class="mb-4"
                     />

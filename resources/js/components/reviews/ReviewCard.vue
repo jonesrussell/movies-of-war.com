@@ -2,7 +2,7 @@
 import type { Review } from '@/types/models';
 
 import { Link } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import { StarRating } from '@/components/primitives';
 import ReviewContent from '@/components/reviews/ReviewContent.vue';
@@ -14,12 +14,15 @@ interface Props {
     hideSpoilerBlur?: boolean;
     /** When true, shows "Curator's pick" styling and badge. */
     isCuratorPick?: boolean;
+    /** When true, show full review content by default (e.g. featured curator review on reviews page). */
+    defaultExpanded?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     compact: false,
     hideSpoilerBlur: false,
     isCuratorPick: false,
+    defaultExpanded: false,
 });
 
 const emit = defineEmits<{
@@ -30,6 +33,12 @@ const emit = defineEmits<{
 
 const spoilerRevealed = ref(false);
 const contentExpanded = ref(false);
+
+onMounted(() => {
+    if (props.defaultExpanded) {
+        contentExpanded.value = true;
+    }
+});
 
 const isSpoilerBlurred = computed(
     () =>

@@ -1,8 +1,9 @@
+import type { Review } from '@/types/models';
+
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockMovie } from '@/__tests__/utils/test-utils';
-import type { Review } from '@/types/models';
 
 vi.mock('@inertiajs/vue3', () => ({
     usePage: vi.fn(() => ({
@@ -136,7 +137,10 @@ function createMockReview(overrides: Partial<Review> = {}): Review {
 import MoviesReviews from '../Reviews.vue';
 
 describe('Movies/Reviews', () => {
-    const defaultMovie = createMockMovie({ slug: 'test-movie', title: 'Test Movie' });
+    const defaultMovie = createMockMovie({
+        slug: 'test-movie',
+        title: 'Test Movie',
+    });
 
     function mountReviews(props: Record<string, unknown> = {}) {
         return mount(MoviesReviews, {
@@ -168,19 +172,26 @@ describe('Movies/Reviews', () => {
     it('shows "All reviews" when no curator review', () => {
         const wrapper = mountReviews();
         const headers = wrapper.findAll('h2');
-        const allReviewsHeader = headers.find((h) => h.text() === 'All reviews');
+        const allReviewsHeader = headers.find(
+            (h) => h.text() === 'All reviews',
+        );
         expect(allReviewsHeader).toBeDefined();
     });
 
     it('shows curator review block and "More reviews" when curator_review provided', () => {
-        const curatorReview = createMockReview({ id: 1, content_excerpt: 'Curator excerpt.' });
+        const curatorReview = createMockReview({
+            id: 1,
+            content_excerpt: 'Curator excerpt.',
+        });
         const wrapper = mountReviews({
             curator_review: curatorReview,
         });
         expect(wrapper.text()).toContain("Curator's review");
         expect(wrapper.find('[data-testid="review-card"]').exists()).toBe(true);
         const headers = wrapper.findAll('h2');
-        const moreReviewsHeader = headers.find((h) => h.text() === 'More reviews');
+        const moreReviewsHeader = headers.find(
+            (h) => h.text() === 'More reviews',
+        );
         expect(moreReviewsHeader).toBeDefined();
     });
 

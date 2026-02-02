@@ -226,7 +226,10 @@ function deleteReview(review: Review) {
                                         class="text-sm text-zinc-300"
                                         :class="{ 'mt-1': review.title }"
                                     >
-                                        {{ review.content_excerpt || '(No content)' }}
+                                        {{
+                                            review.content_excerpt ||
+                                            '(No content)'
+                                        }}
                                     </div>
                                     <div
                                         v-if="review.has_spoilers"

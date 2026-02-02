@@ -6,11 +6,11 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 import InputError from '@/components/InputError.vue';
 import { StarRating } from '@/components/primitives';
+import ReviewContent from '@/components/reviews/ReviewContent.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import ReviewContent from '@/components/reviews/ReviewContent.vue';
 import { preview as markdownPreview } from '@/routes/markdown';
 import { store } from '@/routes/movies/reviews';
 import { update } from '@/routes/reviews';
@@ -42,11 +42,10 @@ async function fetchPreview(markdown: string) {
     previewLoading.value = true;
     previewHtml.value = '';
     try {
-        const token =
-            document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1];
+        const token = document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('XSRF-TOKEN='))
+            ?.split('=')[1];
         const res = await fetch(markdownPreview.url(), {
             method: 'POST',
             headers: {
@@ -120,7 +119,9 @@ const submitLabel = computed(() =>
 
         <div class="space-y-2">
             <div class="flex items-center justify-between gap-2">
-                <Label for="content">Your review (at least 50 characters)</Label>
+                <Label for="content"
+                    >Your review (at least 50 characters)</Label
+                >
                 <div class="flex rounded-lg border border-zinc-800 p-0.5">
                     <button
                         type="button"
@@ -181,10 +182,7 @@ const submitLabel = computed(() =>
                     :content-html="previewHtml"
                     size="sm"
                 />
-                <p
-                    v-else
-                    class="text-sm text-zinc-500"
-                >
+                <p v-else class="text-sm text-zinc-500">
                     Nothing to preview yet.
                 </p>
             </div>

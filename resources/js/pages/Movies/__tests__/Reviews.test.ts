@@ -102,9 +102,24 @@ vi.mock('@/routes', () => ({
     register: () => ({ url: '/register' }),
 }));
 
+const defaultPaginationLinks = [{ url: null, label: '1', active: true }] as {
+    url: string | null;
+    label: string;
+    active: boolean;
+}[];
+
 const defaultPagination = {
-    meta: { total: 0, last_page: 1, current_page: 1 },
-    links: [{ url: null, label: '1', active: true }],
+    meta: {
+        total: 0,
+        last_page: 1,
+        current_page: 1,
+        from: null,
+        to: null,
+        path: '/movies/test-movie/reviews',
+        per_page: 15,
+        links: defaultPaginationLinks,
+    },
+    links: defaultPaginationLinks,
 };
 
 function createMockReview(overrides: Partial<Review> = {}): Review {

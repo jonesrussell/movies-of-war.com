@@ -166,7 +166,7 @@ const loginUrl = computed(
                         :empty-message="
                             hasCuratorReview
                                 ? 'No other reviews yet.'
-                                : undefined
+                                : 'No reviews yet. Be the first to share your thoughts!'
                         "
                     />
                 </div>

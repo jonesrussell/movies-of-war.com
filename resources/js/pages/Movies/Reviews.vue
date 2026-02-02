@@ -38,9 +38,7 @@ const auth = page.props.auth;
 const showReviewForm = ref(false);
 
 const hasCuratorReview = computed(() => Boolean(props.curator_review));
-const hasUserReviews = computed(
-    () => (props.reviews?.data?.length ?? 0) > 0,
-);
+const hasUserReviews = computed(() => (props.reviews?.data?.length ?? 0) > 0);
 const hasNoReviews = computed(
     () => !hasCuratorReview.value && (props.reviews?.data?.length ?? 0) === 0,
 );
@@ -116,10 +114,12 @@ const loginUrl = computed(
                                 class="mt-0.5 text-sm text-zinc-500"
                             >
                                 TMDB:
-                                {{ Number(movie.tmdb_vote_average).toFixed(1)
-                                }}/10
-                                ({{
-                                    Number(movie.tmdb_vote_count).toLocaleString()
+                                {{
+                                    Number(movie.tmdb_vote_average).toFixed(1)
+                                }}/10 ({{
+                                    Number(
+                                        movie.tmdb_vote_count,
+                                    ).toLocaleString()
                                 }}
                                 votes)
                             </p>
@@ -145,11 +145,15 @@ const loginUrl = computed(
                         </div>
 
                         <!-- No curator: "All reviews" lives in main column on desktop so grid isn't lopsided -->
-                        <template v-if="!hasCuratorReview && !onlyCuratorNoUserReviews">
+                        <template
+                            v-if="
+                                !hasCuratorReview && !onlyCuratorNoUserReviews
+                            "
+                        >
                             <SectionHeader
                                 title="All reviews"
                                 :level="2"
-                                class="mb-4 mt-6 lg:mt-0"
+                                class="mt-6 mb-4 lg:mt-0"
                             />
                             <ReviewList
                                 :reviews="reviews"

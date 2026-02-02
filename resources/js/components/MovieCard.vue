@@ -4,6 +4,8 @@ import type { Movie } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
+import { formatReleaseDate } from '@/utils/format';
+
 import { Poster } from '@/components/primitives';
 
 interface Props {
@@ -65,7 +67,9 @@ const displayedTags = computed(() => {
                 </h3>
 
                 <div class="flex items-center gap-2 text-xs text-zinc-300">
-                    <span>{{ movie.release_year }}</span>
+                    <span>{{
+                        formatReleaseDate(movie.release_date, movie.release_year)
+                    }}</span>
                     <template v-if="movie.runtime">
                         <span class="text-zinc-500">•</span>
                         <span>{{ movie.runtime }} min</span>

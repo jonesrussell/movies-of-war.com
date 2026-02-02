@@ -37,6 +37,12 @@ Schedule::command('x:process-auto-replies --limit=10')
     ->name('process-x-auto-replies')
     ->withoutOverlapping();
 
+// Graduate upcoming movies to released when release date passes (daily at 2 AM)
+Schedule::command('movies:graduate-upcoming')
+    ->dailyAt('02:00')
+    ->name('graduate-upcoming-movies')
+    ->withoutOverlapping();
+
 // Discover content daily at 2 AM
 Schedule::command('x:discover-content --min-likes=10 --max-results=50')
     ->dailyAt('02:00')

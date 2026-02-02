@@ -67,7 +67,7 @@ describe('MovieCard', () => {
             expect(wrapper.text()).toContain(defaultMovie.title);
         });
 
-        it('renders release year', () => {
+        it('renders release date or year', () => {
             const wrapper = mountMovieCard();
             expect(wrapper.text()).toContain(String(defaultMovie.release_year));
         });

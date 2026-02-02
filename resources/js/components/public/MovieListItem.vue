@@ -15,6 +15,7 @@ import {
 import { computed, ref, watch } from 'vue';
 
 import { Poster } from '@/components/primitives';
+import { formatReleaseDate } from '@/utils/format';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -134,11 +135,13 @@ async function toggleWatchlist() {
                     class="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400"
                 >
                     <span
-                        v-if="movie.release_year"
+                        v-if="
+                            movie.release_date || movie.release_year != null
+                        "
                         class="flex items-center gap-1"
                     >
                         <Calendar class="size-3" />
-                        {{ movie.release_year }}
+                        {{ formatReleaseDate(movie.release_date, movie.release_year) }}
                     </span>
                     <span v-if="movie.runtime" class="flex items-center gap-1">
                         <Clock class="size-3" />

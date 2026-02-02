@@ -29,7 +29,7 @@ class MovieObserver
     public function updated(Movie $movie): void
     {
         // Check if relevant fields changed
-        $relevantFields = ['status', 'country', 'conflict', 'release_year'];
+        $relevantFields = ['status', 'country', 'conflict', 'release_year', 'is_upcoming'];
         $changedFields = array_keys($movie->getChanges());
 
         if (array_intersect($relevantFields, $changedFields)) {

@@ -13,7 +13,11 @@ import {
     User,
 } from 'lucide-vue-next';
 
-import { formatCurrency, getLanguageName } from '@/utils/format';
+import {
+    formatCurrency,
+    formatReleaseDate,
+    getLanguageName,
+} from '@/utils/format';
 
 defineProps<{ movie: Movie }>();
 </script>
@@ -22,13 +26,13 @@ defineProps<{ movie: Movie }>();
     <dl
         class="grid gap-3 rounded-2xl bg-zinc-950/60 p-5 ring-1 ring-zinc-800/70 sm:grid-cols-2"
     >
-        <dt class="sr-only">Release year</dt>
+        <dt class="sr-only">Release</dt>
         <dd class="flex items-center gap-2 text-sm font-semibold text-zinc-200">
             <Calendar
                 class="size-4 shrink-0 text-zinc-300"
                 aria-hidden="true"
             />
-            {{ movie.release_year }}
+            {{ formatReleaseDate(movie.release_date, movie.release_year) }}
         </dd>
 
         <template v-if="movie.tmdb_vote_average">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Review } from '@/types.models';
+import type { Review } from '@/types/models';
 
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';

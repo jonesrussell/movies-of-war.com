@@ -41,6 +41,7 @@ class ReviewResource extends JsonResource
             'stars' => $this->stars,
             'is_edited' => $this->is_edited,
             'formatted_date' => $this->created_at->diffForHumans(),
+            'is_curator' => config('app.curator_user_id') > 0 && $this->user_id === config('app.curator_user_id'),
             'user' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,

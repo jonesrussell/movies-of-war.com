@@ -20,7 +20,7 @@ const isScrolled = computed(() => y.value > 20);
 
 <template>
     <header
-        class="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm transition-all duration-300"
+        class="z-50 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm transition-all duration-300"
         :class="{ 'py-2': isScrolled, 'py-4': !isScrolled }"
     >
         <PublicContainer>

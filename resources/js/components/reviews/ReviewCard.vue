@@ -12,11 +12,14 @@ interface Props {
     compact?: boolean;
     /** When true, content is never blurred (e.g. user's own review). */
     hideSpoilerBlur?: boolean;
+    /** When true, shows "Curator's pick" styling and badge. */
+    isCuratorPick?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     compact: false,
     hideSpoilerBlur: false,
+    isCuratorPick: false,
 });
 
 const emit = defineEmits<{
@@ -49,11 +52,23 @@ function revealSpoilers() {
 
 <template>
     <article
-        class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 transition-colors dark:border-zinc-800 dark:bg-zinc-900/50"
+        class="rounded-lg border p-6 transition-colors dark:border-zinc-800 dark:bg-zinc-900/50"
+        :class="
+            isCuratorPick
+                ? 'border-red-500/50 bg-zinc-900/80 ring-2 ring-red-500/30 dark:border-red-500/40'
+                : 'border-zinc-800 bg-zinc-900/50'
+        "
         data-testid="review-card"
+        :aria-label="isCuratorPick ? 'Curator\'s pick review' : undefined"
     >
         <header class="mb-3 flex flex-wrap items-start justify-between gap-2">
             <div class="flex flex-wrap items-center gap-2">
+                <span
+                    v-if="isCuratorPick"
+                    class="rounded bg-red-600/90 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-white dark:bg-red-500/90"
+                >
+                    Curator's pick
+                </span>
                 <StarRating :rating="review.rating" :max-stars="4" size="md" />
                 <span
                     v-if="review.has_spoilers"

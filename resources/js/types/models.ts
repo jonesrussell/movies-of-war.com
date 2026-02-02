@@ -121,6 +121,7 @@ export interface Review {
     is_edited: boolean;
     formatted_date: string;
     user?: ReviewAuthor;
+    is_curator?: boolean;
     can_edit: boolean;
     can_delete: boolean;
     comments?: ReviewComment[];
@@ -147,6 +148,7 @@ export interface MovieReviewsData {
     summary: ReviewsSummary;
     user_review: Review | null;
     recent: Review[];
+    curator_review?: Review | null;
 }
 
 export interface FeaturedSlot {

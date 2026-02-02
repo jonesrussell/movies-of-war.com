@@ -27,6 +27,18 @@ defineProps<Props>();
     <PublicLayout>
         <Head title="Movies of War - Curated War Films Database" />
 
+        <!-- Pick of the Week first (curator's featured review) -->
+        <PublicSection v-if="pickOfWeekMovie" spacing="md">
+            <PublicContainer class="flex flex-col gap-10 lg:gap-18">
+                <div class="mx-auto w-full max-w-5xl">
+                    <FeaturedMovie
+                        :movie="pickOfWeekMovie"
+                        title="Pick of the Week"
+                    />
+                </div>
+            </PublicContainer>
+        </PublicSection>
+
         <MovieHero
             v-if="heroMovie"
             :movie="heroMovie"
@@ -81,13 +93,6 @@ defineProps<Props>();
 
         <PublicSection spacing="md">
             <PublicContainer class="flex flex-col gap-10 lg:gap-18">
-                <div v-if="pickOfWeekMovie" class="mx-auto w-full max-w-5xl">
-                    <FeaturedMovie
-                        :movie="pickOfWeekMovie"
-                        title="Pick of the Week"
-                    />
-                </div>
-
                 <div class="flex flex-col gap-6">
                     <SectionHeader
                         title="Latest Releases"

@@ -121,27 +121,44 @@ class MovieController extends Controller
                 ->first();
         }
 
-        $recentReviews = $movie->reviews()
+        $curatorUserId = config('app.curator_user_id');
+        $curatorReview = null;
+        if ($curatorUserId > 0) {
+            $curatorReview = $movie->reviews()
+                ->published()
+                ->where('user_id', $curatorUserId)
+                ->with('user')
+                ->first();
+        }
+
+        $recentQuery = $movie->reviews()
             ->published()
             ->withoutSpoilers()
             ->with('user')
-            ->orderByDesc('created_at')
-            ->limit(5)
-            ->get();
+            ->orderByDesc('created_at');
+        if ($curatorReview !== null) {
+            $recentQuery->where('id', '!=', $curatorReview->id);
+        }
+        $recentReviews = $recentQuery->limit(5)->get();
 
         $reviewsSummary = [
             'user_rating_average' => $movie->user_rating_average,
             'user_rating_count' => $movie->user_rating_count,
         ];
 
+        $reviewsPayload = [
+            'summary' => $reviewsSummary,
+            'user_review' => $userReview ? (new ReviewResource($userReview))->resolve(request()) : null,
+            'recent' => ReviewResource::collection($recentReviews)->resolve(request()),
+        ];
+        if ($curatorReview !== null) {
+            $reviewsPayload['curator_review'] = (new ReviewResource($curatorReview))->resolve(request());
+        }
+
         return Inertia::render('Movies/Show', [
             'movie' => (new MovieResource($movie))->resolve(request()),
             'relatedMovies' => array_values(MovieResource::collection($relatedMovies)->resolve(request())),
-            'reviews' => [
-                'summary' => $reviewsSummary,
-                'user_review' => $userReview ? (new ReviewResource($userReview))->resolve(request()) : null,
-                'recent' => ReviewResource::collection($recentReviews)->resolve(request()),
-            ],
+            'reviews' => $reviewsPayload,
         ]);
     }
 }

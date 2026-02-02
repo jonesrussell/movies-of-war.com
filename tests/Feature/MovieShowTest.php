@@ -1,6 +1,9 @@
 <?php
 
 use App\Models\Movie;
+use App\Models\Review;
+use App\Models\User;
+use Illuminate\Support\Facades\Config;
 
 test('movie show page returns tmdb rating director and writers when set', function () {
     $movie = Movie::factory()->published()->create([
@@ -54,5 +57,28 @@ test('movie show page with no reviews returns reviews data for guest empty state
         ->has('reviews')
         ->where('reviews.summary.user_rating_count', 0)
         ->has('auth')
+    );
+});
+
+test('movie show page includes curator review and is_curator when curator is configured', function () {
+    $curator = User::factory()->create(['name' => 'Russell Jones']);
+    Config::set('app.curator_user_id', $curator->id);
+
+    $movie = Movie::factory()->published()->create(['slug' => 'curator-movie']);
+    $review = Review::factory()->for($curator)->for($movie)->create([
+        'title' => 'Curator pick',
+        'content' => 'The curator says this is essential viewing.',
+        'rating' => 4,
+    ]);
+
+    $response = $this->get(route('movies.show', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Show')
+        ->has('reviews.curator_review')
+        ->where('reviews.curator_review.id', $review->id)
+        ->where('reviews.curator_review.is_curator', true)
+        ->where('reviews.curator_review.user.name', 'Russell Jones')
     );
 });

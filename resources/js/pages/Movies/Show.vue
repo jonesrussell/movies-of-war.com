@@ -58,7 +58,12 @@ const reviewsData = computed(
             summary: { user_rating_average: null, user_rating_count: 0 },
             user_review: null,
             recent: [],
+            curator_review: null,
         },
+);
+
+const hasCuratorReview = computed(
+    () => Boolean(reviewsData.value.curator_review),
 );
 
 const canWriteReview = computed(
@@ -729,8 +734,53 @@ const keyCrew = computed(() => {
                     </div>
                 </div>
 
-                <!-- User's own review -->
-                <div v-if="reviewsData.user_review" class="space-y-4">
+                <!-- Curator's review (Russell Jones / site curator) -->
+                <div
+                    v-if="hasCuratorReview && reviewsData.curator_review"
+                    class="space-y-4"
+                    role="region"
+                    aria-labelledby="curator-review-heading"
+                >
+                    <h2
+                        id="curator-review-heading"
+                        class="text-xl font-semibold text-white"
+                    >
+                        {{ reviewsData.curator_review.user?.name ?? 'Curator' }}'s
+                        review
+                    </h2>
+                    <ReviewCard
+                        :review="reviewsData.curator_review"
+                        :hide-spoiler-blur="true"
+                        :is-curator-pick="true"
+                        @edit="showEditReviewForm = true"
+                    />
+                    <div
+                        v-if="
+                            showEditReviewForm &&
+                            reviewsData.user_review?.id ===
+                                reviewsData.curator_review?.id
+                        "
+                        class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                    >
+                        <h3 class="mb-4 text-base font-semibold text-white">
+                            Edit your review
+                        </h3>
+                        <ReviewForm
+                            :movie="movie"
+                            :existing-review="reviewsData.curator_review"
+                        />
+                    </div>
+                </div>
+
+                <!-- User's own review (when not the curator's review) -->
+                <div
+                    v-if="
+                        reviewsData.user_review &&
+                        reviewsData.user_review.id !==
+                            reviewsData.curator_review?.id
+                    "
+                    class="space-y-4"
+                >
                     <h3 class="text-lg font-semibold text-white">
                         Your review
                     </h3>

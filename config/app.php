@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Curator User ID
+    |--------------------------------------------------------------------------
+    |
+    | The user ID of the site curator. Their reviews are highlighted as
+    | "Curator's pick" on movie pages. Set to the curator's user ID in .env.
+    |
+    */
+
+    'curator_user_id' => (int) env('CURATOR_USER_ID', 0),
+
 ];

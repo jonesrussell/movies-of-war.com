@@ -5,8 +5,7 @@ import { Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
 import { StarRating } from '@/components/primitives';
-
-const CONTENT_PREVIEW_LENGTH = 400;
+import ReviewContent from '@/components/reviews/ReviewContent.vue';
 
 interface Props {
     review: Review;
@@ -36,20 +35,11 @@ const isSpoilerBlurred = computed(
         !spoilerRevealed.value,
 );
 
-const contentToShow = computed(() => {
-    if (props.compact || contentExpanded.value) {
-        return props.review.content;
-    }
-    if (props.review.content.length <= CONTENT_PREVIEW_LENGTH) {
-        return props.review.content;
-    }
-    return props.review.content.slice(0, CONTENT_PREVIEW_LENGTH);
-});
-
 const hasMoreContent = computed(
     () =>
-        props.review.content.length > CONTENT_PREVIEW_LENGTH &&
-        !contentExpanded.value,
+        !contentExpanded.value &&
+        props.review.content_excerpt.length > 0 &&
+        props.review.content_excerpt.endsWith('…'),
 );
 
 function revealSpoilers() {
@@ -95,10 +85,12 @@ function revealSpoilers() {
                     'blur-md transition-all duration-300 select-none [user-select:none]',
             ]"
         >
-            <div class="break-words whitespace-pre-wrap">
-                {{ contentToShow }}
-                <span v-if="hasMoreContent">…</span>
-            </div>
+            <ReviewContent
+                :content-html="review.content_html"
+                :content-excerpt="review.content_excerpt"
+                :collapsed="!contentExpanded && !compact"
+                size="sm"
+            />
             <div
                 v-if="isSpoilerBlurred"
                 class="absolute inset-0 flex items-center justify-center bg-zinc-900/80"

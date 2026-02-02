@@ -10,6 +10,7 @@ import { StarRating } from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import ReviewComments from '@/components/reviews/ReviewComments.vue';
+import ReviewContent from '@/components/reviews/ReviewContent.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {
@@ -95,11 +96,7 @@ function revealSpoilers() {
                                 'blur-md transition-all duration-300 select-none [user-select:none]',
                         ]"
                     >
-                        <div
-                            class="break-words whitespace-pre-wrap text-zinc-300"
-                        >
-                            {{ review.content }}
-                        </div>
+                        <ReviewContent :content-html="review.content_html" />
                         <div
                             v-if="isSpoilerBlurred"
                             class="absolute inset-0 flex items-center justify-center bg-zinc-900/80"

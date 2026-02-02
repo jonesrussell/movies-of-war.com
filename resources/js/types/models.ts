@@ -109,6 +109,8 @@ export interface Review {
     rating: number;
     title: string | null;
     content: string;
+    content_html: string;
+    content_excerpt: string;
     has_spoilers: boolean;
     is_published: boolean;
     helpful_count: number;

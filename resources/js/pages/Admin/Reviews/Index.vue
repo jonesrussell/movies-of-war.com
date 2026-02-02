@@ -62,16 +62,6 @@ function filterByPublished(value: string) {
     );
 }
 
-function truncateContent(content: string | null, maxLength = 80): string {
-    if (!content) {
-        return '(No content)';
-    }
-    if (content.length <= maxLength) {
-        return content;
-    }
-    return content.slice(0, maxLength) + '...';
-}
-
 function formatDate(dateString: string | null): string {
     if (!dateString) {
         return '-';
@@ -236,7 +226,7 @@ function deleteReview(review: Review) {
                                         class="text-sm text-zinc-300"
                                         :class="{ 'mt-1': review.title }"
                                     >
-                                        {{ truncateContent(review.content) }}
+                                        {{ review.content_excerpt || '(No content)' }}
                                     </div>
                                     <div
                                         v-if="review.has_spoilers"

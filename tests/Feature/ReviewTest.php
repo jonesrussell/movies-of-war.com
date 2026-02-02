@@ -32,6 +32,7 @@ test('reviews index includes curator_review and excludes it from paginated list 
     $otherUser = User::factory()->create();
     Review::factory()->for($otherUser)->for($movie)->create([
         'content' => str_repeat('Other review. ', 10),
+        'has_spoilers' => false,
     ]);
 
     $response = $this->get(route('movies.reviews.index', $movie->slug));

@@ -6,6 +6,14 @@ import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { XPostStatus } from '@/types/enums';
 
 interface Props {
@@ -129,6 +137,24 @@ function deletePost(xPost: XPost) {
 function getXPostUrl(xPostId: string): string {
     return `https://x.com/i/web/status/${xPostId}`;
 }
+
+const previewPost = ref<XPost | null>(null);
+
+function openPreview(xPost: XPost) {
+    previewPost.value = xPost;
+}
+
+function closePreview() {
+    previewPost.value = null;
+}
+
+function mediaOverlayText(content: string | null): string | null {
+    if (!content) {
+        return null;
+    }
+    const match = content.match(/^[^(]+\(\d{4}\)/);
+    return match?.at(0) ?? null;
+}
 </script>
 
 <template>
@@ -146,12 +172,20 @@ function getXPostUrl(xPostId: string): string {
                         {{ xPosts?.total ?? 0 }} total posts
                     </p>
                 </div>
-                <Link
-                    href="/x-posts/create"
-                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-                >
-                    Create New Post
-                </Link>
+                <div class="flex flex-wrap items-center gap-2">
+                    <Link
+                        href="/x-posts/import"
+                        class="rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+                    >
+                        Import from Spreadsheet
+                    </Link>
+                    <Link
+                        href="/x-posts/create"
+                        class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                    >
+                        Create New Post
+                    </Link>
+                </div>
             </div>
 
             <!-- Filters -->
@@ -310,6 +344,13 @@ function getXPostUrl(xPostId: string): string {
                                 <div
                                     class="flex items-center justify-end gap-2"
                                 >
+                                    <button
+                                        type="button"
+                                        class="text-zinc-400 hover:text-white"
+                                        @click="openPreview(xPost)"
+                                    >
+                                        Preview
+                                    </button>
                                     <!-- Draft actions -->
                                     <template v-if="xPost.status === 'draft'">
                                         <Link
@@ -429,6 +470,28 @@ function getXPostUrl(xPostId: string): string {
                     <span v-html="link.label" />
                 </Link>
             </div>
+
+            <!-- Preview dialog -->
+            <Dialog :open="!!previewPost" @update:open="(v) => !v && closePreview()">
+                <DialogContent class="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle class="sr-only">
+                            X post preview
+                        </DialogTitle>
+                        <DialogDescription class="sr-only">
+                            How this post will look on X
+                        </DialogDescription>
+                    </DialogHeader>
+                    <XPostPreviewCard
+                        v-if="previewPost"
+                        :content="previewPost.content || ''"
+                        :media-urls="previewPost.media_urls || []"
+                        :media-overlay-text="
+                            mediaOverlayText(previewPost.content)
+                        "
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     </AppSidebarLayout>
 </template>

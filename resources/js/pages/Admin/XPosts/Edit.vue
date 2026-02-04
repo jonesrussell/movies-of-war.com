@@ -6,6 +6,7 @@ import { Plus, Trash2, X } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
 import { XPostStatus } from '@/types/enums';
 
 interface Props {
@@ -88,6 +89,21 @@ function submit() {
                 </div>
 
                 <form @submit.prevent="submit" class="space-y-6">
+                    <!-- Preview -->
+                    <div>
+                        <h3 class="mb-2 text-sm font-medium text-zinc-400">
+                            How it looks on X
+                        </h3>
+                        <XPostPreviewCard
+                            :content="form.content"
+                            :media-urls="form.media_urls"
+                            :media-overlay-text="
+                                form.content?.match(/^[^(]+\(\d{4}\)/)
+                                    ?.at(0) ?? null
+                            "
+                        />
+                    </div>
+
                     <!-- Main Content -->
                     <div>
                         <label

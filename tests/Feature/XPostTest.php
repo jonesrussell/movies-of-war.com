@@ -4,6 +4,7 @@ use App\Enums\XPostStatus;
 use App\Jobs\PublishXPost;
 use App\Models\User;
 use App\Models\XPost;
+use App\Services\XPostSpreadsheetReader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 
@@ -390,4 +391,95 @@ test('x-post scope ready to publish returns correct posts', function () {
 
     expect($readyPosts)->toHaveCount(2);
     expect($readyPosts->pluck('id'))->toContain($ready1->id, $ready2->id);
+});
+
+// Spreadsheet import tests
+
+test('guests cannot access x-posts import page', function () {
+    $response = $this->get(route('admin.x-posts.import'));
+    $response->assertRedirect(route('login'));
+});
+
+test('non-admin users cannot access x-posts import page', function () {
+    $user = User::factory()->create(['is_admin' => false]);
+    $this->actingAs($user);
+
+    $response = $this->get(route('admin.x-posts.import'));
+    $response->assertForbidden();
+});
+
+test('import page redirects when spreadsheet is not found', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    config(['x_posts.spreadsheet_path' => '/nonexistent/path.xlsx']);
+
+    $response = $this->get(route('admin.x-posts.import'));
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('error');
+});
+
+test('admin can see import page when spreadsheet exists', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $path = resource_path('xslx/MoW_X_Posts_2026_CLEANED.xlsx');
+    if (! is_readable($path)) {
+        $this->markTestSkipped('Spreadsheet fixture not present');
+    }
+    config(['x_posts.spreadsheet_path' => $path]);
+
+    $response = $this->get(route('admin.x-posts.import'));
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page->component('Admin/XPosts/Import')->has('preview'));
+});
+
+test('admin can import selected rows as drafts', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin);
+
+    $mockRows = [
+        [
+            'content' => 'Imported tweet one',
+            'media_urls' => ['https://example.com/img.jpg'],
+            'scheduled_for' => null,
+            'theme' => 'Theme A',
+            'post_type' => 'Image Post',
+            'row_number' => 2,
+            'raw' => [],
+        ],
+        [
+            'content' => 'Imported tweet two',
+            'media_urls' => [],
+            'scheduled_for' => null,
+            'theme' => null,
+            'post_type' => null,
+            'row_number' => 3,
+            'raw' => [],
+        ],
+    ];
+
+    $this->mock(XPostSpreadsheetReader::class, function ($mock) use ($mockRows) {
+        $mock->shouldReceive('read')->once()->andReturn($mockRows);
+    });
+
+    config(['x_posts.spreadsheet_path' => resource_path('xslx/MoW_X_Posts_2026_CLEANED.xlsx')]);
+
+    $response = $this->post(route('admin.x-posts.import.store'), [
+        'row_numbers' => [2, 3],
+    ]);
+
+    $response->assertRedirect(route('admin.x-posts.index'));
+    $response->assertSessionHas('success', '2 posts imported as drafts.');
+
+    $this->assertDatabaseCount('x_posts', 2);
+    $this->assertDatabaseHas('x_posts', [
+        'content' => 'Imported tweet one',
+        'status' => 'draft',
+        'user_id' => $admin->id,
+    ]);
+    $this->assertDatabaseHas('x_posts', [
+        'content' => 'Imported tweet two',
+        'status' => 'draft',
+    ]);
 });

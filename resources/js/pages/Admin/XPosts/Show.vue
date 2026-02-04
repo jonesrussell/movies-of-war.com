@@ -4,6 +4,7 @@ import type { XPost } from '@/types/models';
 import { Head, Link } from '@inertiajs/vue3';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
 
 interface Props {
     xPost: XPost;
@@ -69,6 +70,21 @@ function getXPostUrl(tweetId: string): string {
                                 xPost.status.slice(1)
                             }}
                         </span>
+                    </div>
+
+                    <!-- Preview -->
+                    <div>
+                        <h3 class="mb-2 text-sm font-medium text-zinc-400">
+                            How it looks on X
+                        </h3>
+                        <XPostPreviewCard
+                            :content="xPost.content || ''"
+                            :media-urls="xPost.media_urls || []"
+                            :media-overlay-text="
+                                xPost.content?.match(/^[^(]+\(\d{4}\)/)
+                                    ?.at(0) ?? null
+                            "
+                        />
                     </div>
 
                     <!-- Content -->

@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\XAutoReplyController;
 use App\Http\Controllers\Admin\XContentDiscoveryController;
 use App\Http\Controllers\Admin\XOAuth2Controller;
 use App\Http\Controllers\Admin\XPostController;
+use App\Http\Controllers\Admin\XPostImportController;
 use App\Http\Controllers\Admin\XSettingsController;
 use App\Http\Controllers\Admin\XTrendMonitoringController;
 use App\Http\Controllers\DashboardController;
@@ -51,6 +52,8 @@ Route::middleware('admin')->group(function () {
 
     // X Post Management
     Route::prefix('x-posts')->name('admin.x-posts.')->group(function () {
+        Route::get('/import', [XPostImportController::class, 'show'])->name('import');
+        Route::post('/import', [XPostImportController::class, 'store'])->name('import.store');
         Route::post('/{xPost}/schedule', [XPostController::class, 'schedule'])->name('schedule');
         Route::post('/{xPost}/publish', [XPostController::class, 'publish'])->name('publish');
         Route::post('/{xPost}/cancel', [XPostController::class, 'cancel'])->name('cancel');

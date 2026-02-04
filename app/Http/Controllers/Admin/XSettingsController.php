@@ -61,8 +61,11 @@ class XSettingsController extends Controller
             }
         }
 
+        $oauth2CallbackUrl = route('admin.x-oauth2.callback');
+
         return Inertia::render('Admin/XSettings/Index', [
             'connectionStatus' => $connectionStatus,
+            'oauth2CallbackUrl' => $oauth2CallbackUrl,
         ]);
     }
 

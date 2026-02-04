@@ -15,6 +15,7 @@ interface ConnectionStatus {
 
 interface Props {
     connectionStatus: ConnectionStatus;
+    oauth2CallbackUrl: string;
 }
 
 defineProps<Props>();
@@ -164,9 +165,25 @@ function formatDate(dateString: string | null): string {
                 <div v-else class="space-y-4">
                     <p class="text-zinc-400">
                         You need to connect your X.com account to enable posting
-                        tweets. Click the button below to authorize the
-                        application.
+                        tweets. First add the callback URL below in the X
+                        Developer Portal, then click Connect.
                     </p>
+
+                    <div class="rounded-lg bg-zinc-800/50 p-4">
+                        <p class="mb-2 text-sm font-medium text-zinc-300">
+                            Callback URI (add this in X Developer Portal)
+                        </p>
+                        <p class="break-all font-mono text-sm text-white">
+                            {{ oauth2CallbackUrl }}
+                        </p>
+                        <p class="mt-2 text-xs text-zinc-500">
+                            In the portal: your app → User authentication
+                            settings → Callback URI / Redirect URL. Must match
+                            exactly (including https and path). If you use a
+                            development app, sign in to X with the app owner
+                            account before connecting.
+                        </p>
+                    </div>
 
                     <div>
                         <a

@@ -13,7 +13,7 @@ add('shared_files', [
     '.env',
     'database/database.sqlite',
 ]);
-add('shared_dirs', []);
+add('shared_dirs', ['storage/app/public']);
 add('writable_dirs', [
     'storage',
     'bootstrap/cache',

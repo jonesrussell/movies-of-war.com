@@ -49,8 +49,8 @@ task('deploy:install_services', function (): void {
 before('deploy:symlink', 'deploy:install_services');
 
 task('deploy:restart_services', function (): void {
-    run('cd {{release_path}} && {{bin/php}} artisan horizon:terminate', ['allow_failure' => true]);
-    run('cd {{release_path}} && {{bin/php}} artisan inertia:stop-ssr', ['allow_failure' => true]);
+    run('cd {{release_path}} && {{bin/php}} artisan horizon:terminate || true');
+    run('cd {{release_path}} && {{bin/php}} artisan inertia:stop-ssr || true');
     run('systemctl --user restart movies-of-war-schedule-work.service movies-of-war-horizon.service movies-of-war-inertia-ssr.service', ['allow_failure' => true]);
 });
 after('deploy:symlink', 'deploy:restart_services');

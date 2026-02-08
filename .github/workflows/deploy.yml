@@ -46,9 +46,9 @@ jobs:
       - name: Add Host Key
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -T 5 -H movies-of-war.com >> ~/.ssh/known_hosts
+          ssh-keyscan -T 5 -H coforge.xyz >> ~/.ssh/known_hosts
           cat >> ~/.ssh/config << EOF
-          Host movies-of-war.com
+          Host coforge.xyz
             User deployer
             StrictHostKeyChecking no
           EOF
@@ -59,4 +59,4 @@ jobs:
           DEPLOY_ENV: production
         run: |
           set -e
-          dep deploy -v
+          dep deploy coforge.xyz -v

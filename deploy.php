@@ -6,8 +6,8 @@ require 'recipe/laravel.php';
 
 // Config
 
-set('repository', 'git@github.com:jonesrussell/movies-of-war.com.git');
-set('git_ssh_command', 'ssh -i /home/deployer/.ssh/id_ed25519_github -o IdentitiesOnly=yes');
+set('repository', 'git@github-movies-of-war:jonesrussell/movies-of-war.com.git');
+set('keep_releases', 5);
 
 add('shared_files', [
     '.env',
@@ -22,50 +22,45 @@ add('writable_dirs', [
 
 // Hosts
 
-host('movies-of-war.com')
+host('coforge.xyz')
     ->set('remote_user', 'deployer')
     ->set('deploy_path', '~/movies-of-war.com');
 
 // Tasks
 
-task('deploy:npm', function () {
-    cd('{{release_path}}');
-    run('npm ci --production=false');
+task('deploy:build_assets', function (): void {
+    run('bash -lc "source ~/.nvm/nvm.sh 2>/dev/null; cd {{release_path}} && npm ci && npm run build:ssr"');
 });
+after('deploy:vendors', 'deploy:build_assets');
 
-task('deploy:wayfinder', function () {
+task('deploy:wayfinder', function (): void {
     cd('{{release_path}}');
     run('{{bin/php}} artisan wayfinder:generate --with-form');
 });
+before('deploy:build_assets', 'deploy:wayfinder');
 
-task('deploy:build', function () {
-    cd('{{release_path}}');
-    run('npm run build:ssr');
+task('deploy:install_services', function (): void {
+    $serviceDir = '~/.config/systemd/user';
+    run("mkdir -p $serviceDir");
+    run("cp {{release_path}}/deploy/systemd-user/*.service $serviceDir/");
+    run('systemctl --user daemon-reload');
+    run('systemctl --user enable movies-of-war-horizon.service movies-of-war-inertia-ssr.service movies-of-war-schedule-work.service');
 });
+before('deploy:symlink', 'deploy:install_services');
 
-/**
- * Restart queue workers gracefully.
- * This tells all queue workers to finish their current job and then exit.
- * Supervisor will automatically restart them with the new code.
- */
-task('artisan:queue:restart', function () {
-    run('{{bin/php}} {{release_path}}/artisan queue:restart');
+task('deploy:restart_services', function (): void {
+    run('cd {{release_path}} && {{bin/php}} artisan horizon:terminate', ['allow_failure' => true]);
+    run('cd {{release_path}} && {{bin/php}} artisan inertia:stop-ssr', ['allow_failure' => true]);
+    run('systemctl --user restart movies-of-war-schedule-work.service movies-of-war-horizon.service movies-of-war-inertia-ssr.service', ['allow_failure' => true]);
 });
+after('deploy:symlink', 'deploy:restart_services');
 
-/**
- * Restart SSR server gracefully.
- * This stops the existing SSR server, forcing Supervisor to restart it with the new code.
- */
-task('artisan:ssr:restart', function () {
-    run('{{bin/php}} {{release_path}}/artisan inertia:stop-ssr');
+task('deploy:reload_php_fpm', function (): void {
+    run('sudo systemctl restart php8.4-fpm', ['allow_failure' => true]);
 });
+after('deploy:restart_services', 'deploy:reload_php_fpm');
 
 // Hooks
 
-after('deploy:update_code', 'deploy:npm');
-before('deploy:build', 'deploy:wayfinder');
-after('deploy:vendors', 'deploy:build');
-before('deploy:symlink', 'artisan:migrate');
-after('deploy:symlink', 'artisan:queue:restart');
-after('deploy:symlink', 'artisan:ssr:restart');
 after('deploy:failed', 'deploy:unlock');
+before('deploy:symlink', 'artisan:migrate');

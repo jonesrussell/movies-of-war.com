@@ -5,7 +5,6 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
 import {
     Dialog,
@@ -14,6 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { XPostStatus } from '@/types/enums';
 
 interface Props {
@@ -472,7 +472,10 @@ function mediaOverlayText(content: string | null): string | null {
             </div>
 
             <!-- Preview dialog -->
-            <Dialog :open="!!previewPost" @update:open="(v) => !v && closePreview()">
+            <Dialog
+                :open="!!previewPost"
+                @update:open="(v) => !v && closePreview()"
+            >
                 <DialogContent class="max-w-md">
                     <DialogHeader>
                         <DialogTitle class="sr-only">

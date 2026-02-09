@@ -3,8 +3,8 @@ import type { XPost } from '@/types/models';
 
 import { Head, Link } from '@inertiajs/vue3';
 
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
     xPost: XPost;
@@ -81,7 +81,8 @@ function getXPostUrl(tweetId: string): string {
                             :content="xPost.content || ''"
                             :media-urls="xPost.media_urls || []"
                             :media-overlay-text="
-                                xPost.content?.match(/^[^(]+\(\d{4}\)/)
+                                xPost.content
+                                    ?.match(/^[^(]+\(\d{4}\)/)
                                     ?.at(0) ?? null
                             "
                         />

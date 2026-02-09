@@ -53,7 +53,7 @@ const siteLabel = 'movies-of-war.com';
         <!-- Content -->
         <div
             :class="[
-                'whitespace-pre-wrap break-words text-[15px] leading-5 text-white',
+                'text-[15px] leading-5 break-words whitespace-pre-wrap text-white',
                 compact ? 'line-clamp-3' : '',
             ]"
         >
@@ -80,15 +80,13 @@ const siteLabel = 'movies-of-war.com';
             </div>
             <div
                 v-if="mediaOverlayText"
-                class="absolute bottom-0 left-0 right-0 bg-black/70 px-3 py-2 text-sm font-medium text-white"
+                class="absolute right-0 bottom-0 left-0 bg-black/70 px-3 py-2 text-sm font-medium text-white"
             >
                 {{ mediaOverlayText }}
             </div>
         </div>
 
         <!-- Source -->
-        <p class="mt-2 text-xs text-zinc-500">
-            From {{ siteLabel }}
-        </p>
+        <p class="mt-2 text-xs text-zinc-500">From {{ siteLabel }}</p>
     </div>
 </template>

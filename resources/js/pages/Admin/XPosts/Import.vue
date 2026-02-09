@@ -2,8 +2,8 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface PreviewRow {
     row_number: number;
@@ -30,7 +30,10 @@ const form = useForm({
 
 const allSelected = computed({
     get() {
-        return props.preview.length > 0 && selected.value.size === props.preview.length;
+        return (
+            props.preview.length > 0 &&
+            selected.value.size === props.preview.length
+        );
     },
     set(checked: boolean) {
         if (checked) {
@@ -85,8 +88,8 @@ const selectedCount = computed(() => selected.value.size);
                         <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-sm"
                             >MoW_X_Posts_2026_CLEANED.xlsx</code
                         >
-                        to import as draft X posts. You can edit and schedule them
-                        after importing.
+                        to import as draft X posts. You can edit and schedule
+                        them after importing.
                     </p>
                 </div>
 
@@ -123,7 +126,9 @@ const selectedCount = computed(() => selected.value.size);
                                 />
                             </div>
                             <div class="min-w-0 flex-1 space-y-3">
-                                <div class="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                                <div
+                                    class="flex flex-wrap items-center gap-2 text-xs text-zinc-500"
+                                >
                                     <span>Row {{ row.row_number }}</span>
                                     <span
                                         v-if="row.theme"

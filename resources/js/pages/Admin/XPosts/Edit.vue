@@ -5,8 +5,8 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { Plus, Trash2, X } from 'lucide-vue-next';
 import { computed } from 'vue';
 
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
+import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { XPostStatus } from '@/types/enums';
 
 interface Props {
@@ -98,8 +98,8 @@ function submit() {
                             :content="form.content"
                             :media-urls="form.media_urls"
                             :media-overlay-text="
-                                form.content?.match(/^[^(]+\(\d{4}\)/)
-                                    ?.at(0) ?? null
+                                form.content?.match(/^[^(]+\(\d{4}\)/)?.at(0) ??
+                                null
                             "
                         />
                     </div>

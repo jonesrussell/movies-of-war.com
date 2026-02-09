@@ -173,7 +173,7 @@ function formatDate(dateString: string | null): string {
                         <p class="mb-2 text-sm font-medium text-zinc-300">
                             Callback URI (add this in X Developer Portal)
                         </p>
-                        <p class="break-all font-mono text-sm text-white">
+                        <p class="font-mono text-sm break-all text-white">
                             {{ oauth2CallbackUrl }}
                         </p>
                         <p class="mt-2 text-xs text-zinc-500">

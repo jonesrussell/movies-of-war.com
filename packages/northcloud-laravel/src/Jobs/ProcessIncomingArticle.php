@@ -1,6 +1,6 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles\Jobs;
+namespace JonesRussell\NorthcloudLaravel\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -15,10 +15,10 @@ class ProcessIncomingArticle implements ShouldQueue
     public function handle(): void
     {
         try {
-            $processorClass = config('redis-articles.processing.processor');
-            $articleModelClass = config('redis-articles.models.article');
-            $newsSourceModelClass = config('redis-articles.models.news_source');
-            $tagModelClass = config('redis-articles.models.tag');
+            $processorClass = config('northcloud.processing.processor');
+            $articleModelClass = config('northcloud.models.article');
+            $newsSourceModelClass = config('northcloud.models.news_source');
+            $tagModelClass = config('northcloud.models.tag');
 
             $processor = new $processorClass(
                 $articleModelClass,

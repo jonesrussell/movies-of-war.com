@@ -8,6 +8,12 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/northcloud-laravel"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "atymic/twitter": "^3.0",

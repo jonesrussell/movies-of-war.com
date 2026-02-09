@@ -1,11 +1,11 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles\Console\Commands;
+namespace JonesRussell\NorthcloudLaravel\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use JonesRussell\LaravelRedisArticles\Events\ArticleReceived;
-use JonesRussell\LaravelRedisArticles\Jobs\ProcessIncomingArticle;
+use JonesRussell\NorthcloudLaravel\Events\ArticleReceived;
+use JonesRussell\NorthcloudLaravel\Jobs\ProcessIncomingArticle;
 
 class SubscribeToArticleFeed extends Command
 {
@@ -15,9 +15,9 @@ class SubscribeToArticleFeed extends Command
 
     public function handle(): void
     {
-        $channel = $this->argument('channel') ?? config('redis-articles.redis.channel', 'articles:default');
-        $minQualityScore = (int) config('redis-articles.quality.min_score', 0);
-        $qualityFilterEnabled = config('redis-articles.quality.enabled', false);
+        $channel = $this->argument('channel') ?? config('northcloud.redis.channel', 'articles:default');
+        $minQualityScore = (int) config('northcloud.quality.min_score', 0);
+        $qualityFilterEnabled = config('northcloud.quality.enabled', false);
 
         $this->info("Subscribing to Redis channel: {$channel}");
 
@@ -25,7 +25,7 @@ class SubscribeToArticleFeed extends Command
             $this->info("Filtering articles with quality_score >= {$minQualityScore}");
         }
 
-        $redisConnection = config('redis-articles.redis.connection', 'default');
+        $redisConnection = config('northcloud.redis.connection', 'default');
         $redisConfig = config("database.redis.{$redisConnection}");
         $client = new \Redis;
 
@@ -91,7 +91,7 @@ class SubscribeToArticleFeed extends Command
 
             event(new ArticleReceived($data, $channel));
 
-            $processSync = config('redis-articles.processing.sync', true);
+            $processSync = config('northcloud.processing.sync', true);
 
             if ($processSync) {
                 ProcessIncomingArticle::dispatchSync($data);

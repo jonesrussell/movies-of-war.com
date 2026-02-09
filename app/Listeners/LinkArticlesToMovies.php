@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Models\Movie;
 use Illuminate\Support\Str;
-use JonesRussell\LaravelRedisArticles\Events\ArticleProcessed;
+use JonesRussell\NorthcloudLaravel\Events\ArticleProcessed;
 
 class LinkArticlesToMovies
 {

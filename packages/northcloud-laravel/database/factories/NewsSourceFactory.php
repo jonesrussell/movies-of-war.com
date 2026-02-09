@@ -1,10 +1,10 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles\Database\Factories;
+namespace JonesRussell\NorthcloudLaravel\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use JonesRussell\LaravelRedisArticles\Models\NewsSource;
+use JonesRussell\NorthcloudLaravel\Models\NewsSource;
 
 class NewsSourceFactory extends Factory
 {

@@ -1,14 +1,14 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles\Services;
+namespace JonesRussell\NorthcloudLaravel\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use JonesRussell\LaravelRedisArticles\Contracts\ArticleModel;
-use JonesRussell\LaravelRedisArticles\Contracts\ArticleProcessor;
-use JonesRussell\LaravelRedisArticles\Events\ArticleProcessed;
-use JonesRussell\LaravelRedisArticles\Models\NewsSource;
+use JonesRussell\NorthcloudLaravel\Contracts\ArticleModel;
+use JonesRussell\NorthcloudLaravel\Contracts\ArticleProcessor;
+use JonesRussell\NorthcloudLaravel\Events\ArticleProcessed;
+use JonesRussell\NorthcloudLaravel\Models\NewsSource;
 
 class ArticleIngestionService implements ArticleProcessor
 {
@@ -325,7 +325,7 @@ class ArticleIngestionService implements ArticleProcessor
             return null;
         }
 
-        $allowedTags = config('redis-articles.content.allowed_tags', [
+        $allowedTags = config('northcloud.content.allowed_tags', [
             'p', 'br', 'a', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         ]);
 
@@ -340,7 +340,7 @@ class ArticleIngestionService implements ArticleProcessor
     public function attachTags(ArticleModel $article, array $topics): void
     {
         $tagIds = [];
-        $defaultTagType = config('redis-articles.tags.default_type', 'article_category');
+        $defaultTagType = config('northcloud.tags.default_type', 'article_category');
 
         foreach ($topics as $topic) {
             $tagSlug = Str::slug($topic);

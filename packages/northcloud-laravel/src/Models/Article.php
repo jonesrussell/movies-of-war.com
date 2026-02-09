@@ -1,6 +1,6 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles\Models;
+namespace JonesRussell\NorthcloudLaravel\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use JonesRussell\LaravelRedisArticles\Contracts\ArticleModel;
+use JonesRussell\NorthcloudLaravel\Contracts\ArticleModel;
 
 abstract class Article extends Model implements ArticleModel
 {
@@ -52,14 +52,14 @@ abstract class Article extends Model implements ArticleModel
 
     public function newsSource(): BelongsTo
     {
-        $newsSourceModel = config('redis-articles.models.news_source');
+        $newsSourceModel = config('northcloud.models.news_source');
 
         return $this->belongsTo($newsSourceModel);
     }
 
     public function tags(): BelongsToMany
     {
-        $tagModel = config('redis-articles.models.tag');
+        $tagModel = config('northcloud.models.tag');
 
         return $this->belongsToMany($tagModel, 'article_tag', 'article_id', 'tag_id')
             ->withTimestamps()

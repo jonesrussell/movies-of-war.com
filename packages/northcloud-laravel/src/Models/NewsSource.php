@@ -1,6 +1,6 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles\Models;
+namespace JonesRussell\NorthcloudLaravel\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -37,7 +37,7 @@ class NewsSource extends Model
 
     public function articles(): HasMany
     {
-        $articleModel = config('redis-articles.models.article');
+        $articleModel = config('northcloud.models.article');
 
         return $this->hasMany($articleModel);
     }

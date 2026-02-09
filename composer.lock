@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0355cd482519f8be40643c3b97441918",
+    "content-hash": "ad4c4bf510e16bf70946fa8b37525bfc",
     "packages": [
         {
             "name": "atymic/twitter",
@@ -1586,12 +1586,12 @@
             "time": "2026-01-13T15:29:20+00:00"
         },
         {
-            "name": "jonesrussell/laravel-redis-articles",
-            "version": "dev-main",
+            "name": "jonesrussell/northcloud-laravel",
+            "version": "0.1.0",
             "dist": {
                 "type": "path",
-                "url": "packages/laravel-redis-articles",
-                "reference": "25b87bcebf5b8d05fe76ead346032b345be3c7db"
+                "url": "packages/northcloud-laravel",
+                "reference": "b1b6bbb9ec178d848bd5c14f8fff794dc02df1f2"
             },
             "require": {
                 "illuminate/console": "^12.0",
@@ -1609,18 +1609,18 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "JonesRussell\\LaravelRedisArticles\\LaravelRedisArticlesServiceProvider"
+                        "JonesRussell\\NorthcloudLaravel\\NorthcloudLaravelServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "JonesRussell\\LaravelRedisArticles\\": "src/"
+                    "JonesRussell\\NorthcloudLaravel\\": "src/"
                 }
             },
             "autoload-dev": {
                 "psr-4": {
-                    "JonesRussell\\LaravelRedisArticles\\Tests\\": "tests/"
+                    "JonesRussell\\NorthcloudLaravel\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -1634,7 +1634,6 @@
             ],
             "description": "Laravel package for ingesting articles from Redis pub/sub channels with deduplication, source tracking, and tag management",
             "transport-options": {
-                "symlink": true,
                 "relative": true
             }
         },
@@ -11444,9 +11443,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "jonesrussell/laravel-redis-articles": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

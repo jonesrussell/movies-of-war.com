@@ -1,10 +1,10 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles\Events;
+namespace JonesRussell\NorthcloudLaravel\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use JonesRussell\LaravelRedisArticles\Contracts\ArticleModel;
+use JonesRussell\NorthcloudLaravel\Contracts\ArticleModel;
 
 class ArticleProcessed
 {

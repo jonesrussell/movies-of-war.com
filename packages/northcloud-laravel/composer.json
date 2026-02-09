@@ -1,5 +1,6 @@
 {
-    "name": "jonesrussell/laravel-redis-articles",
+    "name": "jonesrussell/northcloud-laravel",
+    "version": "0.1.0",
     "description": "Laravel package for ingesting articles from Redis pub/sub channels with deduplication, source tracking, and tag management",
     "type": "library",
     "license": "MIT",
@@ -23,18 +24,18 @@
     },
     "autoload": {
         "psr-4": {
-            "JonesRussell\\LaravelRedisArticles\\": "src/"
+            "JonesRussell\\NorthcloudLaravel\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "JonesRussell\\LaravelRedisArticles\\Tests\\": "tests/"
+            "JonesRussell\\NorthcloudLaravel\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "JonesRussell\\LaravelRedisArticles\\LaravelRedisArticlesServiceProvider"
+                "JonesRussell\\NorthcloudLaravel\\NorthcloudLaravelServiceProvider"
             ]
         }
     },

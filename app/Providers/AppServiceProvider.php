@@ -18,7 +18,7 @@ use App\Policies\XPostPolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use JonesRussell\LaravelRedisArticles\Events\ArticleProcessed;
+use JonesRussell\NorthcloudLaravel\Events\ArticleProcessed;
 
 class AppServiceProvider extends ServiceProvider
 {

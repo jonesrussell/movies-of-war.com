@@ -1,6 +1,6 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles\Contracts;
+namespace JonesRussell\NorthcloudLaravel\Contracts;
 
 interface ArticleProcessor
 {

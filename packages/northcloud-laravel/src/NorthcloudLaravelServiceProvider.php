@@ -1,17 +1,19 @@
 <?php
 
-namespace JonesRussell\LaravelRedisArticles;
+declare(strict_types=1);
+
+namespace JonesRussell\NorthcloudLaravel;
 
 use Illuminate\Support\ServiceProvider;
-use JonesRussell\LaravelRedisArticles\Console\Commands\SubscribeToArticleFeed;
+use JonesRussell\NorthcloudLaravel\Console\Commands\SubscribeToArticleFeed;
 
-class LaravelRedisArticlesServiceProvider extends ServiceProvider
+class NorthcloudLaravelServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/redis-articles.php',
-            'redis-articles'
+            __DIR__.'/../config/northcloud.php',
+            'northcloud'
         );
     }
 
@@ -23,16 +25,16 @@ class LaravelRedisArticlesServiceProvider extends ServiceProvider
             ]);
 
             $this->publishes([
-                __DIR__.'/../config/redis-articles.php' => config_path('redis-articles.php'),
-            ], 'redis-articles-config');
+                __DIR__.'/../config/northcloud.php' => config_path('northcloud.php'),
+            ], 'northcloud-config');
 
             $this->publishes([
                 __DIR__.'/../database/migrations' => database_path('migrations'),
-            ], 'redis-articles-migrations');
+            ], 'northcloud-migrations');
 
             $this->publishes([
                 __DIR__.'/../database/factories' => database_path('factories'),
-            ], 'redis-articles-factories');
+            ], 'northcloud-factories');
         }
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');

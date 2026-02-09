@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use JonesRussell\LaravelRedisArticles\Models\Article as BaseArticle;
+use JonesRussell\NorthcloudLaravel\Models\Article as BaseArticle;
 
 class WarArticle extends BaseArticle
 {
@@ -37,7 +37,7 @@ class WarArticle extends BaseArticle
      */
     public function tags(): BelongsToMany
     {
-        $tagModel = config('redis-articles.models.tag');
+        $tagModel = config('northcloud.models.tag');
 
         return $this->belongsToMany($tagModel, 'article_tag', 'article_id', 'tag_id')
             ->withTimestamps()

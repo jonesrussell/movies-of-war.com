@@ -11,7 +11,7 @@ return [
     */
     'redis' => [
         'connection' => env('REDIS_ARTICLES_CONNECTION', 'default'),
-        'channel' => env('REDIS_ARTICLES_CHANNEL', 'articles:war'),
+        'channel' => env('REDIS_ARTICLES_CHANNEL', 'articles:default'),
     ],
 
     /*
@@ -23,8 +23,8 @@ return [
     |
     */
     'quality' => [
-        'min_score' => env('ARTICLES_MIN_QUALITY_SCORE', 70),
-        'enabled' => env('ARTICLES_QUALITY_FILTER', true),
+        'min_score' => env('ARTICLES_MIN_QUALITY_SCORE', 0),
+        'enabled' => env('ARTICLES_QUALITY_FILTER', false),
     ],
 
     /*
@@ -37,9 +37,9 @@ return [
     |
     */
     'models' => [
-        'article' => \App\Models\WarArticle::class,
-        'news_source' => \JonesRussell\LaravelRedisArticles\Models\NewsSource::class,
-        'tag' => \JonesRussell\LaravelRedisArticles\Models\Tag::class,
+        'article' => \JonesRussell\NorthcloudLaravel\Models\Article::class,
+        'news_source' => \JonesRussell\NorthcloudLaravel\Models\NewsSource::class,
+        'tag' => \JonesRussell\NorthcloudLaravel\Models\Tag::class,
     ],
 
     /*
@@ -51,7 +51,7 @@ return [
     |
     */
     'processing' => [
-        'processor' => \JonesRussell\LaravelRedisArticles\Services\ArticleIngestionService::class,
+        'processor' => \JonesRussell\NorthcloudLaravel\Services\ArticleIngestionService::class,
         'sync' => env('ARTICLES_PROCESS_SYNC', true), // Sync vs queued processing
     ],
 
@@ -77,7 +77,7 @@ return [
     |
     */
     'tags' => [
-        'default_type' => 'theme',
+        'default_type' => 'article_category',
         'auto_create' => true,
     ],
 ];

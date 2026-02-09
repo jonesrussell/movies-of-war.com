@@ -32,7 +32,7 @@ Add the package repository to your `composer.json`:
     "repositories": [
         {
             "type": "path",
-            "url": "../packages/laravel-redis-articles"
+            "url": "../packages/northcloud-laravel"
         }
     ]
 }
@@ -41,14 +41,14 @@ Add the package repository to your `composer.json`:
 Then require the package:
 
 ```bash
-composer require jonesrussell/laravel-redis-articles:@dev
+composer require jonesrussell/northcloud-laravel:@dev
 ```
 
 ### 2. Publish Configuration and Migrations
 
 ```bash
-php artisan vendor:publish --tag=redis-articles-config
-php artisan vendor:publish --tag=redis-articles-migrations
+php artisan vendor:publish --tag=northcloud-config
+php artisan vendor:publish --tag=northcloud-migrations
 ```
 
 ### 3. Run Migrations
@@ -59,7 +59,7 @@ php artisan migrate
 
 ## Configuration
 
-Edit `config/redis-articles.php` to customize:
+Edit `config/northcloud.php` to customize:
 
 ```php
 return [
@@ -73,8 +73,8 @@ return [
     ],
     'models' => [
         'article' => \App\Models\YourArticle::class,
-        'news_source' => \JonesRussell\LaravelRedisArticles\Models\NewsSource::class,
-        'tag' => \JonesRussell\LaravelRedisArticles\Models\Tag::class,
+        'news_source' => \JonesRussell\NorthcloudLaravel\Models\NewsSource::class,
+        'tag' => \JonesRussell\NorthcloudLaravel\Models\Tag::class,
     ],
     // ... more options
 ];
@@ -91,7 +91,7 @@ Extend the package's abstract Article model:
 
 namespace App\Models;
 
-use JonesRussell\LaravelRedisArticles\Models\Article as BaseArticle;
+use JonesRussell\NorthcloudLaravel\Models\Article as BaseArticle;
 
 class WarArticle extends BaseArticle
 {
@@ -156,7 +156,7 @@ Publish JSON messages to your Redis channel:
 Hook into the article lifecycle with events:
 
 ```php
-use JonesRussell\LaravelRedisArticles\Events\ArticleProcessed;
+use JonesRussell\NorthcloudLaravel\Events\ArticleProcessed;
 
 class LinkArticlesToMovies
 {

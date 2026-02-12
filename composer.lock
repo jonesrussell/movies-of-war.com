@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd87e5b09853f0b87a17a5654b41c596",
+    "content-hash": "fd5c30d91e50916cba935f14460e8d68",
     "packages": [
         {
             "name": "atymic/twitter",
@@ -1587,20 +1587,30 @@
         },
         {
             "name": "jonesrussell/northcloud-laravel",
-            "version": "0.1.0",
+            "version": "v0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jonesrussell/northcloud-laravel.git",
+                "reference": "05a795797a87e55653d9ac06839841183b4a7285"
+            },
             "dist": {
-                "type": "path",
-                "url": "packages/northcloud-laravel",
-                "reference": "b1b6bbb9ec178d848bd5c14f8fff794dc02df1f2"
+                "type": "zip",
+                "url": "https://api.github.com/repos/jonesrussell/northcloud-laravel/zipball/05a795797a87e55653d9ac06839841183b4a7285",
+                "reference": "05a795797a87e55653d9ac06839841183b4a7285",
+                "shasum": ""
             },
             "require": {
+                "ext-json": "*",
+                "ext-pcntl": "*",
+                "ext-redis": "*",
                 "illuminate/console": "^12.0",
                 "illuminate/database": "^12.0",
-                "illuminate/redis": "^12.0",
+                "illuminate/events": "^12.0",
                 "illuminate/support": "^12.0",
                 "php": "^8.4"
             },
             "require-dev": {
+                "laravel/pint": "^1.24",
                 "orchestra/testbench": "^10.0",
                 "pestphp/pest": "^4.0",
                 "pestphp/pest-plugin-laravel": "^4.0"
@@ -1609,33 +1619,25 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "JonesRussell\\NorthcloudLaravel\\NorthcloudLaravelServiceProvider"
+                        "JonesRussell\\NorthCloud\\NorthCloudServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "JonesRussell\\NorthcloudLaravel\\": "src/"
+                    "JonesRussell\\NorthCloud\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "JonesRussell\\NorthcloudLaravel\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
-            "authors": [
-                {
-                    "name": "Russell Jones",
-                    "email": "jones@russell.com"
-                }
-            ],
-            "description": "Laravel package for ingesting articles from Redis pub/sub channels with deduplication, source tracking, and tag management",
-            "transport-options": {
-                "relative": true
-            }
+            "description": "Shared article ingestion pipeline for North Cloud-connected Laravel sites",
+            "support": {
+                "issues": "https://github.com/jonesrussell/northcloud-laravel/issues",
+                "source": "https://github.com/jonesrussell/northcloud-laravel/tree/v0.1.2"
+            },
+            "time": "2026-02-08T18:42:05+00:00"
         },
         {
             "name": "jonesrussell/x-suite-laravel",
@@ -11532,5 +11534,5 @@
         "php": "^8.2"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

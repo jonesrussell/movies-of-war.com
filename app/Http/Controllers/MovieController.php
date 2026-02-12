@@ -79,10 +79,28 @@ class MovieController extends Controller
 
             return $arr;
         })->values()->all();
-        $moviesPayload = array_merge($movies->toArray(), [
+
+        $paginatorArray = $movies->toArray();
+        $moviesPayload = [
             'data' => $data,
             'watchlisted_ids' => $watchlistedIds,
-        ]);
+            'links' => [
+                'first' => $paginatorArray['first_page_url'] ?? null,
+                'last' => $paginatorArray['last_page_url'] ?? null,
+                'prev' => $paginatorArray['prev_page_url'] ?? null,
+                'next' => $paginatorArray['next_page_url'] ?? null,
+            ],
+            'meta' => [
+                'current_page' => $paginatorArray['current_page'],
+                'from' => $paginatorArray['from'] ?? null,
+                'last_page' => $paginatorArray['last_page'],
+                'links' => $paginatorArray['links'] ?? [],
+                'path' => $paginatorArray['path'],
+                'per_page' => $paginatorArray['per_page'],
+                'to' => $paginatorArray['to'] ?? null,
+                'total' => $paginatorArray['total'],
+            ],
+        ];
 
         $filterOptions = $this->filterService->getFilterOptions();
 

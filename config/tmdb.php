@@ -33,6 +33,20 @@ return [
                 'type' => 'keywords',
                 'names' => ['vietnam war', 'vietnam'],
             ],
+            [
+                'key' => 'popular',
+                'type' => 'popular',
+            ],
+            [
+                'key' => 'trending_day',
+                'type' => 'trending',
+                'window' => 'day',
+            ],
+            [
+                'key' => 'trending_week',
+                'type' => 'trending',
+                'window' => 'week',
+            ],
         ],
         'min_vote_count' => 100,
         'min_vote_average' => null,
@@ -40,12 +54,17 @@ return [
         'relevance_min_score' => null,
         'relevance_top_percent' => null,
         'gap_filling_enabled' => true,
+        'require_war_genre_for_list_strategies' => true,
         'strategy_bucket_map' => [
             'war_genre' => null,
             'wwii' => 'wwii',
             'vietnam' => 'vietnam-war',
+            'popular' => null,
+            'trending_day' => null,
+            'trending_week' => null,
         ],
         'max_ids_per_strategy' => 50,
         'keyword_cache_ttl_seconds' => 86400,
+        'changes_days_back' => 1,
     ],
 ];

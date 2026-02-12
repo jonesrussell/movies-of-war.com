@@ -61,6 +61,18 @@ Schedule::command('tmdb:import --upcoming --limit=10')
     ->name('tmdb-import-upcoming')
     ->withoutOverlapping();
 
+// Daily import of new war movies (discovery + popular + trending, fill-to-limit)
+Schedule::command('tmdb:import --limit=50')
+    ->dailyAt('03:30')
+    ->name('tmdb-import-daily')
+    ->withoutOverlapping();
+
+// Refresh movies that TMDB has updated (changes API)
+Schedule::command('tmdb:refresh-changed')
+    ->dailyAt('04:30')
+    ->name('tmdb-refresh-changed')
+    ->withoutOverlapping();
+
 // Refresh stale TMDB data (cadence + max-age) within a window to spread load
 Schedule::command('tmdb:refresh-stale --limit=50')
     ->everyFifteenMinutes()

@@ -84,7 +84,8 @@ class ImportTmdbMovies extends Command
     }
 
     /**
-     * Discover candidate movie IDs using multi-strategy discovery, gap-filling, and filtering.
+     * Discover candidate movie IDs using multi-strategy discovery, fill-to-limit, and filtering.
+     * Keeps fetching pages until at least $limit new (not already in DB) candidates or sources exhausted.
      *
      * @return Collection<int, int>
      */
@@ -100,56 +101,130 @@ class ImportTmdbMovies extends Command
             $strategies = $this->gapFiller->sortStrategiesByGap($strategies);
         }
 
-        $minVoteCount = config('tmdb.import.min_vote_count');
-        $maxIdsPerStrategy = config('tmdb.import.max_ids_per_strategy', 50);
         $allResults = collect();
-        $strategyLog = [];
-
+        $strategyPages = [];
         foreach ($strategies as $strategy) {
             $key = $strategy['key'] ?? 'unknown';
-            $rawResults = $this->fetchStrategyResults($strategy, $upcoming, $maxIdsPerStrategy);
-            $rawCount = $rawResults->count();
+            $strategyPages[$key] = 1;
+        }
+        $maxRounds = 100;
+        $round = 0;
+        $ids = collect();
 
-            Log::info('TMDB import strategy', [
-                'strategy' => $key,
-                'raw_count' => $rawCount,
-            ]);
-            $strategyLog[$key] = ['raw' => $rawCount];
+        while ($round < $maxRounds) {
+            $round++;
+            $anyNew = false;
 
-            $seenIds = $allResults->pluck('id')->flip()->all();
-            foreach ($rawResults as $movie) {
-                $id = $movie['id'] ?? null;
-                if ($id !== null && ! isset($seenIds[$id])) {
-                    $seenIds[$id] = true;
-                    $allResults->push($movie);
+            foreach ($strategies as $strategy) {
+                $key = $strategy['key'] ?? 'unknown';
+                $page = $strategyPages[$key] ?? 1;
+                $pageResults = $this->fetchStrategyResultsOnePage($strategy, $page, $upcoming);
+
+                if ($pageResults->isEmpty()) {
+                    continue;
                 }
+
+                $anyNew = true;
+                $seenIds = $allResults->pluck('id')->flip()->all();
+                foreach ($pageResults as $movie) {
+                    $id = $movie['id'] ?? null;
+                    if ($id !== null && ! isset($seenIds[$id])) {
+                        $seenIds[$id] = true;
+                        $allResults->push($movie);
+                    }
+                }
+                $strategyPages[$key] = $page + 1;
+                usleep(250000);
+            }
+
+            $candidates = $this->filter->filter($allResults)->values();
+            $ids = $candidates;
+
+            if (! $force) {
+                $existingTmdbIds = Movie::whereIn('tmdb_id', $ids->all())->pluck('tmdb_id');
+                $ids = $ids->reject(fn (int $id) => $existingTmdbIds->contains($id))->values();
+            }
+
+            if ($ids->count() >= $limit) {
+                $ids = $ids->take($limit)->values();
+                if ($random) {
+                    $ids = $ids->shuffle()->values();
+                }
+                Log::info('TMDB import discovery fill-to-limit', ['rounds' => $round, 'new_count' => $ids->count()]);
+
+                return $ids;
+            }
+
+            if (! $anyNew) {
+                break;
             }
         }
 
-        $mergedCount = $allResults->count();
-        $candidates = $this->filter->filter($allResults);
-        $filteredCount = $candidates->count();
-
-        foreach (array_keys($strategyLog) as $k) {
-            $strategyLog[$k]['after_dedupe'] = $mergedCount;
-            $strategyLog[$k]['filtered'] = $filteredCount;
-        }
-        Log::info('TMDB import discovery summary', $strategyLog);
-
-        $ids = $candidates->values();
-
-        if (! $force) {
-            $existingTmdbIds = Movie::whereIn('tmdb_id', $ids->all())->pluck('tmdb_id');
-            $ids = $ids->reject(fn (int $id) => $existingTmdbIds->contains($id))->values();
-        }
-
         $ids = $ids->take($limit)->values();
-
         if ($random) {
             $ids = $ids->shuffle()->values();
         }
 
         return $ids;
+    }
+
+    /**
+     * Fetch one page of results for a strategy (genre, keywords, popular, or trending).
+     * Popular and trending are skipped when $upcoming is true.
+     *
+     * @param  array<string, mixed>  $strategy
+     * @return Collection<int, array<string, mixed>>
+     */
+    protected function fetchStrategyResultsOnePage(array $strategy, int $page, bool $upcoming): Collection
+    {
+        $type = $strategy['type'] ?? '';
+
+        if ($type === 'popular') {
+            if ($upcoming) {
+                return collect();
+            }
+
+            return $this->tmdb->getPopularMoviesAsDto($page)->results;
+        }
+
+        if ($type === 'trending') {
+            if ($upcoming) {
+                return collect();
+            }
+            $window = $strategy['window'] ?? 'day';
+
+            return $this->tmdb->getTrendingMoviesAsDto($page, $window)->results;
+        }
+
+        if ($type === 'genre' || $type === 'keywords') {
+            $minVoteCount = config('tmdb.import.min_vote_count');
+            $minVoteAverage = config('tmdb.import.min_vote_average');
+            $genreIds = null;
+            $keywordIds = null;
+
+            if ($type === 'genre' && isset($strategy['genre_id'])) {
+                $genreIds = [(int) $strategy['genre_id']];
+            }
+            if ($type === 'keywords' && ! empty($strategy['names'])) {
+                $keywordIds = $this->tmdb->resolveKeywordIds($strategy['names']);
+                if (empty($keywordIds)) {
+                    return collect();
+                }
+            }
+
+            $response = $this->tmdb->discoverMoviesAsDto(
+                $page,
+                $genreIds,
+                $keywordIds,
+                $minVoteCount,
+                $minVoteAverage,
+                $upcoming
+            );
+
+            return $response->results;
+        }
+
+        return collect();
     }
 
     /**

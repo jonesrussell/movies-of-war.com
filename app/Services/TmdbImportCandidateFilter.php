@@ -14,6 +14,8 @@ class TmdbImportCandidateFilter
      * @param  Collection<int, array<string, mixed>>  $candidates  Discover results with id, title, overview, vote_average, vote_count, release_date
      * @return Collection<int, int> Filtered TMDB IDs
      */
+    private const WAR_GENRE_ID = 10752;
+
     public function filter(Collection $candidates): Collection
     {
         $minVoteCount = config('tmdb.import.min_vote_count');
@@ -21,8 +23,18 @@ class TmdbImportCandidateFilter
         $relevanceKeywords = config('tmdb.import.relevance_keywords', []);
         $relevanceMinScore = config('tmdb.import.relevance_min_score');
         $relevanceTopPercent = config('tmdb.import.relevance_top_percent');
+        $requireWarGenre = config('tmdb.import.require_war_genre_for_list_strategies', false);
 
         $filtered = $candidates
+            ->filter(function (array $movie) use ($requireWarGenre) {
+                if ($requireWarGenre && isset($movie['genre_ids']) && is_array($movie['genre_ids'])) {
+                    if (! in_array(self::WAR_GENRE_ID, $movie['genre_ids'], true)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            })
             ->filter(function (array $movie) use ($minVoteCount, $minVoteAverage) {
                 if ($minVoteCount !== null && ($movie['vote_count'] ?? 0) < $minVoteCount) {
                     return false;

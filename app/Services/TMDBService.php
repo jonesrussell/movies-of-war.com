@@ -254,6 +254,90 @@ class TMDBService
         return TmdbDiscoverResponse::fromApiResponse($data);
     }
 
+    /**
+     * Get popular movies (paginated). Same response shape as discover.
+     */
+    public function getPopularMoviesAsDto(int $page = 1): TmdbDiscoverResponse
+    {
+        $response = Http::get("{$this->baseUrl}/movie/popular", [
+            'api_key' => $this->apiKey,
+            'page' => $page,
+        ]);
+
+        $data = $response->successful() ? $response->json() : [];
+
+        return TmdbDiscoverResponse::fromApiResponse($data);
+    }
+
+    /**
+     * Get trending movies (paginated). Maps response to same shape as discover.
+     *
+     * @param  'day'|'week'  $window
+     */
+    public function getTrendingMoviesAsDto(int $page = 1, string $window = 'day'): TmdbDiscoverResponse
+    {
+        $response = Http::get("{$this->baseUrl}/trending/movie/{$window}", [
+            'api_key' => $this->apiKey,
+            'page' => $page,
+        ]);
+
+        if (! $response->successful()) {
+            return new TmdbDiscoverResponse(collect(), 1, 0, 1);
+        }
+
+        $data = $response->json();
+        if (! isset($data['results'])) {
+            return new TmdbDiscoverResponse(collect(), 1, 0, 1);
+        }
+
+        return TmdbDiscoverResponse::fromApiResponse($data);
+    }
+
+    /**
+     * Get movie IDs that changed in the given date range. Paginates through all pages.
+     * TMDB allows up to 14 days. Defaults to last 24 hours if no dates given.
+     *
+     * @return array<int, int>
+     */
+    public function getMovieChangeIds(?string $startDate = null, ?string $endDate = null): array
+    {
+        $ids = [];
+        $page = 1;
+
+        do {
+            $query = [
+                'api_key' => $this->apiKey,
+                'page' => $page,
+            ];
+            if ($startDate !== null) {
+                $query['start_date'] = $startDate;
+            }
+            if ($endDate !== null) {
+                $query['end_date'] = $endDate;
+            }
+
+            $response = Http::get("{$this->baseUrl}/movie/changes", $query);
+
+            if (! $response->successful()) {
+                break;
+            }
+
+            $data = $response->json();
+            $results = $data['results'] ?? [];
+            foreach ($results as $item) {
+                $id = $item['id'] ?? null;
+                if (is_int($id)) {
+                    $ids[] = $id;
+                }
+            }
+
+            $totalPages = $data['total_pages'] ?? 1;
+            $page++;
+        } while ($page <= $totalPages);
+
+        return $ids;
+    }
+
     public function downloadPoster(string $posterPath): ?string
     {
         if (! $posterPath) {

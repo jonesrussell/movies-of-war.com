@@ -1,0 +1,23 @@
+# Entertainment and film news sources for the North Cloud pipeline
+# One URL per line; use when adding feeds/sources to north-cloud config.
+# See config/entertainment-sources.php for name/slug/url pairs used by NewsSourceSeeder.
+
+https://variety.com
+https://www.hollywoodreporter.com
+https://www.indiewire.com
+https://www.avclub.com
+https://www.slashfilm.com
+https://collider.com
+https://ew.com
+https://deadline.com
+https://screenrant.com
+https://www.empireonline.com
+https://lwlies.com
+https://www.filmcomment.com
+https://www.rogerebert.com
+https://www.bfi.org.uk
+https://www.criterion.com
+https://www.thewrap.com
+https://www.vulture.com
+https://www.polygon.com
+https://www.ign.com/movies

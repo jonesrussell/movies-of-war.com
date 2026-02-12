@@ -16,8 +16,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminSeeder::class,
             TagSeeder::class,
+            NewsSourceSeeder::class,
             MovieSeeder::class,
             ReviewSeeder::class,
+            WarArticleSeeder::class,
         ]);
 
         User::factory()->create([

@@ -37,7 +37,7 @@ class DashboardStatsService
     public function getMovieStats(): array
     {
         return Cache::remember(
-            self::CACHE_PREFIX.':movie_stats',
+            self::CACHE_PREFIX . ':movie_stats',
             self::CACHE_TTL,
             function () {
                 // Single query with conditional counts
@@ -68,7 +68,7 @@ class DashboardStatsService
     public function getXStats(): array
     {
         return Cache::remember(
-            self::CACHE_PREFIX.':x_stats',
+            self::CACHE_PREFIX . ':x_stats',
             self::CACHE_TTL,
             function () {
                 // Single query with conditional counts
@@ -135,8 +135,8 @@ class DashboardStatsService
      */
     public function clearCache(): void
     {
-        Cache::forget(self::CACHE_PREFIX.':movie_stats');
-        Cache::forget(self::CACHE_PREFIX.':x_stats');
+        Cache::forget(self::CACHE_PREFIX . ':movie_stats');
+        Cache::forget(self::CACHE_PREFIX . ':x_stats');
     }
 
     /**

@@ -404,7 +404,7 @@ function cardEnterStyle(index: number) {
             class="relative overflow-hidden pt-10 md:pt-14 lg:pt-20"
         >
             <div
-                class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:20px_20px] opacity-[0.04]"
+                class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] bg-size-[20px_20px] opacity-[0.04]"
                 aria-hidden="true"
             />
             <PublicContainer class="relative flex flex-col gap-8">

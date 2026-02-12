@@ -8,13 +8,11 @@ use App\Listeners\LinkArticlesToMovies;
 use App\Models\Movie;
 use App\Models\Review;
 use App\Models\ReviewComment;
-use App\Models\XPost;
 use App\Observers\MovieObserver;
 use App\Observers\ReviewCommentObserver;
 use App\Policies\MoviePolicy;
 use App\Policies\ReviewCommentPolicy;
 use App\Policies\ReviewPolicy;
-use App\Policies\XPostPolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -57,7 +55,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Movie::class, MoviePolicy::class);
         Gate::policy(Review::class, ReviewPolicy::class);
         Gate::policy(ReviewComment::class, ReviewCommentPolicy::class);
-        Gate::policy(XPost::class, XPostPolicy::class);
     }
 
     /**

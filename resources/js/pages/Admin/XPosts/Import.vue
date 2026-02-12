@@ -2,7 +2,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
-import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
+import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface PreviewRow {
@@ -69,26 +69,22 @@ const selectedCount = computed(() => selected.value.size);
 
 <template>
     <AppSidebarLayout>
-        <Head title="Import X Posts from Spreadsheet - Admin" />
+        <Head title="Import X Posts from Spreadsheet" />
 
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-5xl">
                 <div class="mb-8">
                     <Link
                         href="/x-posts"
-                        class="mb-4 inline-block text-sm text-red-500 hover:text-red-400"
+                        class="mb-4 inline-block text-sm text-blue-500 hover:text-blue-400"
                     >
-                        ← Back to Posts
+                        &larr; Back to Posts
                     </Link>
                     <h1 class="text-3xl font-bold text-white">
                         Import from Spreadsheet
                     </h1>
                     <p class="mt-2 text-zinc-400">
-                        Select rows from
-                        <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-sm"
-                            >MoW_X_Posts_2026_CLEANED.xlsx</code
-                        >
-                        to import as draft X posts. You can edit and schedule
+                        Select rows to import as draft X posts. You can edit and schedule
                         them after importing.
                     </p>
                 </div>
@@ -101,7 +97,7 @@ const selectedCount = computed(() => selected.value.size);
                             <input
                                 v-model="allSelected"
                                 type="checkbox"
-                                class="rounded border-zinc-600 text-red-600 focus:ring-red-500"
+                                class="rounded border-zinc-600 text-blue-600 focus:ring-blue-500"
                             />
                             Select all ({{ preview.length }} rows)
                         </label>
@@ -121,7 +117,7 @@ const selectedCount = computed(() => selected.value.size);
                                     :id="`row-${row.row_number}`"
                                     type="checkbox"
                                     :checked="selected.has(row.row_number)"
-                                    class="rounded border-zinc-600 text-red-600 focus:ring-red-500"
+                                    class="rounded border-zinc-600 text-blue-600 focus:ring-blue-500"
                                     @change="toggleRow(row.row_number)"
                                 />
                             </div>
@@ -165,7 +161,7 @@ const selectedCount = computed(() => selected.value.size);
                         <button
                             type="submit"
                             :disabled="!canSubmit || form.processing"
-                            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                         >
                             {{
                                 form.processing

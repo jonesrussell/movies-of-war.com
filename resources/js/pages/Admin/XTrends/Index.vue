@@ -3,7 +3,7 @@ import type {
     PaginatedXTrendKeywords,
     XTrendKeyword,
     XTrendResult,
-} from '@/types/models';
+} from '../../../types/x-suite';
 
 import { Head, router } from '@inertiajs/vue3';
 
@@ -43,7 +43,7 @@ function deleteKeyword(keyword: XTrendKeyword) {
 
 <template>
     <AppSidebarLayout>
-        <Head title="Trend Monitoring - Admin" />
+        <Head title="Trend Monitoring" />
 
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8">
@@ -60,7 +60,7 @@ function deleteKeyword(keyword: XTrendKeyword) {
                         Monitored Keywords
                     </h2>
                     <button
-                        class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                     >
                         Add Keyword
                     </button>

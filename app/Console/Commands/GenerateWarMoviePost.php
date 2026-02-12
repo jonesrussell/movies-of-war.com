@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Movie;
-use App\Models\XPost;
+use JonesRussell\XSuite\Models\XPost;
 use Illuminate\Console\Command;
 
 class GenerateWarMoviePost extends Command
@@ -43,7 +43,7 @@ class GenerateWarMoviePost extends Command
         $xPost = XPost::create([
             'content' => $content,
             'media_urls' => $movie->poster_path ? [$movie->poster_path] : null,
-            'status' => XPost::STATUS_DRAFT,
+            'status' => 'draft',
             'user_id' => 1, // Admin user ID (adjust as needed)
         ]);
 
@@ -68,8 +68,9 @@ class GenerateWarMoviePost extends Command
         $template = $templates[array_rand($templates)];
 
         // Truncate to 280 characters if needed
-        if (strlen($template) > XPost::MAX_TWEET_LENGTH) {
-            $template = substr($template, 0, XPost::MAX_TWEET_LENGTH - 3).'...';
+        $maxLength = config('x-suite.max_tweet_length', 280);
+        if (strlen($template) > $maxLength) {
+            $template = substr($template, 0, $maxLength - 3).'...';
         }
 
         return $template;

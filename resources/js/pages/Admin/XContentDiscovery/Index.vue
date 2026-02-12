@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PaginatedXCuratedPosts } from '@/types/models';
+import type { PaginatedXCuratedPosts } from '../../../types/x-suite';
 
 import { Head, router } from '@inertiajs/vue3';
 
@@ -37,7 +37,7 @@ function deletePost(post: any) {
 
 <template>
     <AppSidebarLayout>
-        <Head title="Content Discovery - Admin" />
+        <Head title="Content Discovery" />
 
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
@@ -46,12 +46,12 @@ function deletePost(post: any) {
                         Content Discovery
                     </h1>
                     <p class="mt-2 text-zinc-400">
-                        Curated high-quality war movie content
+                        Curated high-quality content from X
                     </p>
                 </div>
                 <button
                     @click="discover"
-                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                 >
                     Discover Content
                 </button>

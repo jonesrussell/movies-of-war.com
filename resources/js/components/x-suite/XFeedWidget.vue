@@ -53,9 +53,9 @@ function getXPostUrl(tweetId: string): string {
                         :href="getXPostUrl(post.x_post_id)"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="text-xs text-red-500 hover:text-red-400"
+                        class="text-xs text-blue-500 hover:text-blue-400"
                     >
-                        View on X →
+                        View on X
                     </a>
                 </div>
             </div>

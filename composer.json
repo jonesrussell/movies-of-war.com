@@ -12,20 +12,23 @@
         {
             "type": "path",
             "url": "packages/northcloud-laravel"
+        },
+        {
+            "type": "path",
+            "url": "../x-suite-laravel"
         }
     ],
     "require": {
         "php": "^8.2",
-        "atymic/twitter": "^3.0",
         "guzzlehttp/guzzle": "^7.10",
         "inertiajs/inertia-laravel": "^2.0",
         "jonesrussell/northcloud-laravel": "^0.1",
+        "jonesrussell/x-suite-laravel": "@dev",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
-        "league/commonmark": "^2.8",
-        "phpoffice/phpspreadsheet": "^5.4"
+        "league/commonmark": "^2.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PaginatedXAutoReplyRules } from '@/types/models';
+import type { PaginatedXAutoReplyRules } from '../../../types/x-suite';
 
 import { Head, router } from '@inertiajs/vue3';
 
@@ -28,7 +28,7 @@ function deleteRule(rule: any) {
 
 <template>
     <AppSidebarLayout>
-        <Head title="Auto-Replies - Admin" />
+        <Head title="Auto-Replies" />
 
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
@@ -41,7 +41,7 @@ function deleteRule(rule: any) {
                     </p>
                 </div>
                 <button
-                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                 >
                     Create Rule
                 </button>

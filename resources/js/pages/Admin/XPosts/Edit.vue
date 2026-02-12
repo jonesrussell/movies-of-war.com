@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import type { XPost } from '@/types/models';
+import type { XPost } from '../../../types/x-suite';
+import { XPostStatus } from '../../../types/x-suite';
 
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { Plus, Trash2, X } from 'lucide-vue-next';
 import { computed } from 'vue';
 
-import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
+import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
-import { XPostStatus } from '@/types/enums';
 
 interface Props {
     xPost: XPost;
@@ -16,24 +15,15 @@ interface Props {
 
 const props = defineProps<Props>();
 
-/* eslint-disable vue/no-setup-props-destructure */
 const form = useForm({
     content: props.xPost.content || '',
     thread_parts: props.xPost.thread_parts || [],
     media_urls: props.xPost.media_urls || [],
-    status:
-        props.xPost.status === XPostStatus.Scheduled
-            ? XPostStatus.Scheduled
-            : XPostStatus.Draft,
-    scheduled_for: props.xPost.scheduled_for
-        ? new Date(props.xPost.scheduled_for).toISOString().slice(0, 16)
-        : '',
+    status: props.xPost.status === XPostStatus.Scheduled ? XPostStatus.Scheduled : XPostStatus.Draft,
+    scheduled_for: props.xPost.scheduled_for ? new Date(props.xPost.scheduled_for).toISOString().slice(0, 16) : '',
 });
-/* eslint-enable vue/no-setup-props-destructure */
 
-const characterCount = computed(
-    () => props.maxTweetLength - (form.content?.length || 0),
-);
+const characterCount = computed(() => props.maxTweetLength - (form.content?.length || 0));
 const threadCharacterCounts = computed(() =>
     form.thread_parts.map((part) => props.maxTweetLength - part.length),
 );
@@ -41,9 +31,7 @@ const threadCharacterCounts = computed(() =>
 const isScheduled = computed(() => form.status === XPostStatus.Scheduled);
 
 function addThreadPart() {
-    if (form.thread_parts.length < 25) {
-        form.thread_parts.push('');
-    }
+    if (form.thread_parts.length < 25) form.thread_parts.push('');
 }
 
 function removeThreadPart(index: number) {
@@ -51,9 +39,7 @@ function removeThreadPart(index: number) {
 }
 
 function addMediaUrl() {
-    if (form.media_urls.length < 4) {
-        form.media_urls.push('');
-    }
+    if (form.media_urls.length < 4) form.media_urls.push('');
 }
 
 function removeMediaUrl(index: number) {
@@ -62,261 +48,92 @@ function removeMediaUrl(index: number) {
 
 function submit() {
     form.put(`/x-posts/${props.xPost.id}`, {
-        onSuccess: () => {
-            router.visit('/x-posts');
-        },
+        onSuccess: () => router.visit('/x-posts'),
     });
 }
 </script>
 
 <template>
     <AppSidebarLayout>
-        <Head title="Edit X Post - Admin" />
+        <Head title="Edit X Post" />
 
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl">
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-white">Edit X Post</h1>
-                    <p class="mt-2 text-zinc-300">
-                        Update X post content, thread, and media
-                    </p>
-                    <div
-                        v-if="xPost.error_message"
-                        class="mt-4 rounded-lg bg-red-900/50 p-4 text-sm text-red-300"
-                    >
+                    <p class="mt-2 text-zinc-300">Update X post content, thread, and media</p>
+                    <div v-if="xPost.error_message" class="mt-4 rounded-lg bg-red-900/50 p-4 text-sm text-red-300">
                         <strong>Last Error:</strong> {{ xPost.error_message }}
                     </div>
                 </div>
 
                 <form @submit.prevent="submit" class="space-y-6">
-                    <!-- Preview -->
                     <div>
-                        <h3 class="mb-2 text-sm font-medium text-zinc-400">
-                            How it looks on X
-                        </h3>
-                        <XPostPreviewCard
-                            :content="form.content"
-                            :media-urls="form.media_urls"
-                            :media-overlay-text="
-                                form.content?.match(/^[^(]+\(\d{4}\)/)?.at(0) ??
-                                null
-                            "
-                        />
+                        <h3 class="mb-2 text-sm font-medium text-zinc-400">How it looks on X</h3>
+                        <XPostPreviewCard :content="form.content" :media-urls="form.media_urls" />
                     </div>
 
-                    <!-- Main Content -->
                     <div>
-                        <label
-                            for="content"
-                            class="block text-sm font-medium text-zinc-300"
-                        >
-                            Tweet Content
-                            <span class="text-zinc-400"
-                                >({{ characterCount }} remaining)</span
-                            >
+                        <label for="content" class="block text-sm font-medium text-zinc-300">
+                            Tweet Content <span class="text-zinc-400">({{ characterCount }} remaining)</span>
                         </label>
-                        <textarea
-                            id="content"
-                            v-model="form.content"
-                            rows="4"
-                            :maxlength="maxTweetLength"
-                            placeholder="What's happening?"
-                            class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-red-500 focus:ring-red-500"
-                        />
-                        <div
-                            v-if="form.errors.content"
-                            class="mt-1 text-sm text-red-500"
-                        >
-                            {{ form.errors.content }}
-                        </div>
+                        <textarea id="content" v-model="form.content" rows="4" :maxlength="maxTweetLength" placeholder="What's happening?" class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-blue-500" />
+                        <div v-if="form.errors.content" class="mt-1 text-sm text-red-500">{{ form.errors.content }}</div>
                     </div>
 
-                    <!-- Thread Parts -->
                     <div>
                         <div class="mb-2 flex items-center justify-between">
-                            <label
-                                class="block text-sm font-medium text-zinc-300"
-                            >
-                                Thread Parts
-                                <span class="text-zinc-400"
-                                    >({{ form.thread_parts.length }}/25)</span
-                                >
-                            </label>
-                            <button
-                                v-if="form.thread_parts.length < 25"
-                                type="button"
-                                @click="addThreadPart"
-                                class="flex items-center gap-1 rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-300 hover:bg-zinc-700"
-                            >
-                                <Plus class="size-4" />
-                                Add Thread
-                            </button>
+                            <label class="block text-sm font-medium text-zinc-300">Thread Parts <span class="text-zinc-400">({{ form.thread_parts.length }}/25)</span></label>
+                            <button v-if="form.thread_parts.length < 25" type="button" @click="addThreadPart" class="rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-300 hover:bg-zinc-700">+ Add Thread</button>
                         </div>
-                        <div
-                            v-if="form.thread_parts.length > 0"
-                            class="space-y-3"
-                        >
-                            <div
-                                v-for="(part, index) in form.thread_parts"
-                                :key="index"
-                                class="flex gap-2"
-                            >
+                        <div v-if="form.thread_parts.length > 0" class="space-y-3">
+                            <div v-for="(part, index) in form.thread_parts" :key="index" class="flex gap-2">
                                 <div class="flex-1">
-                                    <textarea
-                                        v-model="form.thread_parts[index]"
-                                        rows="3"
-                                        :maxlength="maxTweetLength"
-                                        :placeholder="`Thread part ${index + 1}`"
-                                        class="w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-red-500 focus:ring-red-500"
-                                    />
-                                    <div class="mt-1 text-xs text-zinc-400">
-                                        {{ threadCharacterCounts[index] }}
-                                        remaining
-                                    </div>
+                                    <textarea v-model="form.thread_parts[index]" rows="3" :maxlength="maxTweetLength" :placeholder="`Thread part ${index + 1}`" class="w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-blue-500" />
+                                    <div class="mt-1 text-xs text-zinc-400">{{ threadCharacterCounts[index] }} remaining</div>
                                 </div>
-                                <button
-                                    type="button"
-                                    @click="removeThreadPart(index)"
-                                    class="mt-1 text-red-500 hover:text-red-400"
-                                >
-                                    <Trash2 class="size-5" />
-                                </button>
+                                <button type="button" @click="removeThreadPart(index)" class="mt-1 text-red-500 hover:text-red-400">Remove</button>
                             </div>
-                        </div>
-                        <div
-                            v-if="form.errors.thread_parts"
-                            class="mt-1 text-sm text-red-500"
-                        >
-                            {{ form.errors.thread_parts }}
                         </div>
                     </div>
 
-                    <!-- Media URLs -->
                     <div>
                         <div class="mb-2 flex items-center justify-between">
-                            <label
-                                class="block text-sm font-medium text-zinc-300"
-                            >
-                                Media URLs
-                                <span class="text-zinc-400"
-                                    >({{ form.media_urls.length }}/4)</span
-                                >
-                            </label>
-                            <button
-                                v-if="form.media_urls.length < 4"
-                                type="button"
-                                @click="addMediaUrl"
-                                class="flex items-center gap-1 rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-300 hover:bg-zinc-700"
-                            >
-                                <Plus class="size-4" />
-                                Add Media
-                            </button>
+                            <label class="block text-sm font-medium text-zinc-300">Media URLs <span class="text-zinc-400">({{ form.media_urls.length }}/4)</span></label>
+                            <button v-if="form.media_urls.length < 4" type="button" @click="addMediaUrl" class="rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-300 hover:bg-zinc-700">+ Add Media</button>
                         </div>
-                        <div
-                            v-if="form.media_urls.length > 0"
-                            class="space-y-2"
-                        >
-                            <div
-                                v-for="(url, index) in form.media_urls"
-                                :key="index"
-                                class="flex gap-2"
-                            >
-                                <input
-                                    v-model="form.media_urls[index]"
-                                    type="url"
-                                    :placeholder="`Media URL ${index + 1}`"
-                                    class="flex-1 rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-red-500 focus:ring-red-500"
-                                />
-                                <button
-                                    type="button"
-                                    @click="removeMediaUrl(index)"
-                                    class="text-red-500 hover:text-red-400"
-                                >
-                                    <X class="size-5" />
-                                </button>
+                        <div v-if="form.media_urls.length > 0" class="space-y-2">
+                            <div v-for="(url, index) in form.media_urls" :key="index" class="flex gap-2">
+                                <input v-model="form.media_urls[index]" type="url" :placeholder="`Media URL ${index + 1}`" class="flex-1 rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-blue-500" />
+                                <button type="button" @click="removeMediaUrl(index)" class="text-red-500 hover:text-red-400">Remove</button>
                             </div>
-                        </div>
-                        <div
-                            v-if="form.errors.media_urls"
-                            class="mt-1 text-sm text-red-500"
-                        >
-                            {{ form.errors.media_urls }}
                         </div>
                     </div>
 
-                    <!-- Status -->
                     <div>
-                        <label class="block text-sm font-medium text-zinc-300">
-                            Status
-                        </label>
+                        <label class="block text-sm font-medium text-zinc-300">Status</label>
                         <div class="mt-2 flex gap-4">
-                            <label
-                                class="flex cursor-pointer items-center gap-2"
-                            >
-                                <input
-                                    v-model="form.status"
-                                    type="radio"
-                                    value="draft"
-                                    class="text-red-600 focus:ring-red-500"
-                                />
+                            <label class="flex cursor-pointer items-center gap-2">
+                                <input v-model="form.status" type="radio" value="draft" class="text-blue-600 focus:ring-blue-500" />
                                 <span class="text-sm text-zinc-300">Draft</span>
                             </label>
-                            <label
-                                class="flex cursor-pointer items-center gap-2"
-                            >
-                                <input
-                                    v-model="form.status"
-                                    type="radio"
-                                    value="scheduled"
-                                    class="text-red-600 focus:ring-red-500"
-                                />
-                                <span class="text-sm text-zinc-300"
-                                    >Scheduled</span
-                                >
+                            <label class="flex cursor-pointer items-center gap-2">
+                                <input v-model="form.status" type="radio" value="scheduled" class="text-blue-600 focus:ring-blue-500" />
+                                <span class="text-sm text-zinc-300">Scheduled</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Scheduled For -->
                     <div v-if="isScheduled">
-                        <label
-                            for="scheduled_for"
-                            class="block text-sm font-medium text-zinc-300"
-                        >
-                            Schedule For
-                            <span class="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="scheduled_for"
-                            v-model="form.scheduled_for"
-                            type="datetime-local"
-                            required
-                            class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white focus:border-red-500 focus:ring-red-500"
-                        />
-                        <div
-                            v-if="form.errors.scheduled_for"
-                            class="mt-1 text-sm text-red-500"
-                        >
-                            {{ form.errors.scheduled_for }}
-                        </div>
+                        <label for="scheduled_for" class="block text-sm font-medium text-zinc-300">Schedule For <span class="text-red-500">*</span></label>
+                        <input id="scheduled_for" v-model="form.scheduled_for" type="datetime-local" required class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white focus:border-blue-500 focus:ring-blue-500" />
+                        <div v-if="form.errors.scheduled_for" class="mt-1 text-sm text-red-500">{{ form.errors.scheduled_for }}</div>
                     </div>
 
-                    <!-- Actions -->
                     <div class="flex justify-end gap-4">
-                        <Link
-                            href="/x-posts"
-                            class="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
-                        >
-                            Cancel
-                        </Link>
-                        <button
-                            type="submit"
-                            :disabled="form.processing"
-                            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-                        >
-                            {{
-                                form.processing ? 'Updating...' : 'Update Post'
-                            }}
+                        <Link href="/x-posts" class="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700">Cancel</Link>
+                        <button type="submit" :disabled="form.processing" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+                            {{ form.processing ? 'Updating...' : 'Update Post' }}
                         </button>
                     </div>
                 </form>

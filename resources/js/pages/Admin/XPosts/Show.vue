@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { XPost } from '@/types/models';
+import type { XPost } from '../../../types/x-suite';
 
 import { Head, Link } from '@inertiajs/vue3';
 
-import XPostPreviewCard from '@/components/dashboard/XPostPreviewCard.vue';
+import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
@@ -32,16 +32,16 @@ function getXPostUrl(tweetId: string): string {
 
 <template>
     <AppSidebarLayout>
-        <Head title="X Post Details - Admin" />
+        <Head title="X Post Details" />
 
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl">
                 <div class="mb-8">
                     <Link
                         href="/x-posts"
-                        class="mb-4 inline-block text-sm text-red-500 hover:text-red-400"
+                        class="mb-4 inline-block text-sm text-blue-500 hover:text-blue-400"
                     >
-                        ← Back to Posts
+                        &larr; Back to Posts
                     </Link>
                     <h1 class="text-3xl font-bold text-white">
                         X Post Details
@@ -80,11 +80,6 @@ function getXPostUrl(tweetId: string): string {
                         <XPostPreviewCard
                             :content="xPost.content || ''"
                             :media-urls="xPost.media_urls || []"
-                            :media-overlay-text="
-                                xPost.content
-                                    ?.match(/^[^(]+\(\d{4}\)/)
-                                    ?.at(0) ?? null
-                            "
                         />
                     </div>
 
@@ -135,7 +130,7 @@ function getXPostUrl(tweetId: string): string {
                                 :href="url"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="block truncate text-sm text-red-500 hover:text-red-400"
+                                class="block truncate text-sm text-blue-500 hover:text-blue-400"
                             >
                                 {{ url }}
                             </a>
@@ -187,9 +182,9 @@ function getXPostUrl(tweetId: string): string {
                             :href="getXPostUrl(xPost.x_post_id)"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="text-red-500 hover:text-red-400"
+                            class="text-blue-500 hover:text-blue-400"
                         >
-                            View on X →
+                            View on X &rarr;
                         </a>
                     </div>
 

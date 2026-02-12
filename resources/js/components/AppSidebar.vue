@@ -103,27 +103,27 @@ const mainNavItems = computed<NavItem[]>(() => [
                       },
                       {
                           title: 'Analytics',
-                          href: '/dashboard/x-analytics',
+                          href: '/x-analytics',
                           icon: BarChart3,
                       },
                       {
                           title: 'Trends',
-                          href: '/dashboard/x-trends',
+                          href: '/x-trends',
                           icon: TrendingUp,
                       },
                       {
                           title: 'Auto-Replies',
-                          href: '/dashboard/x-auto-replies',
+                          href: '/x-auto-replies',
                           icon: Reply,
                       },
                       {
                           title: 'Content Discovery',
-                          href: '/dashboard/x-content-discovery',
+                          href: '/x-content-discovery',
                           icon: Search,
                       },
                       {
                           title: 'Settings',
-                          href: '/dashboard/x-settings',
+                          href: '/x-settings',
                           icon: Settings,
                       },
                   ],

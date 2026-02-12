@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { Check } from 'lucide-vue-next';
-
 interface Props {
     content: string;
     mediaUrls?: string[];
-    /** Optional overlay text on media (e.g. movie title) */
     mediaOverlayText?: string | null;
-    /** Compact mode for use in tables */
     compact?: boolean;
 }
 
@@ -15,8 +11,6 @@ withDefaults(defineProps<Props>(), {
     mediaOverlayText: null,
     compact: false,
 });
-
-const siteLabel = 'movies-of-war.com';
 </script>
 
 <template>
@@ -30,23 +24,12 @@ const siteLabel = 'movies-of-war.com';
         <div class="mb-2 flex items-start gap-3">
             <div
                 class="size-10 shrink-0 overflow-hidden rounded-full bg-zinc-700 ring-1 ring-zinc-600"
-            >
-                <img
-                    src="/images/branding/logo-96.webp"
-                    alt=""
-                    class="size-full object-cover"
-                    loading="lazy"
-                />
-            </div>
+            />
             <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5">
-                    <span class="font-bold text-white">Movies of War</span>
-                    <Check
-                        class="size-4 shrink-0 text-blue-400"
-                        aria-label="Verified"
-                    />
+                    <span class="font-bold text-white">Your Account</span>
                 </div>
-                <p class="text-sm text-zinc-500">@MoviesOfWar</p>
+                <p class="text-sm text-zinc-500">@your_handle</p>
             </div>
         </div>
 
@@ -85,8 +68,5 @@ const siteLabel = 'movies-of-war.com';
                 {{ mediaOverlayText }}
             </div>
         </div>
-
-        <!-- Source -->
-        <p class="mt-2 text-xs text-zinc-500">From {{ siteLabel }}</p>
     </div>
 </template>

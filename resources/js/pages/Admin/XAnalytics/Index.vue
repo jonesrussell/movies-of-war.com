@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
@@ -31,7 +30,7 @@ function sync() {
 
 <template>
     <AppSidebarLayout>
-        <Head title="X Analytics - Admin" />
+        <Head title="X Analytics" />
 
         <div class="w-full px-4 py-12 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
@@ -43,7 +42,7 @@ function sync() {
                 </div>
                 <button
                     @click="sync"
-                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                 >
                     Sync Analytics
                 </button>
@@ -112,7 +111,7 @@ function sync() {
                             <Link
                                 v-if="analytics.x_post"
                                 :href="`/x-analytics/${analytics.x_post.id}`"
-                                class="text-red-500 hover:text-red-400"
+                                class="text-blue-500 hover:text-blue-400"
                             >
                                 View Details
                             </Link>

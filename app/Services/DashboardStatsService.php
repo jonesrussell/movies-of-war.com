@@ -8,8 +8,8 @@ use App\Models\FeaturedSlot;
 use App\Models\Movie;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\XPost;
-use App\Models\XTrendKeyword;
+use JonesRussell\XSuite\Models\XPost;
+use JonesRussell\XSuite\Models\XTrendKeyword;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -26,7 +26,7 @@ class DashboardStatsService
     private const CACHE_PREFIX = 'dashboard_stats';
 
     public function __construct(
-        protected XAnalyticsService $analyticsService
+        protected \JonesRussell\XSuite\Services\XAnalyticsService $analyticsService
     ) {}
 
     /**

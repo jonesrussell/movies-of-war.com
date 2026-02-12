@@ -30,7 +30,7 @@ class GenerateWarMoviePost extends Command
         // Select a random published movie
         $movie = Movie::published()->inRandomOrder()->first();
 
-        if (!$movie) {
+        if (! $movie) {
             $this->error('No published movies found.');
 
             return Command::FAILURE;
@@ -70,7 +70,7 @@ class GenerateWarMoviePost extends Command
         // Truncate to 280 characters if needed
         $maxLength = config('x-suite.max_tweet_length', 280);
         if (strlen($template) > $maxLength) {
-            $template = substr($template, 0, $maxLength - 3) . '...';
+            $template = substr($template, 0, $maxLength - 3).'...';
         }
 
         return $template;

@@ -23,6 +23,18 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 1
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Validate Composer
+        run: composer install --no-scripts --no-interaction --no-progress
+        env:
+          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+
       - name: Download Deployer
         run: |
           curl -LO https://deployer.org/deployer.phar

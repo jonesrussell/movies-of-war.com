@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8814c8df32c0b291b3ea8134389f8e55",
+    "content-hash": "fd87e5b09853f0b87a17a5654b41c596",
     "packages": [
         {
             "name": "atymic/twitter",
@@ -1639,11 +1639,17 @@
         },
         {
             "name": "jonesrussell/x-suite-laravel",
-            "version": "dev-main",
-            "dist": {
-                "type": "path",
-                "url": "../x-suite-laravel",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jonesrussell/x-suite-laravel.git",
                 "reference": "31cfb7415b87241c639eb1d7212bf4aa3ce93966"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jonesrussell/x-suite-laravel/zipball/31cfb7415b87241c639eb1d7212bf4aa3ce93966",
+                "reference": "31cfb7415b87241c639eb1d7212bf4aa3ce93966",
+                "shasum": ""
             },
             "require": {
                 "atymic/twitter": "^3.0",
@@ -1675,20 +1681,7 @@
                     "JonesRussell\\XSuite\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "JonesRussell\\XSuite\\Tests\\": "tests/",
-                    "JonesRussell\\XSuite\\Database\\Factories\\": "database/factories/"
-                }
-            },
-            "scripts": {
-                "lint": [
-                    "pint --parallel"
-                ],
-                "test": [
-                    "pest"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1707,9 +1700,11 @@
                 "vue",
                 "x"
             ],
-            "transport-options": {
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/jonesrussell/x-suite-laravel/issues",
+                "source": "https://github.com/jonesrussell/x-suite-laravel/tree/v0.1.0"
+            },
+            "time": "2026-02-12T20:20:46+00:00"
         },
         {
             "name": "kamermans/guzzle-oauth2-subscriber",
@@ -11530,9 +11525,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "jonesrussell/x-suite-laravel": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

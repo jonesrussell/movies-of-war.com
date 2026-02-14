@@ -27,7 +27,8 @@ class DashboardStatsService
 
     public function __construct(
         protected \JonesRussell\XSuite\Services\XAnalyticsService $analyticsService
-    ) {}
+    ) {
+    }
 
     /**
      * Get core movie stats with caching.
@@ -39,8 +40,7 @@ class DashboardStatsService
         return Cache::remember(
             self::CACHE_PREFIX.':movie_stats',
             self::CACHE_TTL,
-            function ()
-            {
+            function () {
                 // Single query with conditional counts
                 $counts = Movie::query()
                     ->select([
@@ -71,8 +71,7 @@ class DashboardStatsService
         return Cache::remember(
             self::CACHE_PREFIX.':x_stats',
             self::CACHE_TTL,
-            function ()
-            {
+            function () {
                 // Single query with conditional counts
                 $xPostCounts = XPost::query()
                     ->select([

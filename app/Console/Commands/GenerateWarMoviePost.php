@@ -30,7 +30,7 @@ class GenerateWarMoviePost extends Command
         // Select a random published movie
         $movie = Movie::published()->inRandomOrder()->first();
 
-        if (!$movie) {
+        if (! $movie) {
             $this->error('No published movies found.');
 
             return Command::FAILURE;

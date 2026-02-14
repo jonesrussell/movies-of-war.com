@@ -8,10 +8,10 @@ use App\Models\FeaturedSlot;
 use App\Models\Movie;
 use App\Models\Tag;
 use App\Models\User;
-use JonesRussell\XSuite\Models\XPost;
-use JonesRussell\XSuite\Models\XTrendKeyword;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use JonesRussell\XSuite\Models\XPost;
+use JonesRussell\XSuite\Models\XTrendKeyword;
 
 class DashboardStatsService
 {
@@ -27,8 +27,7 @@ class DashboardStatsService
 
     public function __construct(
         protected \JonesRussell\XSuite\Services\XAnalyticsService $analyticsService
-    ) {
-    }
+    ) {}
 
     /**
      * Get core movie stats with caching.

@@ -1,7 +1,7 @@
 <?php
 
-use App\Jobs\PublishXPost;
-use App\Models\XPost;
+use JonesRussell\XSuite\Jobs\PublishXPost;
+use JonesRussell\XSuite\Models\XPost;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;

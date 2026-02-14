@@ -8,7 +8,7 @@ require 'recipe/laravel.php';
 
 set('repository', 'git@github-movies-of-war:jonesrussell/movies-of-war.com.git');
 set('keep_releases', 5);
-set('composer_options', '--verbose --prefer-dist --no-progress --no-interaction --no-dev --optimize-autoloader');
+set('composer_options', '--verbose --no-progress --no-interaction --no-dev --optimize-autoloader');
 
 add('shared_files', [
     '.env',
@@ -45,14 +45,13 @@ task('deploy:install_services', function (): void {
     run("mkdir -p $serviceDir");
     run("cp {{release_path}}/deploy/systemd-user/*.service $serviceDir/");
     run('systemctl --user daemon-reload');
-    run('systemctl --user enable movies-of-war-horizon.service movies-of-war-inertia-ssr.service movies-of-war-schedule-work.service');
+    run('systemctl --user enable movies-of-war-inertia-ssr.service movies-of-war-schedule-work.service');
 });
 before('deploy:symlink', 'deploy:install_services');
 
 task('deploy:restart_services', function (): void {
-    run('cd {{release_path}} && {{bin/php}} artisan horizon:terminate || true');
     run('cd {{release_path}} && {{bin/php}} artisan inertia:stop-ssr || true');
-    run('systemctl --user restart movies-of-war-schedule-work.service movies-of-war-horizon.service movies-of-war-inertia-ssr.service || true');
+    run('systemctl --user restart movies-of-war-schedule-work.service movies-of-war-inertia-ssr.service || true');
 });
 after('deploy:symlink', 'deploy:restart_services');
 

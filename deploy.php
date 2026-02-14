@@ -8,7 +8,6 @@ require 'recipe/laravel.php';
 
 set('repository', 'git@github-movies-of-war:jonesrussell/movies-of-war.com.git');
 set('keep_releases', 5);
-set('composer_options', '--verbose --no-progress --no-interaction --no-dev --optimize-autoloader');
 
 add('shared_files', [
     '.env',

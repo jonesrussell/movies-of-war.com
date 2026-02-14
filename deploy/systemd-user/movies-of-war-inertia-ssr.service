@@ -6,6 +6,7 @@ ConditionPathExists=/home/deployer/movies-of-war.com/current
 [Service]
 Type=simple
 WorkingDirectory=/home/deployer/movies-of-war.com/current
+Environment=INERTIA_SSR_PORT=13717
 ExecStart=/bin/bash -lc 'source ~/.nvm/nvm.sh 2>/dev/null; exec /usr/bin/php artisan inertia:start-ssr'
 Restart=always
 RestartSec=3

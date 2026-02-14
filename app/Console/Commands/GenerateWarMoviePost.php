@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Movie;
-use JonesRussell\XSuite\Models\XPost;
 use Illuminate\Console\Command;
+use JonesRussell\XSuite\Models\XPost;
 
 class GenerateWarMoviePost extends Command
 {

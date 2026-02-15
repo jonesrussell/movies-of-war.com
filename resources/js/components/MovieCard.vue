@@ -5,6 +5,7 @@ import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 import { Poster, StarRating } from '@/components/primitives';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { formatReleaseDate } from '@/utils/format';
 
 interface Props {
@@ -44,9 +45,9 @@ const displayedTags = computed(() => {
                     <!-- Upcoming badge -->
                     <div
                         v-if="movie.is_upcoming"
-                        class="absolute top-3 right-3 z-20 rounded-full bg-red-600 px-3 py-1 text-xs font-bold tracking-wide text-white uppercase shadow-lg"
+                        class="absolute top-3 right-3 z-20"
                     >
-                        Coming Soon
+                        <UpcomingBadge />
                     </div>
 
                     <!-- Overlay slot for actions -->

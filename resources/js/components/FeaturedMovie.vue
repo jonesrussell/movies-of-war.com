@@ -5,6 +5,7 @@ import { Link } from '@inertiajs/vue3';
 import { Info, Play } from 'lucide-vue-next';
 
 import { Poster, StarRating } from '@/components/primitives';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 
 interface Props {
     movie: Movie;
@@ -114,7 +115,14 @@ const posterImage =
                         context="grid"
                         aspect-ratio="2/3"
                         class="rounded-md"
-                    />
+                    >
+                        <div
+                            v-if="movie.is_upcoming"
+                            class="absolute top-3 right-3 z-10"
+                        >
+                            <UpcomingBadge />
+                        </div>
+                    </Poster>
                 </div>
             </div>
         </div>

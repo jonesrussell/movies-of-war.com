@@ -6,6 +6,7 @@ import { Archive, CheckCircle } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import { Poster } from '@/components/primitives';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { Button } from '@/components/ui/button';
 import {
     Tooltip,
@@ -57,7 +58,14 @@ function handleArchive(e: MouseEvent) {
                 context="grid"
                 aspect-ratio="2/3"
                 class="transition-transform duration-200 group-hover:scale-[1.02]"
-            />
+            >
+                <div
+                    v-if="movie.is_upcoming"
+                    class="absolute top-3 right-3 z-20"
+                >
+                    <UpcomingBadge />
+                </div>
+            </Poster>
         </Link>
 
         <div class="flex items-center justify-between gap-2 p-3">

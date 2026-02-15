@@ -8,6 +8,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import JsonLdScript from '@/components/JsonLdScript.vue';
 import MovieCard from '@/components/MovieCard.vue';
 import { Poster, StarRating } from '@/components/primitives';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
@@ -473,7 +474,7 @@ const jsonLdBreadcrumb = computed(() =>
                             <!-- Coming Soon badge -->
                             <div
                                 v-if="movie.is_upcoming"
-                                class="mb-3 inline-flex transform rounded-full bg-red-600/90 px-3 py-1 text-xs font-semibold text-white transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
+                                class="mb-3 inline-flex transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
                                         ? 'translate-y-0 opacity-100'
@@ -481,7 +482,7 @@ const jsonLdBreadcrumb = computed(() =>
                                 "
                                 :style="{ transitionDelay: '100ms' }"
                             >
-                                Coming Soon
+                                <UpcomingBadge />
                             </div>
 
                             <!-- Title with entrance animation -->

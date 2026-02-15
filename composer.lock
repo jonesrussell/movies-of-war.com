@@ -1641,16 +1641,16 @@
         },
         {
             "name": "jonesrussell/x-suite-laravel",
-            "version": "v0.1.1",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jonesrussell/x-suite-laravel.git",
-                "reference": "d2949204c8eade4ce605ffdc563acb180a43f16d"
+                "reference": "b76063473b0495bb02bf779aae89b0fdd38aa3bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jonesrussell/x-suite-laravel/zipball/d2949204c8eade4ce605ffdc563acb180a43f16d",
-                "reference": "d2949204c8eade4ce605ffdc563acb180a43f16d",
+                "url": "https://api.github.com/repos/jonesrussell/x-suite-laravel/zipball/b76063473b0495bb02bf779aae89b0fdd38aa3bc",
+                "reference": "b76063473b0495bb02bf779aae89b0fdd38aa3bc",
                 "shasum": ""
             },
             "require": {
@@ -1704,9 +1704,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jonesrussell/x-suite-laravel/issues",
-                "source": "https://github.com/jonesrussell/x-suite-laravel/tree/v0.1.1"
+                "source": "https://github.com/jonesrussell/x-suite-laravel/tree/v0.1.2"
             },
-            "time": "2026-02-14T14:53:43+00:00"
+            "time": "2026-02-15T18:47:50+00:00"
         },
         {
             "name": "kamermans/guzzle-oauth2-subscriber",

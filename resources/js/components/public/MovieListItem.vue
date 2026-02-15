@@ -15,6 +15,7 @@ import {
 import { computed, ref, watch } from 'vue';
 
 import { Poster } from '@/components/primitives';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatReleaseDate } from '@/utils/format';
@@ -110,9 +111,9 @@ async function toggleWatchlist() {
             >
                 <div
                     v-if="movie.is_upcoming"
-                    class="absolute top-2 right-2 z-10 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold tracking-wide text-white uppercase"
+                    class="absolute top-2 right-2 z-10"
                 >
-                    Soon
+                    <UpcomingBadge size="compact" />
                 </div>
             </Poster>
         </Link>

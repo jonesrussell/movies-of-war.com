@@ -6,6 +6,7 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import { Poster } from '@/components/primitives';
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
@@ -15,7 +16,6 @@ import ReviewCard from '@/components/reviews/ReviewCard.vue';
 import ReviewForm from '@/components/reviews/ReviewForm.vue';
 import ReviewList from '@/components/reviews/ReviewList.vue';
 import { Button } from '@/components/ui/button';
-import JsonLdScript from '@/components/JsonLdScript.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { login, register } from '@/routes';
 

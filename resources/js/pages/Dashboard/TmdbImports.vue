@@ -54,18 +54,26 @@ const form = useForm({
     upcoming: false,
 });
 
-function applyFilters(updates: Record<string, string | number | undefined> = {}) {
-    const resetPage = ['search', 'sort', 'per_page'].some((k) => updates[k] !== undefined);
-    router.get('/dashboard/tmdb/imports', {
-        search: search.value || undefined,
-        sort: sortFilter.value || undefined,
-        per_page: perPage.value,
-        ...updates,
-        ...(resetPage ? { page: 1 } : {}),
-    } as Record<string, string | number | undefined>, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+function applyFilters(
+    updates: Record<string, string | number | undefined> = {},
+) {
+    const resetPage = ['search', 'sort', 'per_page'].some(
+        (k) => updates[k] !== undefined,
+    );
+    router.get(
+        '/dashboard/tmdb/imports',
+        {
+            search: search.value || undefined,
+            sort: sortFilter.value || undefined,
+            per_page: perPage.value,
+            ...updates,
+            ...(resetPage ? { page: 1 } : {}),
+        } as Record<string, string | number | undefined>,
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
 }
 
 function handleSearchUpdate(value: string) {
@@ -239,26 +247,48 @@ function handleImport() {
                     />
                     <div class="flex flex-wrap items-center gap-4">
                         <div class="flex items-center gap-2">
-                            <label for="tmdb-sort" class="text-sm text-zinc-400">Sort</label>
+                            <label for="tmdb-sort" class="text-sm text-zinc-400"
+                                >Sort</label
+                            >
                             <select
                                 id="tmdb-sort"
                                 :value="sortFilter"
                                 class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
-                                @change="setSort(($event.target as HTMLSelectElement).value)"
+                                @change="
+                                    setSort(
+                                        ($event.target as HTMLSelectElement)
+                                            .value,
+                                    )
+                                "
                             >
-                                <option value="updated_at_desc">Newest first</option>
-                                <option value="updated_at_asc">Oldest first</option>
+                                <option value="updated_at_desc">
+                                    Newest first
+                                </option>
+                                <option value="updated_at_asc">
+                                    Oldest first
+                                </option>
                                 <option value="title_asc">Title A–Z</option>
                                 <option value="title_desc">Title Z–A</option>
                             </select>
                         </div>
                         <div class="flex items-center gap-2">
-                            <label for="tmdb-per-page" class="text-sm text-zinc-400">Per page</label>
+                            <label
+                                for="tmdb-per-page"
+                                class="text-sm text-zinc-400"
+                                >Per page</label
+                            >
                             <select
                                 id="tmdb-per-page"
                                 :value="perPage"
                                 class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
-                                @change="setPerPage(Number(($event.target as HTMLSelectElement).value))"
+                                @change="
+                                    setPerPage(
+                                        Number(
+                                            ($event.target as HTMLSelectElement)
+                                                .value,
+                                        ),
+                                    )
+                                "
                             >
                                 <option
                                     v-for="n in PER_PAGE_OPTIONS"

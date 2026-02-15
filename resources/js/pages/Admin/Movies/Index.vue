@@ -42,22 +42,32 @@ const search = ref(queryParams.value?.search ?? '');
 const statusFilter = ref(queryParams.value?.status ?? '');
 const tagFilter = ref(queryParams.value?.tag ?? '');
 const perPage = ref(queryParams.value?.per_page ?? 20);
-const currentSort = computed(() => queryParams.value?.sort ?? 'updated_at_desc');
+const currentSort = computed(
+    () => queryParams.value?.sort ?? 'updated_at_desc',
+);
 
-function applyFilters(updates: Record<string, string | number | undefined> = {}) {
-    const resetPage = ['sort', 'per_page', 'status', 'tag'].some((k) => updates[k] !== undefined);
-    router.get('/dashboard/movies', {
-        search: search.value || undefined,
-        sort: currentSort.value || undefined,
-        per_page: perPage.value,
-        status: statusFilter.value || undefined,
-        tag: tagFilter.value || undefined,
-        ...updates,
-        ...(resetPage ? { page: 1 } : {}),
-    } as Record<string, string | number | undefined>, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+function applyFilters(
+    updates: Record<string, string | number | undefined> = {},
+) {
+    const resetPage = ['sort', 'per_page', 'status', 'tag'].some(
+        (k) => updates[k] !== undefined,
+    );
+    router.get(
+        '/dashboard/movies',
+        {
+            search: search.value || undefined,
+            sort: currentSort.value || undefined,
+            per_page: perPage.value,
+            status: statusFilter.value || undefined,
+            tag: tagFilter.value || undefined,
+            ...updates,
+            ...(resetPage ? { page: 1 } : {}),
+        } as Record<string, string | number | undefined>,
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
 }
 
 const debouncedSearch = useDebounceFn((searchValue: string) => {
@@ -98,7 +108,6 @@ function setPerPage(n: number) {
     perPage.value = n;
     applyFilters({ per_page: n });
 }
-
 
 function archiveMovie(movie: Movie) {
     if (confirm(`Are you sure you want to archive "${movie.title}"?`)) {
@@ -177,7 +186,9 @@ function unpublishMovie(movie: Movie) {
                 <div class="flex flex-wrap items-center gap-4">
                     <div class="flex items-center gap-2">
                         <span class="text-sm text-zinc-400">Status</span>
-                        <div class="flex rounded-lg bg-zinc-900 ring-1 ring-zinc-800">
+                        <div
+                            class="flex rounded-lg bg-zinc-900 ring-1 ring-zinc-800"
+                        >
                             <button
                                 type="button"
                                 :class="[
@@ -217,16 +228,22 @@ function unpublishMovie(movie: Movie) {
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="tag-filter" class="text-sm text-zinc-400">Tag</label>
+                        <label for="tag-filter" class="text-sm text-zinc-400"
+                            >Tag</label
+                        >
                         <select
                             id="tag-filter"
                             :value="tagFilter"
                             class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
-                            @change="setTag(($event.target as HTMLSelectElement).value)"
+                            @change="
+                                setTag(
+                                    ($event.target as HTMLSelectElement).value,
+                                )
+                            "
                         >
                             <option value="">All tags</option>
                             <option
-                                v-for="t in (tags ?? [])"
+                                v-for="t in tags ?? []"
                                 :key="t.id"
                                 :value="t.slug ?? t.id"
                             >
@@ -235,12 +252,21 @@ function unpublishMovie(movie: Movie) {
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="per-page" class="text-sm text-zinc-400">Per page</label>
+                        <label for="per-page" class="text-sm text-zinc-400"
+                            >Per page</label
+                        >
                         <select
                             id="per-page"
                             :value="perPage"
                             class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
-                            @change="setPerPage(Number(($event.target as HTMLSelectElement).value))"
+                            @change="
+                                setPerPage(
+                                    Number(
+                                        ($event.target as HTMLSelectElement)
+                                            .value,
+                                    ),
+                                )
+                            "
                         >
                             <option
                                 v-for="n in PER_PAGE_OPTIONS"
@@ -400,7 +426,9 @@ function unpublishMovie(movie: Movie) {
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('title') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('title') === 'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -415,11 +443,17 @@ function unpublishMovie(movie: Movie) {
                                 >
                                     Year
                                     <ChevronUp
-                                        v-if="sortDirection('release_year') === 'asc'"
+                                        v-if="
+                                            sortDirection('release_year') ===
+                                            'asc'
+                                        "
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('release_year') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('release_year') ===
+                                            'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -443,7 +477,9 @@ function unpublishMovie(movie: Movie) {
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('status') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('status') === 'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -598,10 +634,7 @@ function unpublishMovie(movie: Movie) {
             </div>
 
             <!-- Pagination -->
-            <Pagination
-                v-if="movies?.meta"
-                :meta="movies.meta"
-            />
+            <Pagination v-if="movies?.meta" :meta="movies.meta" />
         </div>
     </AppSidebarLayout>
 </template>

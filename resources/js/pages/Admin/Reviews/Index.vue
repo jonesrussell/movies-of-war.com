@@ -35,21 +35,31 @@ const queryParams = computed(() => props.queryParams ?? {});
 const search = ref(queryParams.value?.search ?? '');
 const publishedFilter = ref(queryParams.value?.published ?? '');
 const perPage = ref(queryParams.value?.per_page ?? 20);
-const currentSort = computed(() => queryParams.value?.sort ?? 'created_at_desc');
+const currentSort = computed(
+    () => queryParams.value?.sort ?? 'created_at_desc',
+);
 
-function applyFilters(updates: Record<string, string | number | undefined> = {}) {
-    const resetPage = ['sort', 'per_page', 'published'].some((k) => updates[k] !== undefined);
-    router.get('/dashboard/reviews', {
-        search: search.value || undefined,
-        published: publishedFilter.value || undefined,
-        sort: currentSort.value || undefined,
-        per_page: perPage.value,
-        ...updates,
-        ...(resetPage ? { page: 1 } : {}),
-    } as Record<string, string | number | undefined>, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+function applyFilters(
+    updates: Record<string, string | number | undefined> = {},
+) {
+    const resetPage = ['sort', 'per_page', 'published'].some(
+        (k) => updates[k] !== undefined,
+    );
+    router.get(
+        '/dashboard/reviews',
+        {
+            search: search.value || undefined,
+            published: publishedFilter.value || undefined,
+            sort: currentSort.value || undefined,
+            per_page: perPage.value,
+            ...updates,
+            ...(resetPage ? { page: 1 } : {}),
+        } as Record<string, string | number | undefined>,
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
 }
 
 const debouncedSearch = useDebounceFn((searchValue: string) => {
@@ -183,12 +193,20 @@ function deleteReview(review: Review) {
                     </button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <label for="reviews-per-page" class="text-sm text-zinc-400">Per page</label>
+                    <label for="reviews-per-page" class="text-sm text-zinc-400"
+                        >Per page</label
+                    >
                     <select
                         id="reviews-per-page"
                         :value="perPage"
                         class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
-                        @change="setPerPage(Number(($event.target as HTMLSelectElement).value))"
+                        @change="
+                            setPerPage(
+                                Number(
+                                    ($event.target as HTMLSelectElement).value,
+                                ),
+                            )
+                        "
                     >
                         <option
                             v-for="n in PER_PAGE_OPTIONS"
@@ -202,10 +220,7 @@ function deleteReview(review: Review) {
             </div>
 
             <!-- Pagination summary -->
-            <div
-                v-if="paginationSummary"
-                class="mb-2 text-sm text-zinc-400"
-            >
+            <div v-if="paginationSummary" class="mb-2 text-sm text-zinc-400">
                 {{ paginationSummary }}
             </div>
 
@@ -229,11 +244,17 @@ function deleteReview(review: Review) {
                                 >
                                     Movie
                                     <ChevronUp
-                                        v-if="sortDirection('movie_title') === 'asc'"
+                                        v-if="
+                                            sortDirection('movie_title') ===
+                                            'asc'
+                                        "
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('movie_title') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('movie_title') ===
+                                            'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -252,7 +273,9 @@ function deleteReview(review: Review) {
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('author') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('author') === 'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -272,11 +295,17 @@ function deleteReview(review: Review) {
                                 >
                                     Status
                                     <ChevronUp
-                                        v-if="sortDirection('is_published') === 'asc'"
+                                        v-if="
+                                            sortDirection('is_published') ===
+                                            'asc'
+                                        "
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('is_published') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('is_published') ===
+                                            'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -291,11 +320,17 @@ function deleteReview(review: Review) {
                                 >
                                     Date
                                     <ChevronUp
-                                        v-if="sortDirection('created_at') === 'asc'"
+                                        v-if="
+                                            sortDirection('created_at') ===
+                                            'asc'
+                                        "
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('created_at') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('created_at') ===
+                                            'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -420,10 +455,7 @@ function deleteReview(review: Review) {
             </div>
 
             <!-- Pagination -->
-            <Pagination
-                v-if="reviews?.meta"
-                :meta="reviews.meta"
-            />
+            <Pagination v-if="reviews?.meta" :meta="reviews.meta" />
         </div>
     </AppSidebarLayout>
 </template>

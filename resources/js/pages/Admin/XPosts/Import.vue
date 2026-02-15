@@ -2,8 +2,9 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
-import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 
 interface PreviewRow {
     row_number: number;
@@ -84,8 +85,8 @@ const selectedCount = computed(() => selected.value.size);
                         Import from Spreadsheet
                     </h1>
                     <p class="mt-2 text-zinc-400">
-                        Select rows to import as draft X posts. You can edit and schedule
-                        them after importing.
+                        Select rows to import as draft X posts. You can edit and
+                        schedule them after importing.
                     </p>
                 </div>
 

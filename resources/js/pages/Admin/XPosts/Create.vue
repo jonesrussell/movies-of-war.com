@@ -2,8 +2,9 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 
 interface Props {
     maxTweetLength: number;
@@ -20,13 +21,17 @@ const form = useForm({
     publish_immediately: false,
 });
 
-const characterCount = computed(() => props.maxTweetLength - (form.content?.length || 0));
+const characterCount = computed(
+    () => props.maxTweetLength - (form.content?.length || 0),
+);
 const threadCharacterCounts = computed(() =>
     form.thread_parts.map((part) => props.maxTweetLength - part.length),
 );
 
 const isScheduled = computed(() => form.status === 'scheduled');
-const isPublishImmediately = computed(() => form.status === 'publish_immediately');
+const isPublishImmediately = computed(
+    () => form.status === 'publish_immediately',
+);
 
 function addThreadPart() {
     if (form.thread_parts.length < 25) form.thread_parts.push('');
@@ -64,20 +69,33 @@ function submit() {
             <div class="mx-auto max-w-3xl">
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-white">Create X Post</h1>
-                    <p class="mt-2 text-zinc-400">Create a new X (Twitter) post or schedule it for later</p>
+                    <p class="mt-2 text-zinc-400">
+                        Create a new X (Twitter) post or schedule it for later
+                    </p>
                 </div>
 
                 <form @submit.prevent="submit" class="space-y-6">
                     <!-- Preview -->
                     <div>
-                        <h3 class="mb-2 text-sm font-medium text-zinc-400">How it looks on X</h3>
-                        <XPostPreviewCard :content="form.content" :media-urls="form.media_urls" />
+                        <h3 class="mb-2 text-sm font-medium text-zinc-400">
+                            How it looks on X
+                        </h3>
+                        <XPostPreviewCard
+                            :content="form.content"
+                            :media-urls="form.media_urls"
+                        />
                     </div>
 
                     <!-- Main Content -->
                     <div>
-                        <label for="content" class="block text-sm font-medium text-zinc-300">
-                            Tweet Content <span class="text-zinc-500">({{ characterCount }} remaining)</span>
+                        <label
+                            for="content"
+                            class="block text-sm font-medium text-zinc-300"
+                        >
+                            Tweet Content
+                            <span class="text-zinc-500"
+                                >({{ characterCount }} remaining)</span
+                            >
                         </label>
                         <textarea
                             id="content"
@@ -87,21 +105,43 @@ function submit() {
                             placeholder="What's happening?"
                             class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-blue-500"
                         />
-                        <div v-if="form.errors.content" class="mt-1 text-sm text-red-500">{{ form.errors.content }}</div>
+                        <div
+                            v-if="form.errors.content"
+                            class="mt-1 text-sm text-red-500"
+                        >
+                            {{ form.errors.content }}
+                        </div>
                     </div>
 
                     <!-- Thread Parts -->
                     <div>
                         <div class="mb-2 flex items-center justify-between">
-                            <label class="block text-sm font-medium text-zinc-300">
-                                Thread Parts <span class="text-zinc-500">({{ form.thread_parts.length }}/25)</span>
+                            <label
+                                class="block text-sm font-medium text-zinc-300"
+                            >
+                                Thread Parts
+                                <span class="text-zinc-500"
+                                    >({{ form.thread_parts.length }}/25)</span
+                                >
                             </label>
-                            <button v-if="form.thread_parts.length < 25" type="button" @click="addThreadPart" class="rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-300 hover:bg-zinc-700">
+                            <button
+                                v-if="form.thread_parts.length < 25"
+                                type="button"
+                                @click="addThreadPart"
+                                class="rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-300 hover:bg-zinc-700"
+                            >
                                 + Add Thread
                             </button>
                         </div>
-                        <div v-if="form.thread_parts.length > 0" class="space-y-3">
-                            <div v-for="(part, index) in form.thread_parts" :key="index" class="flex gap-2">
+                        <div
+                            v-if="form.thread_parts.length > 0"
+                            class="space-y-3"
+                        >
+                            <div
+                                v-for="(part, index) in form.thread_parts"
+                                :key="index"
+                                class="flex gap-2"
+                            >
                                 <div class="flex-1">
                                     <textarea
                                         v-model="form.thread_parts[index]"
@@ -110,9 +150,18 @@ function submit() {
                                         :placeholder="`Thread part ${index + 1}`"
                                         class="w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-blue-500"
                                     />
-                                    <div class="mt-1 text-xs text-zinc-500">{{ threadCharacterCounts[index] }} remaining</div>
+                                    <div class="mt-1 text-xs text-zinc-500">
+                                        {{ threadCharacterCounts[index] }}
+                                        remaining
+                                    </div>
                                 </div>
-                                <button type="button" @click="removeThreadPart(index)" class="mt-1 text-red-500 hover:text-red-400">Remove</button>
+                                <button
+                                    type="button"
+                                    @click="removeThreadPart(index)"
+                                    class="mt-1 text-red-500 hover:text-red-400"
+                                >
+                                    Remove
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -120,48 +169,101 @@ function submit() {
                     <!-- Media URLs -->
                     <div>
                         <div class="mb-2 flex items-center justify-between">
-                            <label class="block text-sm font-medium text-zinc-300">
-                                Media URLs <span class="text-zinc-500">({{ form.media_urls.length }}/4)</span>
+                            <label
+                                class="block text-sm font-medium text-zinc-300"
+                            >
+                                Media URLs
+                                <span class="text-zinc-500"
+                                    >({{ form.media_urls.length }}/4)</span
+                                >
                             </label>
-                            <button v-if="form.media_urls.length < 4" type="button" @click="addMediaUrl" class="rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-300 hover:bg-zinc-700">
+                            <button
+                                v-if="form.media_urls.length < 4"
+                                type="button"
+                                @click="addMediaUrl"
+                                class="rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-300 hover:bg-zinc-700"
+                            >
                                 + Add Media
                             </button>
                         </div>
-                        <div v-if="form.media_urls.length > 0" class="space-y-2">
-                            <div v-for="(url, index) in form.media_urls" :key="index" class="flex gap-2">
+                        <div
+                            v-if="form.media_urls.length > 0"
+                            class="space-y-2"
+                        >
+                            <div
+                                v-for="(url, index) in form.media_urls"
+                                :key="index"
+                                class="flex gap-2"
+                            >
                                 <input
                                     v-model="form.media_urls[index]"
                                     type="url"
                                     :placeholder="`Media URL ${index + 1}`"
                                     class="flex-1 rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-blue-500"
                                 />
-                                <button type="button" @click="removeMediaUrl(index)" class="text-red-500 hover:text-red-400">Remove</button>
+                                <button
+                                    type="button"
+                                    @click="removeMediaUrl(index)"
+                                    class="text-red-500 hover:text-red-400"
+                                >
+                                    Remove
+                                </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Status -->
                     <div>
-                        <label class="block text-sm font-medium text-zinc-300">Status</label>
+                        <label class="block text-sm font-medium text-zinc-300"
+                            >Status</label
+                        >
                         <div class="mt-2 flex gap-4">
-                            <label class="flex cursor-pointer items-center gap-2">
-                                <input v-model="form.status" type="radio" value="draft" class="text-blue-600 focus:ring-blue-500" />
+                            <label
+                                class="flex cursor-pointer items-center gap-2"
+                            >
+                                <input
+                                    v-model="form.status"
+                                    type="radio"
+                                    value="draft"
+                                    class="text-blue-600 focus:ring-blue-500"
+                                />
                                 <span class="text-sm text-zinc-300">Draft</span>
                             </label>
-                            <label class="flex cursor-pointer items-center gap-2">
-                                <input v-model="form.status" type="radio" value="scheduled" class="text-blue-600 focus:ring-blue-500" />
-                                <span class="text-sm text-zinc-300">Scheduled</span>
+                            <label
+                                class="flex cursor-pointer items-center gap-2"
+                            >
+                                <input
+                                    v-model="form.status"
+                                    type="radio"
+                                    value="scheduled"
+                                    class="text-blue-600 focus:ring-blue-500"
+                                />
+                                <span class="text-sm text-zinc-300"
+                                    >Scheduled</span
+                                >
                             </label>
-                            <label class="flex cursor-pointer items-center gap-2">
-                                <input v-model="form.status" type="radio" value="publish_immediately" class="text-blue-600 focus:ring-blue-500" />
-                                <span class="text-sm text-zinc-300">Publish Immediately</span>
+                            <label
+                                class="flex cursor-pointer items-center gap-2"
+                            >
+                                <input
+                                    v-model="form.status"
+                                    type="radio"
+                                    value="publish_immediately"
+                                    class="text-blue-600 focus:ring-blue-500"
+                                />
+                                <span class="text-sm text-zinc-300"
+                                    >Publish Immediately</span
+                                >
                             </label>
                         </div>
                     </div>
 
                     <!-- Scheduled For -->
                     <div v-if="isScheduled">
-                        <label for="scheduled_for" class="block text-sm font-medium text-zinc-300">
+                        <label
+                            for="scheduled_for"
+                            class="block text-sm font-medium text-zinc-300"
+                        >
                             Schedule For <span class="text-red-500">*</span>
                         </label>
                         <input
@@ -171,18 +273,35 @@ function submit() {
                             :required="isScheduled"
                             class="mt-1 w-full rounded-lg border-zinc-700 bg-zinc-900 px-4 py-2 text-white focus:border-blue-500 focus:ring-blue-500"
                         />
-                        <div v-if="form.errors.scheduled_for" class="mt-1 text-sm text-red-500">{{ form.errors.scheduled_for }}</div>
+                        <div
+                            v-if="form.errors.scheduled_for"
+                            class="mt-1 text-sm text-red-500"
+                        >
+                            {{ form.errors.scheduled_for }}
+                        </div>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex justify-end gap-4">
-                        <Link href="/x-posts" class="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700">Cancel</Link>
+                        <Link
+                            href="/x-posts"
+                            class="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+                            >Cancel</Link
+                        >
                         <button
                             type="submit"
                             :disabled="form.processing"
                             class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                         >
-                            {{ form.processing ? 'Creating...' : isPublishImmediately ? 'Publish Now' : isScheduled ? 'Schedule Post' : 'Create Draft' }}
+                            {{
+                                form.processing
+                                    ? 'Creating...'
+                                    : isPublishImmediately
+                                      ? 'Publish Now'
+                                      : isScheduled
+                                        ? 'Schedule Post'
+                                        : 'Create Draft'
+                            }}
                         </button>
                     </div>
                 </form>

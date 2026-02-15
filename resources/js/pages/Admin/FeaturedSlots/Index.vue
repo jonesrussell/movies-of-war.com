@@ -29,19 +29,29 @@ usePage();
 
 const queryParams = computed(() => props.queryParams ?? {});
 const perPage = ref(queryParams.value?.per_page ?? 20);
-const currentSort = computed(() => queryParams.value?.sort ?? 'created_at_desc');
+const currentSort = computed(
+    () => queryParams.value?.sort ?? 'created_at_desc',
+);
 
-function applyFilters(updates: Record<string, string | number | undefined> = {}) {
-    const resetPage = ['sort', 'per_page'].some((k) => updates[k] !== undefined);
-    router.get('/dashboard/featured-slots', {
-        sort: currentSort.value || undefined,
-        per_page: perPage.value,
-        ...updates,
-        ...(resetPage ? { page: 1 } : {}),
-    } as Record<string, string | number | undefined>, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+function applyFilters(
+    updates: Record<string, string | number | undefined> = {},
+) {
+    const resetPage = ['sort', 'per_page'].some(
+        (k) => updates[k] !== undefined,
+    );
+    router.get(
+        '/dashboard/featured-slots',
+        {
+            sort: currentSort.value || undefined,
+            per_page: perPage.value,
+            ...updates,
+            ...(resetPage ? { page: 1 } : {}),
+        } as Record<string, string | number | undefined>,
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
 }
 
 function applySort(column: string) {
@@ -106,12 +116,20 @@ function getSlotBadge(slot: string): string {
             <!-- Filters -->
             <div class="mb-6 flex flex-wrap items-center gap-4">
                 <div class="flex items-center gap-2">
-                    <label for="slots-per-page" class="text-sm text-zinc-400">Per page</label>
+                    <label for="slots-per-page" class="text-sm text-zinc-400"
+                        >Per page</label
+                    >
                     <select
                         id="slots-per-page"
                         :value="perPage"
                         class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
-                        @change="setPerPage(Number(($event.target as HTMLSelectElement).value))"
+                        @change="
+                            setPerPage(
+                                Number(
+                                    ($event.target as HTMLSelectElement).value,
+                                ),
+                            )
+                        "
                     >
                         <option
                             v-for="n in PER_PAGE_OPTIONS"
@@ -125,10 +143,7 @@ function getSlotBadge(slot: string): string {
             </div>
 
             <!-- Pagination summary -->
-            <div
-                v-if="paginationSummary"
-                class="mb-2 text-sm text-zinc-400"
-            >
+            <div v-if="paginationSummary" class="mb-2 text-sm text-zinc-400">
                 {{ paginationSummary }}
             </div>
 
@@ -147,11 +162,17 @@ function getSlotBadge(slot: string): string {
                                 >
                                     Movie
                                     <ChevronUp
-                                        v-if="sortDirection('movie_title') === 'asc'"
+                                        v-if="
+                                            sortDirection('movie_title') ===
+                                            'asc'
+                                        "
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('movie_title') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('movie_title') ===
+                                            'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -170,7 +191,9 @@ function getSlotBadge(slot: string): string {
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('slot') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('slot') === 'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -237,10 +260,7 @@ function getSlotBadge(slot: string): string {
             </div>
 
             <!-- Pagination -->
-            <Pagination
-                v-if="slots?.meta"
-                :meta="slots.meta"
-            />
+            <Pagination v-if="slots?.meta" :meta="slots.meta" />
         </div>
     </AppSidebarLayout>
 </template>

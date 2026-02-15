@@ -30,21 +30,31 @@ const queryParams = computed(() => props.queryParams ?? {});
 const search = ref(queryParams.value?.search ?? '');
 const tagFilter = ref(queryParams.value?.tag ?? '');
 const perPage = ref(queryParams.value?.per_page ?? 20);
-const currentSort = computed(() => queryParams.value?.sort ?? 'updated_at_desc');
+const currentSort = computed(
+    () => queryParams.value?.sort ?? 'updated_at_desc',
+);
 
-function applyFilters(updates: Record<string, string | number | undefined> = {}) {
-    const resetPage = ['sort', 'per_page', 'tag'].some((k) => updates[k] !== undefined);
-    router.get('/dashboard/movies/archived', {
-        search: search.value || undefined,
-        sort: currentSort.value || undefined,
-        per_page: perPage.value,
-        tag: tagFilter.value || undefined,
-        ...updates,
-        ...(resetPage ? { page: 1 } : {}),
-    } as Record<string, string | number | undefined>, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+function applyFilters(
+    updates: Record<string, string | number | undefined> = {},
+) {
+    const resetPage = ['sort', 'per_page', 'tag'].some(
+        (k) => updates[k] !== undefined,
+    );
+    router.get(
+        '/dashboard/movies/archived',
+        {
+            search: search.value || undefined,
+            sort: currentSort.value || undefined,
+            per_page: perPage.value,
+            tag: tagFilter.value || undefined,
+            ...updates,
+            ...(resetPage ? { page: 1 } : {}),
+        } as Record<string, string | number | undefined>,
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
 }
 
 const debouncedSearch = useDebounceFn((searchValue: string) => {
@@ -126,16 +136,24 @@ function deleteMovie(movie: Movie) {
                 />
                 <div class="flex flex-wrap items-center gap-4">
                     <div class="flex items-center gap-2">
-                        <label for="archived-tag-filter" class="text-sm text-zinc-400">Tag</label>
+                        <label
+                            for="archived-tag-filter"
+                            class="text-sm text-zinc-400"
+                            >Tag</label
+                        >
                         <select
                             id="archived-tag-filter"
                             :value="tagFilter"
                             class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
-                            @change="setTag(($event.target as HTMLSelectElement).value)"
+                            @change="
+                                setTag(
+                                    ($event.target as HTMLSelectElement).value,
+                                )
+                            "
                         >
                             <option value="">All tags</option>
                             <option
-                                v-for="t in (tags ?? [])"
+                                v-for="t in tags ?? []"
                                 :key="t.id"
                                 :value="t.slug ?? t.id"
                             >
@@ -144,12 +162,23 @@ function deleteMovie(movie: Movie) {
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="archived-per-page" class="text-sm text-zinc-400">Per page</label>
+                        <label
+                            for="archived-per-page"
+                            class="text-sm text-zinc-400"
+                            >Per page</label
+                        >
                         <select
                             id="archived-per-page"
                             :value="perPage"
                             class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
-                            @change="setPerPage(Number(($event.target as HTMLSelectElement).value))"
+                            @change="
+                                setPerPage(
+                                    Number(
+                                        ($event.target as HTMLSelectElement)
+                                            .value,
+                                    ),
+                                )
+                            "
                         >
                             <option
                                 v-for="n in PER_PAGE_OPTIONS"
@@ -164,10 +193,7 @@ function deleteMovie(movie: Movie) {
             </div>
 
             <!-- Pagination summary -->
-            <div
-                v-if="paginationSummary"
-                class="mb-2 text-sm text-zinc-400"
-            >
+            <div v-if="paginationSummary" class="mb-2 text-sm text-zinc-400">
                 {{ paginationSummary }}
             </div>
 
@@ -266,7 +292,9 @@ function deleteMovie(movie: Movie) {
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('title') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('title') === 'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -281,11 +309,17 @@ function deleteMovie(movie: Movie) {
                                 >
                                     Year
                                     <ChevronUp
-                                        v-if="sortDirection('release_year') === 'asc'"
+                                        v-if="
+                                            sortDirection('release_year') ===
+                                            'asc'
+                                        "
                                         class="size-4"
                                     />
                                     <ChevronDown
-                                        v-else-if="sortDirection('release_year') === 'desc'"
+                                        v-else-if="
+                                            sortDirection('release_year') ===
+                                            'desc'
+                                        "
                                         class="size-4"
                                     />
                                 </button>
@@ -392,10 +426,7 @@ function deleteMovie(movie: Movie) {
             </div>
 
             <!-- Pagination -->
-            <Pagination
-                v-if="movies?.meta"
-                :meta="movies.meta"
-            />
+            <Pagination v-if="movies?.meta" :meta="movies.meta" />
         </div>
     </AppSidebarLayout>
 </template>

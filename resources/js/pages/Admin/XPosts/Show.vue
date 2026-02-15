@@ -3,8 +3,9 @@ import type { XPost } from '../../../types/x-suite';
 
 import { Head, Link } from '@inertiajs/vue3';
 
-import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+import XPostPreviewCard from '../../../components/x-suite/XPostPreviewCard.vue';
 
 interface Props {
     xPost: XPost;

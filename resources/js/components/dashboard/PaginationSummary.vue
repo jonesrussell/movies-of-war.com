@@ -20,10 +20,7 @@ const summary = computed(() => {
 </script>
 
 <template>
-    <div
-        v-if="summary"
-        class="mb-2 text-sm text-zinc-400"
-    >
+    <div v-if="summary" class="mb-2 text-sm text-zinc-400">
         {{ summary }}
     </div>
 </template>

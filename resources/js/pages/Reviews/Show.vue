@@ -5,12 +5,12 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import { StarRating } from '@/components/primitives';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import ReviewComments from '@/components/reviews/ReviewComments.vue';
 import ReviewContent from '@/components/reviews/ReviewContent.vue';
-import JsonLdScript from '@/components/JsonLdScript.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {

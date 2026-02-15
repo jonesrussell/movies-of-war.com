@@ -35,14 +35,8 @@ function handleClick() {
             @click="handleClick"
         >
             {{ label }}
-            <ChevronUp
-                v-if="direction === 'asc'"
-                class="size-4"
-            />
-            <ChevronDown
-                v-else-if="direction === 'desc'"
-                class="size-4"
-            />
+            <ChevronUp v-if="direction === 'asc'" class="size-4" />
+            <ChevronDown v-else-if="direction === 'desc'" class="size-4" />
         </button>
     </th>
 </template>

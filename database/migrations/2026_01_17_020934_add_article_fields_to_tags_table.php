@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tags', function (Blueprint $table) {
-            $table->string('color')->nullable()->after('type');
-            $table->text('description')->nullable()->after('color');
-            $table->integer('article_count')->default(0)->after('description');
+            if (! Schema::hasColumn('tags', 'color')) {
+                $table->string('color')->nullable()->after('type');
+            }
+            if (! Schema::hasColumn('tags', 'description')) {
+                $table->text('description')->nullable()->after('color');
+            }
+            if (! Schema::hasColumn('tags', 'article_count')) {
+                $table->integer('article_count')->default(0)->after('description');
+            }
         });
     }
 
@@ -24,7 +30,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tags', function (Blueprint $table) {
-            $table->dropColumn(['color', 'description', 'article_count']);
+            $columns = array_filter(
+                ['color', 'description', 'article_count'],
+                fn (string $col) => Schema::hasColumn('tags', $col)
+            );
+            if ($columns !== []) {
+                $table->dropColumn($columns);
+            }
         });
     }
 };

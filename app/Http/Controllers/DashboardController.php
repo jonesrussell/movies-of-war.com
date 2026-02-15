@@ -210,33 +210,6 @@ class DashboardController extends Controller
         return redirect()->route('dashboard.tmdb.search')->with('success', "'{$result['movie']->title}' has been imported as a draft.");
     }
 
-    public function publishMovie(Movie $movie): RedirectResponse
-    {
-        $this->authorize('publish', $movie);
-
-        $movie->publish();
-
-        return redirect()->route('dashboard.tmdb.imports')->with('success', 'Movie published successfully.');
-    }
-
-    public function archiveMovie(Movie $movie): RedirectResponse
-    {
-        $this->authorize('archive', $movie);
-
-        $movie->archive();
-
-        return redirect()->route('dashboard.tmdb.imports')->with('success', 'Movie archived successfully.');
-    }
-
-    public function unpublishMovie(Movie $movie): RedirectResponse
-    {
-        $this->authorize('unpublish', $movie);
-
-        $movie->unpublish();
-
-        return redirect()->back()->with('success', 'Movie unpublished successfully.');
-    }
-
     public function importTmdbMovies(ImportTmdbMoviesRequest $request): RedirectResponse
     {
         $limit = $request->validated()['limit'] ?? 30;

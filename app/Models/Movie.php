@@ -48,21 +48,6 @@ class Movie extends Model
     /** @use HasFactory<\Database\Factories\MovieFactory> */
     use HasFactory;
 
-    /**
-     * @deprecated Use MovieStatus::Draft instead
-     */
-    public const STATUS_DRAFT = 'draft';
-
-    /**
-     * @deprecated Use MovieStatus::Published instead
-     */
-    public const STATUS_PUBLISHED = 'published';
-
-    /**
-     * @deprecated Use MovieStatus::Archived instead
-     */
-    public const STATUS_ARCHIVED = 'archived';
-
     protected $fillable = [
         'tmdb_id',
         'title',

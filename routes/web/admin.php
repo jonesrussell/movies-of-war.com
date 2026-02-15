@@ -14,8 +14,6 @@ Route::middleware('admin')->group(function () {
     Route::post('/tmdb/search', [DashboardController::class, 'performTmdbSearch'])->name('tmdb.search');
     Route::post('/tmdb/import', [DashboardController::class, 'importTmdbMovies'])->name('tmdb.import');
     Route::post('/tmdb/import-single', [DashboardController::class, 'importSingleTmdbMovie'])->name('tmdb.import-single');
-    Route::post('/movies/{movie}/publish', [DashboardController::class, 'publishMovie'])->name('tmdb.movies.publish');
-    Route::post('/movies/{movie}/archive', [DashboardController::class, 'archiveMovie'])->name('tmdb.movies.archive');
 
     // Admin movies
     Route::get('/dashboard/movies', [AdminMovieController::class, 'index'])->name('dashboard.movies');

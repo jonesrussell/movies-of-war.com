@@ -12,6 +12,7 @@ use App\Models\Movie;
 use App\Services\DashboardStatsService;
 use App\Services\TmdbMovieImportService;
 use App\Services\TMDBService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -128,6 +129,33 @@ class DashboardController extends Controller
             'searchResults' => [],
             'query' => '',
         ]);
+    }
+
+    /**
+     * Return TMDB movie details for preview (e.g. before import). Used by TMDB Search dialog.
+     */
+    public function tmdbPreview(int $tmdbId): JsonResponse
+    {
+        $this->authorize('create', Movie::class);
+
+        $dto = $this->tmdbService->getMovieDetailsAsDto($tmdbId);
+
+        if ($dto === null) {
+            return response()->json(['error' => 'Movie not found'], 404);
+        }
+
+        $trailer = $dto->videos->first(fn ($v) => $v->isYoutubeTrailer());
+        $trailerUrl = $trailer?->getYoutubeUrl();
+
+        $payload = array_merge($dto->toArray(), [
+            'director' => $dto->director,
+            'writers' => $dto->writers,
+            'trailer_url' => $trailerUrl,
+            'already_imported' => Movie::where('tmdb_id', $tmdbId)->exists(),
+            'is_upcoming' => $dto->releaseDate && strtotime($dto->releaseDate) >= now()->startOfDay()->timestamp,
+        ]);
+
+        return response()->json($payload);
     }
 
     public function performTmdbSearch(Request $request): Response

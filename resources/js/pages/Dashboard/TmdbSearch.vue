@@ -3,6 +3,7 @@ import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { CheckCircle, Download, Search } from 'lucide-vue-next';
 import { computed, ref, toRef } from 'vue';
 
+import TmdbSearchPreviewDialog from '@/components/TmdbSearchPreviewDialog.vue';
 import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +40,27 @@ const importForm = useForm({
     tmdb_id: 0,
 });
 
+const previewOpen = ref(false);
+const previewTmdbId = ref<number | null>(null);
+
+function openPreview(movie: TmdbMovie) {
+    previewTmdbId.value = movie.id;
+    previewOpen.value = true;
+}
+
+function closePreview() {
+    previewOpen.value = false;
+    previewTmdbId.value = null;
+}
+
+function handleImportFromPreview(tmdbId: number) {
+    importForm.tmdb_id = tmdbId;
+    importForm.post('/tmdb/import-single', {
+        preserveScroll: true,
+    });
+    closePreview();
+}
+
 function handleSearch() {
     if (!searchQuery.value.trim()) {
         return;
@@ -56,7 +78,8 @@ function handleSearch() {
     );
 }
 
-function handleImport(movie: TmdbMovie) {
+function handleImport(movie: TmdbMovie, e?: MouseEvent) {
+    e?.stopPropagation();
     importForm.tmdb_id = movie.id;
     importForm.post('/tmdb/import-single', {
         preserveScroll: true,
@@ -141,7 +164,12 @@ function getPosterUrl(posterPath: string | null): string {
                     <div
                         v-for="movie in props.searchResults"
                         :key="movie.id"
-                        class="group relative overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-lg hover:shadow-black/20"
+                        class="group relative cursor-pointer overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-lg hover:shadow-black/20"
+                        role="button"
+                        tabindex="0"
+                        @click="openPreview(movie)"
+                        @keydown.enter="openPreview(movie)"
+                        @keydown.space.prevent="openPreview(movie)"
                     >
                         <div class="relative aspect-2/3">
                             <img
@@ -173,8 +201,14 @@ function getPosterUrl(posterPath: string | null): string {
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between gap-2 p-3">
-                            <div class="min-w-0 flex-1">
+                        <div
+                            class="flex items-center justify-between gap-2 p-3"
+                            @click.stop
+                        >
+                            <div
+                                class="min-w-0 flex-1"
+                                @click.stop
+                            >
                                 <h3
                                     class="mb-0.5 truncate text-sm font-semibold"
                                 >
@@ -200,11 +234,11 @@ function getPosterUrl(posterPath: string | null): string {
                             <div class="flex shrink-0">
                                 <Button
                                     v-if="!movie.already_imported"
-                                    @click="handleImport(movie)"
                                     variant="default"
                                     size="sm"
                                     class="gap-1"
                                     :disabled="importForm.processing"
+                                    @click="handleImport(movie, $event)"
                                 >
                                     <Download class="size-3" />
                                     {{
@@ -227,6 +261,13 @@ function getPosterUrl(posterPath: string | null): string {
                         </div>
                     </div>
                 </div>
+
+                <!-- TMDB preview dialog -->
+                <TmdbSearchPreviewDialog
+                    v-model:open="previewOpen"
+                    :tmdb-id="previewTmdbId"
+                    @import="handleImportFromPreview"
+                />
 
                 <!-- No results -->
                 <div

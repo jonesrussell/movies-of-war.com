@@ -10,6 +10,7 @@ Route::middleware('admin')->group(function () {
     // TMDB movie management
     Route::get('/dashboard/tmdb/imports', [DashboardController::class, 'tmdbImports'])->name('dashboard.tmdb.imports');
     Route::get('/dashboard/tmdb/search', [DashboardController::class, 'tmdbSearch'])->name('dashboard.tmdb.search');
+    Route::get('/dashboard/tmdb/preview/{tmdbId}', [DashboardController::class, 'tmdbPreview'])->name('dashboard.tmdb.preview');
     Route::post('/tmdb/search', [DashboardController::class, 'performTmdbSearch'])->name('tmdb.search');
     Route::post('/tmdb/import', [DashboardController::class, 'importTmdbMovies'])->name('tmdb.import');
     Route::post('/tmdb/import-single', [DashboardController::class, 'importSingleTmdbMovie'])->name('tmdb.import-single');

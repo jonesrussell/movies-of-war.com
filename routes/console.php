@@ -1,10 +1,10 @@
 <?php
 
-use JonesRussell\XSuite\Jobs\PublishXPost;
-use JonesRussell\XSuite\Models\XPost;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use JonesRussell\XSuite\Jobs\PublishXPost;
+use JonesRussell\XSuite\Models\XPost;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

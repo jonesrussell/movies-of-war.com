@@ -68,12 +68,25 @@ final class MovieController extends Controller
         }
 
         $perPage = $this->resolvePerPage($request);
-        $movies = $query->paginate($perPage)->withQueryString();
+        $paginator = $query->paginate($perPage)->withQueryString();
+        $movies = [
+            'data' => $paginator->items(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'from' => $paginator->firstItem(),
+                'last_page' => $paginator->lastPage(),
+                'links' => $paginator->linkCollection()->toArray(),
+                'path' => $paginator->path(),
+                'per_page' => $paginator->perPage(),
+                'to' => $paginator->lastItem(),
+                'total' => $paginator->total(),
+            ],
+        ];
 
         return Inertia::render('Admin/Movies/Index', [
             'movies' => $movies,
             'tags' => Tag::orderBy('name')->get(['id', 'name', 'slug']),
-            'queryParams' => $request->only(['search', 'sort', 'per_page', 'status', 'tag']),
+            'queryParams' => $this->queryParams($request, ['search', 'sort', 'per_page', 'status', 'tag']),
         ]);
     }
 
@@ -108,13 +121,40 @@ final class MovieController extends Controller
         }
 
         $perPage = $this->resolvePerPage($request);
-        $movies = $query->paginate($perPage)->withQueryString();
+        $paginator = $query->paginate($perPage)->withQueryString();
+        $movies = [
+            'data' => $paginator->items(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'from' => $paginator->firstItem(),
+                'last_page' => $paginator->lastPage(),
+                'links' => $paginator->linkCollection()->toArray(),
+                'path' => $paginator->path(),
+                'per_page' => $paginator->perPage(),
+                'to' => $paginator->lastItem(),
+                'total' => $paginator->total(),
+            ],
+        ];
 
         return Inertia::render('Admin/Movies/Archived', [
             'movies' => $movies,
             'tags' => Tag::orderBy('name')->get(['id', 'name', 'slug']),
-            'queryParams' => $request->only(['search', 'sort', 'per_page', 'tag']),
+            'queryParams' => $this->queryParams($request, ['search', 'sort', 'per_page', 'tag']),
         ]);
+    }
+
+    /**
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    private function queryParams(Request $request, array $keys): array
+    {
+        $params = $request->only($keys);
+        if (array_key_exists('per_page', $params) && $params['per_page'] !== null) {
+            $params['per_page'] = (int) $params['per_page'];
+        }
+
+        return $params;
     }
 
     private function resolvePerPage(Request $request): int

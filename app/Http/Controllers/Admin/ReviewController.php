@@ -54,8 +54,22 @@ class ReviewController extends Controller
 
         return Inertia::render('Admin/Reviews/Index', [
             'reviews' => ReviewResource::collection($reviews),
-            'queryParams' => $request->only(['search', 'published', 'sort', 'per_page']),
+            'queryParams' => $this->queryParams($request, ['search', 'published', 'sort', 'per_page']),
         ]);
+    }
+
+    /**
+     * @param  array<int, string>  $keys
+     * @return array<string, mixed>
+     */
+    private function queryParams(Request $request, array $keys): array
+    {
+        $params = $request->only($keys);
+        if (array_key_exists('per_page', $params) && $params['per_page'] !== null) {
+            $params['per_page'] = (int) $params['per_page'];
+        }
+
+        return $params;
     }
 
     private function resolvePerPage(Request $request): int

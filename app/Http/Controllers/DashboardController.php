@@ -95,8 +95,21 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard/TmdbImports', [
             'tmdbDrafts' => MovieResource::collection($tmdbDrafts),
-            'queryParams' => $request->only(['search', 'sort', 'per_page']),
+            'queryParams' => $this->tmdbImportsQueryParams($request),
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function tmdbImportsQueryParams(Request $request): array
+    {
+        $params = $request->only(['search', 'sort', 'per_page']);
+        if (array_key_exists('per_page', $params) && $params['per_page'] !== null) {
+            $params['per_page'] = (int) $params['per_page'];
+        }
+
+        return $params;
     }
 
     private function resolveTmdbImportsPerPage(Request $request): int

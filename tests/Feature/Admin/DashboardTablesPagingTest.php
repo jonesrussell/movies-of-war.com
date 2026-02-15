@@ -29,9 +29,12 @@ test('dashboard movies index accepts sort per_page and returns pagination meta',
 
 test('dashboard movies index preserves search in pagination links', function () {
     $admin = User::factory()->create(['is_admin' => true]);
-    Movie::factory()->count(25)->create(['status' => MovieStatus::Published]);
+    Movie::factory()->count(25)->create([
+        'status' => MovieStatus::Published,
+        'title' => fn () => 'Test Movie '.fake()->unique()->numberBetween(1, 100),
+    ]);
 
-    $response = $this->actingAs($admin)->get('/dashboard/movies?search=test&per_page=10');
+    $response = $this->actingAs($admin)->get('/dashboard/movies?search=Test&per_page=10');
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -39,9 +42,9 @@ test('dashboard movies index preserves search in pagination links', function () 
     );
     $props = $response->original->getData()['page']['props'];
     $links = $props['movies']['meta']['links'] ?? [];
-    $nextLink = collect($links)->first(fn ($l) => strip_tags($l['label'] ?? '') === 'Next');
+    $nextLink = collect($links)->first(fn ($l) => ($l['url'] ?? null) !== null && str_contains((string) $l['url'], 'page=2'));
     expect($nextLink)->not->toBeNull();
-    expect($nextLink['url'])->toContain('search=test');
+    expect($nextLink['url'])->toContain('search=Test');
 });
 
 test('dashboard movies index filters by status draft', function () {
@@ -77,8 +80,10 @@ test('dashboard movies archived accepts sort and per_page', function () {
 
 test('dashboard reviews index accepts sort and per_page', function () {
     $admin = User::factory()->create(['is_admin' => true]);
-    $movie = Movie::factory()->published()->create();
-    Review::factory()->for($admin)->for($movie)->count(2)->create();
+    $movie1 = Movie::factory()->published()->create();
+    $movie2 = Movie::factory()->published()->create();
+    Review::factory()->for($admin)->for($movie1)->create();
+    Review::factory()->for($admin)->for($movie2)->create();
 
     $response = $this->actingAs($admin)->get('/dashboard/reviews?sort=created_at_asc&per_page=10');
 
@@ -109,9 +114,10 @@ test('dashboard reviews index filters by unpublished', function () {
 
 test('dashboard reviews index filters by published', function () {
     $admin = User::factory()->create(['is_admin' => true]);
-    $movie = Movie::factory()->published()->create();
-    Review::factory()->for($admin)->for($movie)->create(['is_published' => true]);
-    Review::factory()->for($admin)->for($movie)->create(['is_published' => false]);
+    $movie1 = Movie::factory()->published()->create();
+    $movie2 = Movie::factory()->published()->create();
+    Review::factory()->for($admin)->for($movie1)->create(['is_published' => true]);
+    Review::factory()->for($admin)->for($movie2)->create(['is_published' => false]);
 
     $response = $this->actingAs($admin)->get('/dashboard/reviews?published=1');
 

@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Storage;
 
 class TMDBService
 {
-    protected string $apiKey;
+    protected ?string $apiKey;
 
-    protected string $baseUrl;
+    protected ?string $baseUrl;
 
-    protected string $imageBaseUrl;
+    protected ?string $imageBaseUrl;
 
     public function __construct()
     {

@@ -16,18 +16,20 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const form = useForm({
-    content: props.xPost.content || '',
-    thread_parts: props.xPost.thread_parts || [],
-    media_urls: props.xPost.media_urls || [],
+const initialFormState = computed(() => ({
+    content: props.xPost?.content ?? '',
+    thread_parts: [...(props.xPost?.thread_parts ?? [])],
+    media_urls: [...(props.xPost?.media_urls ?? [])],
     status:
-        props.xPost.status === XPostStatus.Scheduled
+        props.xPost?.status === XPostStatus.Scheduled
             ? XPostStatus.Scheduled
             : XPostStatus.Draft,
-    scheduled_for: props.xPost.scheduled_for
+    scheduled_for: props.xPost?.scheduled_for
         ? new Date(props.xPost.scheduled_for).toISOString().slice(0, 16)
         : '',
-});
+}));
+
+const form = useForm({ ...initialFormState.value });
 
 const characterCount = computed(
     () => props.maxTweetLength - (form.content?.length || 0),

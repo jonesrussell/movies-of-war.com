@@ -431,6 +431,7 @@ function closePreview() {
                               : 'cursor-not-allowed bg-zinc-900 text-zinc-600',
                     ]"
                 >
+                    <!-- eslint-disable-next-line vue/no-v-html -->
                     <span v-html="link.label" />
                 </Link>
             </div>

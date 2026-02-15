@@ -256,13 +256,6 @@ function getPosterUrl(posterPath: string | null): string {
                     </div>
                 </div>
 
-                <!-- TMDB preview dialog -->
-                <TmdbSearchPreviewDialog
-                    v-model:open="previewOpen"
-                    :tmdb-id="previewTmdbId"
-                    @import="handleImportFromPreview"
-                />
-
                 <!-- No results -->
                 <div
                     v-else-if="props.query && props.searchResults.length === 0"
@@ -289,6 +282,13 @@ function getPosterUrl(posterPath: string | null): string {
                         Enter a movie title above to get started
                     </p>
                 </div>
+
+                <!-- TMDB preview dialog (outside v-if chain so vue/valid-v-else-if is satisfied) -->
+                <TmdbSearchPreviewDialog
+                    v-model:open="previewOpen"
+                    :tmdb-id="previewTmdbId"
+                    @import="handleImportFromPreview"
+                />
             </div>
         </div>
     </AppSidebarLayout>

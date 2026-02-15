@@ -14,14 +14,16 @@ use Inertia\Response;
 
 class ReviewController extends Controller
 {
+    private const PER_PAGE_OPTIONS = [10, 20, 50, 100];
+
     public function index(Request $request): Response
     {
         $query = Review::query()->with(['user', 'movie']);
 
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search): void {
-                $q->where('content', 'like', "%{$search}%")
-                    ->orWhere('title', 'like', "%{$search}%")
+                $q->where('reviews.content', 'like', "%{$search}%")
+                    ->orWhere('reviews.title', 'like', "%{$search}%")
                     ->orWhereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%"))
                     ->orWhereHas('movie', fn ($q) => $q->where('title', 'like', "%{$search}%"));
             });
@@ -31,16 +33,36 @@ class ReviewController extends Controller
             if ($published === '1') {
                 $query->published();
             } else {
-                $query->where('is_published', false);
+                $query->where('reviews.is_published', false);
             }
         }
 
-        $reviews = $query->latest()->paginate(20)->withQueryString();
+        $sort = $request->get('sort', 'created_at_desc');
+        match ($sort) {
+            'created_at_asc' => $query->oldest('created_at'),
+            'movie_title_asc' => $query->join('movies', 'reviews.movie_id', '=', 'movies.id')->orderBy('movies.title', 'asc')->select('reviews.*'),
+            'movie_title_desc' => $query->join('movies', 'reviews.movie_id', '=', 'movies.id')->orderBy('movies.title', 'desc')->select('reviews.*'),
+            'author_asc' => $query->join('users', 'reviews.user_id', '=', 'users.id')->orderBy('users.name', 'asc')->select('reviews.*'),
+            'author_desc' => $query->join('users', 'reviews.user_id', '=', 'users.id')->orderBy('users.name', 'desc')->select('reviews.*'),
+            'is_published_asc' => $query->orderBy('is_published', 'asc')->orderBy('created_at', 'desc'),
+            'is_published_desc' => $query->orderBy('is_published', 'desc')->orderBy('created_at', 'desc'),
+            default => $query->latest('created_at'),
+        };
+
+        $perPage = $this->resolvePerPage($request);
+        $reviews = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Admin/Reviews/Index', [
             'reviews' => ReviewResource::collection($reviews),
-            'queryParams' => $request->only(['search', 'published']),
+            'queryParams' => $request->only(['search', 'published', 'sort', 'per_page']),
         ]);
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        $perPage = (int) $request->get('per_page', 20);
+
+        return in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : 20;
     }
 
     public function destroy(Review $review): RedirectResponse

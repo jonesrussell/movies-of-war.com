@@ -24,19 +24,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
+const PER_PAGE_OPTIONS = [10, 20, 24, 50, 100] as const;
+
 interface Props {
     tmdbDrafts:
         | PaginatedMovies
         | { data: Movie[]; meta?: PaginatedMovies['meta'] };
     queryParams: {
         search?: string;
+        sort?: string;
+        per_page?: number;
     };
 }
 
 const props = defineProps<Props>();
 
-const queryParams = computed(() => props.queryParams);
-const search = ref(queryParams.value?.search || '');
+const queryParams = computed(() => props.queryParams ?? {});
+const search = ref(queryParams.value?.search ?? '');
+const sortFilter = ref(queryParams.value?.sort ?? 'updated_at_desc');
+const perPage = ref(queryParams.value?.per_page ?? 24);
 const confirmDialogOpen = ref(false);
 const pendingAction = ref<{ type: 'publish' | 'archive'; movie: Movie } | null>(
     null,
@@ -48,19 +54,43 @@ const form = useForm({
     upcoming: false,
 });
 
+function applyFilters(updates: Record<string, string | number | undefined> = {}) {
+    const resetPage = ['search', 'sort', 'per_page'].some((k) => updates[k] !== undefined);
+    router.get('/dashboard/tmdb/imports', {
+        search: search.value || undefined,
+        sort: sortFilter.value || undefined,
+        per_page: perPage.value,
+        ...updates,
+        ...(resetPage ? { page: 1 } : {}),
+    } as Record<string, string | number | undefined>, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+}
+
 function handleSearchUpdate(value: string) {
     search.value = value;
-    router.get(
-        '/dashboard/tmdb/imports',
-        {
-            search: value || undefined,
-        },
-        {
-            preserveState: true,
-            preserveScroll: true,
-        },
-    );
+    applyFilters({ search: value || undefined });
 }
+
+function setSort(s: string) {
+    sortFilter.value = s;
+    applyFilters({ sort: s || undefined });
+}
+
+function setPerPage(n: number) {
+    perPage.value = n;
+    applyFilters({ per_page: n });
+}
+
+const paginationSummary = computed(() => {
+    const m = props.tmdbDrafts?.meta;
+    if (!m || m.total === 0) return null;
+    const from = m.from ?? 0;
+    const to = m.to ?? 0;
+    const total = m.total;
+    return `Showing ${from}–${to} of ${total}`;
+});
 
 function publishMovie(movie: Movie) {
     pendingAction.value = { type: 'publish', movie };
@@ -200,13 +230,54 @@ function handleImport() {
                     </Dialog>
                 </div>
 
-                <!-- Search -->
-                <div class="mb-6">
+                <!-- Search and filters -->
+                <div class="mb-6 flex flex-col gap-4">
                     <SearchInput
                         :model-value="search"
                         placeholder="Search TMDB imports..."
                         @update:model-value="handleSearchUpdate"
                     />
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label for="tmdb-sort" class="text-sm text-zinc-400">Sort</label>
+                            <select
+                                id="tmdb-sort"
+                                :value="sortFilter"
+                                class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
+                                @change="setSort(($event.target as HTMLSelectElement).value)"
+                            >
+                                <option value="updated_at_desc">Newest first</option>
+                                <option value="updated_at_asc">Oldest first</option>
+                                <option value="title_asc">Title A–Z</option>
+                                <option value="title_desc">Title Z–A</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label for="tmdb-per-page" class="text-sm text-zinc-400">Per page</label>
+                            <select
+                                id="tmdb-per-page"
+                                :value="perPage"
+                                class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
+                                @change="setPerPage(Number(($event.target as HTMLSelectElement).value))"
+                            >
+                                <option
+                                    v-for="n in PER_PAGE_OPTIONS"
+                                    :key="n"
+                                    :value="n"
+                                >
+                                    {{ n }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination summary -->
+                <div
+                    v-if="paginationSummary"
+                    class="mb-2 text-sm text-zinc-400"
+                >
+                    {{ paginationSummary }}
                 </div>
 
                 <!-- TMDB Movies Grid -->

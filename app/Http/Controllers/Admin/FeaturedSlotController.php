@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -12,16 +14,54 @@ use Inertia\Response;
 
 class FeaturedSlotController extends Controller
 {
-    public function index(): Response
+    private const PER_PAGE_OPTIONS = [10, 20, 50, 100];
+
+    public function index(Request $request): Response
     {
-        $slots = FeaturedSlot::query()
-            ->with('movie')
-            ->latest()
-            ->paginate(20);
+        $query = FeaturedSlot::query()->with('movie');
+
+        $sort = $request->get('sort', 'created_at_desc');
+        match ($sort) {
+            'movie_title_asc' => $query->join('movies', 'featured_slots.movie_id', '=', 'movies.id')
+                ->orderBy('movies.title', 'asc')
+                ->select('featured_slots.*'),
+            'movie_title_desc' => $query->join('movies', 'featured_slots.movie_id', '=', 'movies.id')
+                ->orderBy('movies.title', 'desc')
+                ->select('featured_slots.*'),
+            'slot_asc' => $query->orderBy('slot', 'asc')->orderBy('created_at', 'desc'),
+            'slot_desc' => $query->orderBy('slot', 'desc')->orderBy('created_at', 'desc'),
+            'created_at_asc' => $query->oldest('created_at'),
+            default => $query->latest('created_at'),
+        };
+
+        $perPage = $this->resolvePerPage($request);
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        $slots = [
+            'data' => $paginator->items(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'from' => $paginator->firstItem(),
+                'last_page' => $paginator->lastPage(),
+                'links' => $paginator->linkCollection()->toArray(),
+                'path' => $paginator->path(),
+                'per_page' => $paginator->perPage(),
+                'to' => $paginator->lastItem(),
+                'total' => $paginator->total(),
+            ],
+        ];
 
         return Inertia::render('Admin/FeaturedSlots/Index', [
             'slots' => $slots,
+            'queryParams' => $request->only(['sort', 'per_page']),
         ]);
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        $perPage = (int) $request->get('per_page', 20);
+
+        return in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : 20;
     }
 
     public function create(): Response

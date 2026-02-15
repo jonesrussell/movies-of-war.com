@@ -17,6 +17,19 @@ use Inertia\Response;
 
 final class MovieController extends Controller
 {
+    private const PER_PAGE_OPTIONS = [10, 20, 50, 100];
+
+    private const INDEX_SORT_MAP = [
+        'title_asc' => [['title', 'asc']],
+        'title_desc' => [['title', 'desc']],
+        'release_year_asc' => [['release_year', 'asc'], ['title', 'asc']],
+        'release_year_desc' => [['release_year', 'desc'], ['title', 'asc']],
+        'status_asc' => [['status', 'asc'], ['title', 'asc']],
+        'status_desc' => [['status', 'desc'], ['title', 'asc']],
+        'updated_at_asc' => [['updated_at', 'asc']],
+        'updated_at_desc' => [['updated_at', 'desc']],
+    ];
+
     public function index(Request $request): Response
     {
         $this->authorize('viewAny', Movie::class);
@@ -29,11 +42,38 @@ final class MovieController extends Controller
             $query->where('title', 'like', "%{$search}%");
         }
 
-        $movies = $query->latest()->paginate(20);
+        $status = $request->get('status');
+        if (in_array($status, ['draft', 'published'], true)) {
+            $query->where('status', $status);
+        }
+
+        $tag = $request->get('tag');
+        if ($tag !== null && $tag !== '') {
+            $query->whereHas('tags', function ($q) use ($tag): void {
+                if (is_numeric($tag)) {
+                    $q->where('tags.id', (int) $tag);
+                } else {
+                    $q->where('tags.slug', $tag);
+                }
+            });
+        }
+
+        $sort = $request->get('sort', 'updated_at_desc');
+        if (isset(self::INDEX_SORT_MAP[$sort])) {
+            foreach (self::INDEX_SORT_MAP[$sort] as [$column, $direction]) {
+                $query->orderBy($column, $direction);
+            }
+        } else {
+            $query->latest('updated_at');
+        }
+
+        $perPage = $this->resolvePerPage($request);
+        $movies = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Admin/Movies/Index', [
             'movies' => $movies,
-            'queryParams' => $request->only(['search']),
+            'tags' => Tag::orderBy('name')->get(['id', 'name', 'slug']),
+            'queryParams' => $request->only(['search', 'sort', 'per_page', 'status', 'tag']),
         ]);
     }
 
@@ -47,12 +87,41 @@ final class MovieController extends Controller
             $query->where('title', 'like', "%{$search}%");
         }
 
-        $movies = $query->latest()->paginate(20);
+        $tag = $request->get('tag');
+        if ($tag !== null && $tag !== '') {
+            $query->whereHas('tags', function ($q) use ($tag): void {
+                if (is_numeric($tag)) {
+                    $q->where('tags.id', (int) $tag);
+                } else {
+                    $q->where('tags.slug', $tag);
+                }
+            });
+        }
+
+        $sort = $request->get('sort', 'updated_at_desc');
+        if (isset(self::INDEX_SORT_MAP[$sort])) {
+            foreach (self::INDEX_SORT_MAP[$sort] as [$column, $direction]) {
+                $query->orderBy($column, $direction);
+            }
+        } else {
+            $query->latest('updated_at');
+        }
+
+        $perPage = $this->resolvePerPage($request);
+        $movies = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Admin/Movies/Archived', [
             'movies' => $movies,
-            'queryParams' => $request->only(['search']),
+            'tags' => Tag::orderBy('name')->get(['id', 'name', 'slug']),
+            'queryParams' => $request->only(['search', 'sort', 'per_page', 'tag']),
         ]);
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        $perPage = (int) $request->get('per_page', 20);
+
+        return in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : 20;
     }
 
     public function show(Movie $movie): Response

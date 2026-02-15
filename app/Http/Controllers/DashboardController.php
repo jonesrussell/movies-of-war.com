@@ -73,18 +73,38 @@ class DashboardController extends Controller
     {
         $this->authorize('create', Movie::class);
 
-        $query = Movie::query()->draft()->with('tags')->latest();
+        $query = Movie::query()->draft()->with('tags');
 
         if ($search = $request->get('search')) {
             $query->where('title', 'like', "%{$search}%");
         }
 
-        $tmdbDrafts = $query->paginate(24)->withQueryString();
+        $sort = $request->get('sort', 'updated_at_desc');
+        if ($sort === 'title_asc') {
+            $query->orderBy('title', 'asc');
+        } elseif ($sort === 'title_desc') {
+            $query->orderBy('title', 'desc');
+        } elseif ($sort === 'updated_at_asc') {
+            $query->oldest('updated_at');
+        } else {
+            $query->latest('updated_at');
+        }
+
+        $perPage = $this->resolveTmdbImportsPerPage($request);
+        $tmdbDrafts = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Dashboard/TmdbImports', [
             'tmdbDrafts' => MovieResource::collection($tmdbDrafts),
-            'queryParams' => $request->only(['search']),
+            'queryParams' => $request->only(['search', 'sort', 'per_page']),
         ]);
+    }
+
+    private function resolveTmdbImportsPerPage(Request $request): int
+    {
+        $allowed = [10, 20, 24, 50, 100];
+        $perPage = (int) $request->get('per_page', 24);
+
+        return in_array($perPage, $allowed, true) ? $perPage : 24;
     }
 
     public function tmdbSearch(): Response

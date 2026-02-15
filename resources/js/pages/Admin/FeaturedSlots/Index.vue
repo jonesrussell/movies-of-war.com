@@ -1,16 +1,73 @@
 <script setup lang="ts">
-import type { FeaturedSlot, PaginatedFeaturedSlots } from '@/types/models';
+import type { FeaturedSlot } from '@/types/models';
+import type { PaginationMeta } from '@/types/models';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { ChevronDown, ChevronUp } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 
+import Pagination from '@/components/Pagination.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
-interface Props {
-    slots: PaginatedFeaturedSlots;
+const PER_PAGE_OPTIONS = [10, 20, 50, 100] as const;
+
+interface SlotsPayload {
+    data: FeaturedSlot[];
+    meta: PaginationMeta;
 }
 
-defineProps<Props>();
+interface Props {
+    slots: SlotsPayload;
+    queryParams: {
+        sort?: string;
+        per_page?: number;
+    };
+}
+
+const props = defineProps<Props>();
 usePage();
+
+const queryParams = computed(() => props.queryParams ?? {});
+const perPage = ref(queryParams.value?.per_page ?? 20);
+const currentSort = computed(() => queryParams.value?.sort ?? 'created_at_desc');
+
+function applyFilters(updates: Record<string, string | number | undefined> = {}) {
+    const resetPage = ['sort', 'per_page'].some((k) => updates[k] !== undefined);
+    router.get('/dashboard/featured-slots', {
+        sort: currentSort.value || undefined,
+        per_page: perPage.value,
+        ...updates,
+        ...(resetPage ? { page: 1 } : {}),
+    } as Record<string, string | number | undefined>, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+}
+
+function applySort(column: string) {
+    const dir = currentSort.value === `${column}_asc` ? 'desc' : 'asc';
+    applyFilters({ sort: `${column}_${dir}` });
+}
+
+function sortDirection(key: string): 'asc' | 'desc' | null {
+    if (currentSort.value === `${key}_asc`) return 'asc';
+    if (currentSort.value === `${key}_desc`) return 'desc';
+    return null;
+}
+
+function setPerPage(n: number) {
+    perPage.value = n;
+    applyFilters({ per_page: n });
+}
+
+const paginationSummary = computed(() => {
+    const m = props.slots?.meta;
+    if (!m || m.total === 0) return null;
+    const from = m.from ?? 0;
+    const to = m.to ?? 0;
+    const total = m.total;
+    return `Showing ${from}–${to} of ${total}`;
+});
 
 function deleteSlot(slot: FeaturedSlot) {
     if (confirm(`Are you sure you want to delete this featured slot?`)) {
@@ -46,6 +103,35 @@ function getSlotBadge(slot: string): string {
                 </Link>
             </div>
 
+            <!-- Filters -->
+            <div class="mb-6 flex flex-wrap items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <label for="slots-per-page" class="text-sm text-zinc-400">Per page</label>
+                    <select
+                        id="slots-per-page"
+                        :value="perPage"
+                        class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
+                        @change="setPerPage(Number(($event.target as HTMLSelectElement).value))"
+                    >
+                        <option
+                            v-for="n in PER_PAGE_OPTIONS"
+                            :key="n"
+                            :value="n"
+                        >
+                            {{ n }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Pagination summary -->
+            <div
+                v-if="paginationSummary"
+                class="mb-2 text-sm text-zinc-400"
+            >
+                {{ paginationSummary }}
+            </div>
+
             <!-- Slots Table -->
             <div class="overflow-hidden rounded-lg bg-zinc-900">
                 <table class="min-w-full divide-y divide-zinc-800">
@@ -54,12 +140,40 @@ function getSlotBadge(slot: string): string {
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
                             >
-                                Movie
+                                <button
+                                    type="button"
+                                    class="flex items-center gap-1 hover:text-white"
+                                    @click="applySort('movie_title')"
+                                >
+                                    Movie
+                                    <ChevronUp
+                                        v-if="sortDirection('movie_title') === 'asc'"
+                                        class="size-4"
+                                    />
+                                    <ChevronDown
+                                        v-else-if="sortDirection('movie_title') === 'desc'"
+                                        class="size-4"
+                                    />
+                                </button>
                             </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-400 uppercase"
                             >
-                                Slot Type
+                                <button
+                                    type="button"
+                                    class="flex items-center gap-1 hover:text-white"
+                                    @click="applySort('slot')"
+                                >
+                                    Slot Type
+                                    <ChevronUp
+                                        v-if="sortDirection('slot') === 'asc'"
+                                        class="size-4"
+                                    />
+                                    <ChevronDown
+                                        v-else-if="sortDirection('slot') === 'desc'"
+                                        class="size-4"
+                                    />
+                                </button>
                             </th>
                             <th
                                 class="px-6 py-3 text-right text-xs font-medium tracking-wider text-zinc-400 uppercase"
@@ -123,27 +237,10 @@ function getSlotBadge(slot: string): string {
             </div>
 
             <!-- Pagination -->
-            <div
-                v-if="slots.last_page > 1"
-                class="mt-6 flex justify-center gap-2"
-            >
-                <Link
-                    v-for="page in slots.links"
-                    :key="page.label"
-                    :href="page.url || '#'"
-                    :class="[
-                        'rounded px-3 py-2 text-sm',
-                        page.active
-                            ? 'bg-red-600 text-white'
-                            : page.url
-                              ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-                              : 'cursor-not-allowed bg-zinc-900 text-zinc-600',
-                    ]"
-                >
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <span v-html="page.label" />
-                </Link>
-            </div>
+            <Pagination
+                v-if="slots?.meta"
+                :meta="slots.meta"
+            />
         </div>
     </AppSidebarLayout>
 </template>

@@ -3,9 +3,13 @@ import type { PaginationMeta, Review } from '@/types/models';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
+import { ChevronDown, ChevronUp } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
+import Pagination from '@/components/Pagination.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+
+const PER_PAGE_OPTIONS = [10, 20, 50, 100] as const;
 
 interface PaginatedReviews {
     data: Review[];
@@ -20,27 +24,36 @@ interface Props {
     queryParams: {
         search?: string;
         published?: string;
+        sort?: string;
+        per_page?: number;
     };
 }
 
 const props = defineProps<Props>();
 
-const queryParams = computed(() => props.queryParams);
+const queryParams = computed(() => props.queryParams ?? {});
 const search = ref(queryParams.value?.search ?? '');
 const publishedFilter = ref(queryParams.value?.published ?? '');
+const perPage = ref(queryParams.value?.per_page ?? 20);
+const currentSort = computed(() => queryParams.value?.sort ?? 'created_at_desc');
+
+function applyFilters(updates: Record<string, string | number | undefined> = {}) {
+    const resetPage = ['sort', 'per_page', 'published'].some((k) => updates[k] !== undefined);
+    router.get('/dashboard/reviews', {
+        search: search.value || undefined,
+        published: publishedFilter.value || undefined,
+        sort: currentSort.value || undefined,
+        per_page: perPage.value,
+        ...updates,
+        ...(resetPage ? { page: 1 } : {}),
+    } as Record<string, string | number | undefined>, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+}
 
 const debouncedSearch = useDebounceFn((searchValue: string) => {
-    router.get(
-        '/dashboard/reviews',
-        {
-            search: searchValue || undefined,
-            published: publishedFilter.value || undefined,
-        },
-        {
-            preserveState: true,
-            preserveScroll: true,
-        },
-    );
+    applyFilters({ search: searchValue || undefined });
 }, 300);
 
 watch(search, (value) => {
@@ -49,18 +62,34 @@ watch(search, (value) => {
 
 function filterByPublished(value: string) {
     publishedFilter.value = value;
-    router.get(
-        '/dashboard/reviews',
-        {
-            search: search.value || undefined,
-            published: value || undefined,
-        },
-        {
-            preserveState: true,
-            preserveScroll: true,
-        },
-    );
+    applyFilters({ published: value || undefined });
 }
+
+function applySort(column: string) {
+    const dir = currentSort.value === `${column}_asc` ? 'desc' : 'asc';
+    const next = `${column}_${dir}`;
+    applyFilters({ sort: next });
+}
+
+function sortDirection(key: string): 'asc' | 'desc' | null {
+    if (currentSort.value === `${key}_asc`) return 'asc';
+    if (currentSort.value === `${key}_desc`) return 'desc';
+    return null;
+}
+
+function setPerPage(n: number) {
+    perPage.value = n;
+    applyFilters({ per_page: n });
+}
+
+const paginationSummary = computed(() => {
+    const m = props.reviews?.meta;
+    if (!m || m.total === 0) return null;
+    const from = m.from ?? 0;
+    const to = m.to ?? 0;
+    const total = m.total;
+    return `Showing ${from}–${to} of ${total}`;
+});
 
 function formatDate(dateString: string | null): string {
     if (!dateString) {
@@ -153,6 +182,31 @@ function deleteReview(review: Review) {
                         Unpublished
                     </button>
                 </div>
+                <div class="flex items-center gap-2">
+                    <label for="reviews-per-page" class="text-sm text-zinc-400">Per page</label>
+                    <select
+                        id="reviews-per-page"
+                        :value="perPage"
+                        class="rounded-lg border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-red-500 focus:ring-red-500"
+                        @change="setPerPage(Number(($event.target as HTMLSelectElement).value))"
+                    >
+                        <option
+                            v-for="n in PER_PAGE_OPTIONS"
+                            :key="n"
+                            :value="n"
+                        >
+                            {{ n }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Pagination summary -->
+            <div
+                v-if="paginationSummary"
+                class="mb-2 text-sm text-zinc-400"
+            >
+                {{ paginationSummary }}
             </div>
 
             <!-- Table -->
@@ -168,12 +222,40 @@ function deleteReview(review: Review) {
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
-                                Movie
+                                <button
+                                    type="button"
+                                    class="flex items-center gap-1 hover:text-white"
+                                    @click="applySort('movie_title')"
+                                >
+                                    Movie
+                                    <ChevronUp
+                                        v-if="sortDirection('movie_title') === 'asc'"
+                                        class="size-4"
+                                    />
+                                    <ChevronDown
+                                        v-else-if="sortDirection('movie_title') === 'desc'"
+                                        class="size-4"
+                                    />
+                                </button>
                             </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
-                                Author
+                                <button
+                                    type="button"
+                                    class="flex items-center gap-1 hover:text-white"
+                                    @click="applySort('author')"
+                                >
+                                    Author
+                                    <ChevronUp
+                                        v-if="sortDirection('author') === 'asc'"
+                                        class="size-4"
+                                    />
+                                    <ChevronDown
+                                        v-else-if="sortDirection('author') === 'desc'"
+                                        class="size-4"
+                                    />
+                                </button>
                             </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
@@ -183,12 +265,40 @@ function deleteReview(review: Review) {
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
-                                Status
+                                <button
+                                    type="button"
+                                    class="flex items-center gap-1 hover:text-white"
+                                    @click="applySort('is_published')"
+                                >
+                                    Status
+                                    <ChevronUp
+                                        v-if="sortDirection('is_published') === 'asc'"
+                                        class="size-4"
+                                    />
+                                    <ChevronDown
+                                        v-else-if="sortDirection('is_published') === 'desc'"
+                                        class="size-4"
+                                    />
+                                </button>
                             </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium tracking-wider text-zinc-300 uppercase"
                             >
-                                Date
+                                <button
+                                    type="button"
+                                    class="flex items-center gap-1 hover:text-white"
+                                    @click="applySort('created_at')"
+                                >
+                                    Date
+                                    <ChevronUp
+                                        v-if="sortDirection('created_at') === 'asc'"
+                                        class="size-4"
+                                    />
+                                    <ChevronDown
+                                        v-else-if="sortDirection('created_at') === 'desc'"
+                                        class="size-4"
+                                    />
+                                </button>
                             </th>
                             <th
                                 class="px-6 py-3 text-right text-xs font-medium tracking-wider text-zinc-300 uppercase"
@@ -310,50 +420,10 @@ function deleteReview(review: Review) {
             </div>
 
             <!-- Pagination -->
-            <div
-                v-if="reviews?.meta?.last_page && reviews.meta.last_page > 1"
-                class="mt-6 flex justify-center gap-2"
-            >
-                <Link
-                    v-for="link in reviews.meta.links"
-                    :key="link.label"
-                    :href="link.url || '#'"
-                    :class="[
-                        'rounded px-3 py-2 text-sm',
-                        link.active
-                            ? 'bg-red-600 text-white'
-                            : link.url
-                              ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-                              : 'cursor-not-allowed bg-zinc-900 text-zinc-600',
-                    ]"
-                >
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <span v-html="link.label" />
-                </Link>
-            </div>
-            <div
-                v-else-if="
-                    reviews?.links?.length && (reviews.last_page ?? 0) > 1
-                "
-                class="mt-6 flex justify-center gap-2"
-            >
-                <Link
-                    v-for="link in reviews.links"
-                    :key="link.label"
-                    :href="link.url || '#'"
-                    :class="[
-                        'rounded px-3 py-2 text-sm',
-                        link.active
-                            ? 'bg-red-600 text-white'
-                            : link.url
-                              ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-                              : 'cursor-not-allowed bg-zinc-900 text-zinc-600',
-                    ]"
-                >
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <span v-html="link.label" />
-                </Link>
-            </div>
+            <Pagination
+                v-if="reviews?.meta"
+                :meta="reviews.meta"
+            />
         </div>
     </AppSidebarLayout>
 </template>

@@ -96,12 +96,10 @@ const jsonLdBreadcrumb = computed(() =>
             <meta name="twitter:title" :content="person.name" />
             <meta name="twitter:description" :content="personDescription" />
             <meta name="twitter:image" :content="ogImage" />
-            <JsonLdScript head-key="jsonld-person" :content="jsonLdPerson" />
-            <JsonLdScript
-                head-key="jsonld-breadcrumb-person"
-                :content="jsonLdBreadcrumb"
-            />
         </Head>
+
+        <JsonLdScript :content="jsonLdPerson" />
+        <JsonLdScript :content="jsonLdBreadcrumb" />
 
         <div class="min-h-screen bg-zinc-950">
             <PublicContainer class="py-12 sm:py-14 lg:py-16">

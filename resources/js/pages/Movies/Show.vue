@@ -330,12 +330,10 @@ const jsonLdBreadcrumb = computed(() =>
             />
             <meta name="twitter:description" :content="ogDescription" />
             <meta name="twitter:image" :content="ogImage" />
-            <JsonLdScript head-key="jsonld-movie" :content="jsonLdMovie" />
-            <JsonLdScript
-                head-key="jsonld-breadcrumb-movie"
-                :content="jsonLdBreadcrumb"
-            />
         </Head>
+
+        <JsonLdScript :content="jsonLdMovie" />
+        <JsonLdScript :content="jsonLdBreadcrumb" />
 
         <div class="relative overflow-hidden bg-zinc-950">
             <!-- Background layers -->

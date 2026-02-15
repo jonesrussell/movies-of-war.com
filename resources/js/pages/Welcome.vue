@@ -5,7 +5,6 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 import FeaturedMovie from '@/components/FeaturedMovie.vue';
-import JsonLdScript from '@/components/JsonLdScript.vue';
 import MovieCard from '@/components/MovieCard.vue';
 import MovieHero from '@/components/MovieHero.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
@@ -13,6 +12,7 @@ import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
 import XFeedWidget from '@/components/x-suite/XFeedWidget.vue';
+import JsonLdScript from '@/components/JsonLdScript.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {
@@ -64,8 +64,9 @@ const jsonLdWebSite = computed(() =>
             <meta name="twitter:title" content="Curated War Films Database" />
             <meta name="twitter:description" :content="defaultDescription" />
             <meta name="twitter:image" :content="defaultOgImage" />
-            <JsonLdScript head-key="jsonld-website" :content="jsonLdWebSite" />
         </Head>
+
+        <JsonLdScript :content="jsonLdWebSite" />
 
         <!-- Pick of the Week first (curator's featured review, hero style) -->
         <MovieHero

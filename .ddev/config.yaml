@@ -20,10 +20,11 @@ web_extra_exposed_ports:
     http_port: 5174
     https_port: 5175
 
-web_extra_daemons:
-  - name: articles-subscribe
-    command: "php /var/www/html/artisan articles:subscribe articles:war"
-    directory: /var/www/html
+# Disabled: causes supervisor "spawn error" on start (e.g. Redis not ready or path). Re-enable when needed.
+# web_extra_daemons:
+#   - name: articles-subscribe
+#     command: "php /var/www/html/artisan articles:subscribe articles:war"
+#     directory: /var/www/html
 
 # Key features of DDEV's config.yaml:
 

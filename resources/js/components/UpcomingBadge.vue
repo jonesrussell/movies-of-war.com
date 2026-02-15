@@ -17,9 +17,7 @@ withDefaults(defineProps<Props>(), {
     <span
         class="inline-flex rounded-full bg-red-600 font-bold tracking-wide text-white uppercase shadow-lg"
         :class="
-            size === 'compact'
-                ? 'px-2 py-0.5 text-[10px]'
-                : 'px-3 py-1 text-xs'
+            size === 'compact' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs'
         "
     >
         <slot>Coming Soon</slot>

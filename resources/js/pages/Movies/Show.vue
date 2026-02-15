@@ -8,13 +8,13 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import JsonLdScript from '@/components/JsonLdScript.vue';
 import MovieCard from '@/components/MovieCard.vue';
 import { Poster, StarRating } from '@/components/primitives';
-import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
 import { Button } from '@/components/ui/button';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import { login, register } from '@/routes';
 import {

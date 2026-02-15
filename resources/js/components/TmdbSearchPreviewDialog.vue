@@ -31,7 +31,7 @@ interface TmdbPreview {
     vote_count: number | null;
     director: string | null;
     writers: string[];
-    genres: Array<{ id: number; name: string }>;
+    genres: { id: number; name: string }[];
     trailer_url: string | null;
     already_imported: boolean;
     is_upcoming?: boolean;
@@ -72,7 +72,10 @@ async function fetchPreview(id: number) {
     loading.value = true;
     try {
         const res = await fetch(`/dashboard/tmdb/preview/${id}`, {
-            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
         });
         if (!res.ok) {
             const data = await res.json().catch(() => ({}));
@@ -119,7 +122,10 @@ function handleImport() {
         <DialogContent
             class="max-w-2xl border-zinc-800 bg-zinc-950 p-0 text-white"
         >
-            <div v-if="loading" class="flex min-h-[280px] items-center justify-center p-8">
+            <div
+                v-if="loading"
+                class="flex min-h-[280px] items-center justify-center p-8"
+            >
                 <Loader2 class="size-10 animate-spin text-zinc-400" />
             </div>
             <div v-else-if="error" class="p-6 text-center">
@@ -147,12 +153,20 @@ function handleImport() {
                     </DialogHeader>
 
                     <!-- Meta -->
-                    <div class="mb-4 flex flex-wrap gap-3 text-sm text-zinc-400">
-                        <span v-if="releaseYear" class="flex items-center gap-1">
+                    <div
+                        class="mb-4 flex flex-wrap gap-3 text-sm text-zinc-400"
+                    >
+                        <span
+                            v-if="releaseYear"
+                            class="flex items-center gap-1"
+                        >
                             <Calendar class="size-4" />
                             {{ releaseYear }}
                         </span>
-                        <span v-if="preview.runtime" class="flex items-center gap-1">
+                        <span
+                            v-if="preview.runtime"
+                            class="flex items-center gap-1"
+                        >
                             <Clock class="size-4" />
                             {{ preview.runtime }} min
                         </span>
@@ -160,15 +174,23 @@ function handleImport() {
                             v-if="preview.vote_average != null"
                             class="flex items-center gap-1"
                         >
-                            <Star class="size-4 fill-yellow-500 text-yellow-500" />
+                            <Star
+                                class="size-4 fill-yellow-500 text-yellow-500"
+                            />
                             {{ preview.vote_average.toFixed(1) }}
-                            <span v-if="preview.vote_count" class="text-zinc-500">
+                            <span
+                                v-if="preview.vote_count"
+                                class="text-zinc-500"
+                            >
                                 ({{ preview.vote_count }})
                             </span>
                         </span>
                     </div>
 
-                    <div v-if="preview.director" class="mb-2 flex items-center gap-1 text-sm text-zinc-400">
+                    <div
+                        v-if="preview.director"
+                        class="mb-2 flex items-center gap-1 text-sm text-zinc-400"
+                    >
                         <User class="size-4" />
                         {{ preview.director }}
                     </div>
@@ -224,12 +246,7 @@ function handleImport() {
                             <CheckCircle class="mr-2 size-4" />
                             Import
                         </Button>
-                        <Button
-                            v-else
-                            variant="outline"
-                            size="sm"
-                            disabled
-                        >
+                        <Button v-else variant="outline" size="sm" disabled>
                             <CheckCircle class="mr-2 size-4" />
                             Already imported
                         </Button>

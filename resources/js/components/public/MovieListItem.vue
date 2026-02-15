@@ -15,9 +15,9 @@ import {
 import { computed, ref, watch } from 'vue';
 
 import { Poster } from '@/components/primitives';
-import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { formatReleaseDate } from '@/utils/format';
 
 interface Props {

@@ -4,9 +4,9 @@ import { CheckCircle, Download, Search } from 'lucide-vue-next';
 import { computed, ref, toRef } from 'vue';
 
 import TmdbSearchPreviewDialog from '@/components/TmdbSearchPreviewDialog.vue';
-import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface TmdbMovie {
@@ -205,10 +205,7 @@ function getPosterUrl(posterPath: string | null): string {
                             class="flex items-center justify-between gap-2 p-3"
                             @click.stop
                         >
-                            <div
-                                class="min-w-0 flex-1"
-                                @click.stop
-                            >
+                            <div class="min-w-0 flex-1" @click.stop>
                                 <h3
                                     class="mb-0.5 truncate text-sm font-semibold"
                                 >
@@ -217,10 +214,7 @@ function getPosterUrl(posterPath: string | null): string {
                                 <p class="text-xs text-muted-foreground">
                                     {{
                                         movie.release_date
-                                            ? movie.release_date.substring(
-                                                  0,
-                                                  4,
-                                              )
+                                            ? movie.release_date.substring(0, 4)
                                             : 'Unknown'
                                     }}
                                     <span

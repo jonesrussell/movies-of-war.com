@@ -6,7 +6,6 @@ import { Archive, CheckCircle } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import { Poster } from '@/components/primitives';
-import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { Button } from '@/components/ui/button';
 import {
     Tooltip,
@@ -14,6 +13,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 
 interface Props {
     movie: Movie;

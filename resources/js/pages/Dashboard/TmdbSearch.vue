@@ -3,6 +3,7 @@ import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { CheckCircle, Download, Search } from 'lucide-vue-next';
 import { computed, ref, toRef } from 'vue';
 
+import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
@@ -15,6 +16,7 @@ interface TmdbMovie {
     release_date: string;
     vote_average: number;
     already_imported: boolean;
+    is_upcoming?: boolean;
 }
 
 interface Props {
@@ -147,6 +149,13 @@ function getPosterUrl(posterPath: string | null): string {
                                 :alt="movie.title"
                                 class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
                             />
+                            <!-- Upcoming badge -->
+                            <div
+                                v-if="movie.is_upcoming"
+                                class="absolute top-3 right-3 z-10"
+                            >
+                                <UpcomingBadge />
+                            </div>
                             <!-- Already imported overlay -->
                             <div
                                 v-if="movie.already_imported"

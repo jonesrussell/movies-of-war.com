@@ -146,6 +146,8 @@ class DashboardController extends Controller
 
             $results = collect($results)->map(function ($movie) use ($existingMovies) {
                 $movie['already_imported'] = in_array($movie['id'], $existingMovies);
+                $releaseDate = $movie['release_date'] ?? null;
+                $movie['is_upcoming'] = $releaseDate && strtotime($releaseDate) !== false && strtotime($releaseDate) >= now()->startOfDay()->timestamp;
 
                 return $movie;
             })->toArray();

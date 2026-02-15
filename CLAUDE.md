@@ -95,7 +95,7 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 **X API Features:**
 - Analytics: `/dashboard/x-analytics` - `x:sync-analytics` every 15 min
 - Trends: `/dashboard/x-trends` - `x:monitor-trends` every 30 min
-- Auto-replies: `/dashboard/x-auto-replies` - `x:process-auto-replies` every 10 min
+- Auto-replies: `/dashboard/x-auto-replies` - `x-suite:process-auto-replies` every 10 min
 - Content discovery: `/dashboard/x-content-discovery` - `x:discover-content` daily 2 AM
 - Auto-content: `x:generate-content` daily 8 AM
 

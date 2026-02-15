@@ -20,19 +20,19 @@ Schedule::call(function (): void {
 })->everyMinute()->name('publish-scheduled-x-posts')->withoutOverlapping();
 
 // Sync X analytics every 15 minutes (respect rate limits)
-Schedule::command('x:sync-analytics --limit=50')
+Schedule::command('x-suite:sync-analytics --limit=50')
     ->everyFifteenMinutes()
     ->name('sync-x-analytics')
     ->withoutOverlapping();
 
 // Monitor trends every 30 minutes
-Schedule::command('x:monitor-trends')
+Schedule::command('x-suite:monitor-trends')
     ->everyThirtyMinutes()
     ->name('monitor-x-trends')
     ->withoutOverlapping();
 
 // Process auto-replies every 10 minutes
-Schedule::command('x:process-auto-replies --limit=10')
+Schedule::command('x-suite:process-auto-replies --limit=10')
     ->everyTenMinutes()
     ->name('process-x-auto-replies')
     ->withoutOverlapping();
@@ -44,7 +44,7 @@ Schedule::command('movies:graduate-upcoming')
     ->withoutOverlapping();
 
 // Discover content daily at 2 AM
-Schedule::command('x:discover-content --min-likes=10 --max-results=50')
+Schedule::command('x-suite:discover-content --min-likes=10 --max-results=50')
     ->dailyAt('02:00')
     ->name('discover-x-content')
     ->withoutOverlapping();

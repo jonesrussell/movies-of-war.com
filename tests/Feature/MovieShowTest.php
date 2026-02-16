@@ -101,3 +101,48 @@ test('movie show page includes user review in main content when user has reviewe
         ->where('reviews.user_review.rating', 2)
     );
 });
+
+test('movie show page includes filesystem curator review when review file exists', function () {
+    $movie = Movie::factory()->published()->create(['slug' => 'fs-review-movie']);
+
+    $reviewContent = <<<'MD'
+---
+title: "FS Review Movie"
+year: 2024
+rating: 3.5
+director: "Test Director"
+starring: ["Actor A"]
+runtime: 100
+---
+
+A filesystem curator review.
+MD;
+
+    $path = resource_path('reviews/fs-review-movie.md');
+    file_put_contents($path, $reviewContent);
+
+    $response = $this->get(route('movies.show', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Show')
+        ->has('curatorReview')
+        ->where('curatorReview.title', 'FS Review Movie')
+        ->where('curatorReview.rating', 3.5)
+        ->where('curatorReview.director', 'Test Director')
+    );
+
+    @unlink($path);
+});
+
+test('movie show page has null curatorReview when no review file exists', function () {
+    $movie = Movie::factory()->published()->create(['slug' => 'no-fs-review']);
+
+    $response = $this->get(route('movies.show', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Show')
+        ->where('curatorReview', null)
+    );
+});

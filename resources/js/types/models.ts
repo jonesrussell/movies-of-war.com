@@ -151,6 +151,19 @@ export interface ReviewsSummary {
     user_rating_count: number;
 }
 
+export interface FilesystemCuratorReview {
+    title: string;
+    year: number;
+    rating: number;
+    director: string | null;
+    starring: string[];
+    runtime: number | null;
+    slug: string;
+    has_spoilers: boolean;
+    content_html: string;
+    content_excerpt: string;
+}
+
 export interface MovieReviewsData {
     summary: ReviewsSummary;
     user_review: Review | null;

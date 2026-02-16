@@ -49,3 +49,15 @@ test('guest users never receive user_review on movies index', function () {
         expect($movie)->not->toHaveKey('user_review');
     }
 });
+
+test('movies index returns filters.tags as unwrapped array not data wrapper', function () {
+    Movie::factory()->published()->count(2)->create();
+
+    $response = $this->get(route('movies.index'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page->component('Movies/Index')->has('filters'));
+    $tags = $response->inertiaProps('filters')['tags'] ?? null;
+    // Backend must send tags as plain array (withoutWrapping); frontend expects .find() on array.
+    expect($tags === null || (is_array($tags) && array_keys($tags) !== ['data']))->toBeTrue();
+});

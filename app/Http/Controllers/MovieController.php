@@ -8,6 +8,7 @@ use App\Http\Resources\MovieResource;
 use App\Http\Resources\ReviewResource;
 use App\Http\Resources\TagResource;
 use App\Models\Movie;
+use App\Services\CuratorReviewService;
 use App\Services\MovieFilterService;
 use App\Support\UserReviewEnrichment;
 use Illuminate\Http\Request;
@@ -17,7 +18,8 @@ use Inertia\Response;
 class MovieController extends Controller
 {
     public function __construct(
-        protected MovieFilterService $filterService
+        protected MovieFilterService $filterService,
+        protected CuratorReviewService $curatorReviewService,
     ) {}
 
     public function index(Request $request): Response
@@ -186,10 +188,13 @@ class MovieController extends Controller
             $reviewsPayload['curator_review'] = (new ReviewResource($curatorReview))->resolve(request());
         }
 
+        $fsCuratorReview = $this->curatorReviewService->forMovie($movie->slug);
+
         return Inertia::render('Movies/Show', [
             'movie' => (new MovieResource($movie))->resolve(request()),
             'relatedMovies' => array_values(MovieResource::collection($relatedMovies)->resolve(request())),
             'reviews' => $reviewsPayload,
+            'curatorReview' => $fsCuratorReview?->toArray(),
         ]);
     }
 }

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { AppPageProps, Movie, MovieReviewsData } from '@/types';
+import type {
+    AppPageProps,
+    FilesystemCuratorReview,
+    Movie,
+    MovieReviewsData,
+} from '@/types';
 
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, ArrowRight, Check, Play, Plus } from 'lucide-vue-next';
@@ -13,6 +18,7 @@ import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
+import CuratorReviewComponent from '@/components/reviews/CuratorReview.vue';
 import { Button } from '@/components/ui/button';
 import UpcomingBadge from '@/components/UpcomingBadge.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
@@ -29,12 +35,14 @@ interface Props {
     movie: Movie;
     relatedMovies: Movie[];
     reviews?: MovieReviewsData;
+    curatorReview?: FilesystemCuratorReview | null;
 }
 
 interface PageProps extends AppPageProps {
     movie: Movie;
     relatedMovies: Movie[];
     reviews?: MovieReviewsData;
+    curatorReview?: FilesystemCuratorReview | null;
 }
 
 const props = defineProps<Props>();
@@ -60,6 +68,8 @@ const reviewsData = computed(
 const hasCuratorReview = computed(() =>
     Boolean(reviewsData.value.curator_review),
 );
+
+const hasFilesystemCuratorReview = computed(() => Boolean(props.curatorReview));
 
 const canWriteReview = computed(
     () => auth.user && !reviewsData.value.user_review,
@@ -751,6 +761,16 @@ const jsonLdBreadcrumb = computed(() =>
         <PublicSection id="reviews" spacing="md">
             <PublicContainer class="flex flex-col gap-6">
                 <SectionHeader title="Reviews" :level="2" />
+
+                <!-- Filesystem curator review (editorial) -->
+                <div
+                    v-if="hasFilesystemCuratorReview && curatorReview"
+                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                    role="region"
+                    aria-label="Editorial review"
+                >
+                    <CuratorReviewComponent :review="curatorReview" />
+                </div>
 
                 <!-- One-line summary when only curator review -->
                 <div

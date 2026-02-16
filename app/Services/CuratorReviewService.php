@@ -76,12 +76,28 @@ final class CuratorReviewService
         return $review;
     }
 
+    /**
+     * Resolve the review file path for a movie slug.
+     *
+     * Tries exact slug first, then base slug when the movie slug has a year suffix
+     * (e.g. gallipoli-1981 → gallipoli-1981.md, then gallipoli.md). This allows
+     * review files named after the base title to match movies whose slugs include
+     * the year for uniqueness (TMDB import uses year when base slug is taken).
+     */
     private function resolveFilePath(string $slug): ?string
     {
         $path = $this->reviewsPath.'/'.$slug.'.md';
 
         if (file_exists($path)) {
             return $path;
+        }
+
+        if (preg_match('/^(.+)-(\d{4})$/', $slug, $matches)) {
+            $baseSlug = $matches[1];
+            $basePath = $this->reviewsPath.'/'.$baseSlug.'.md';
+            if (file_exists($basePath)) {
+                return $basePath;
+            }
         }
 
         return null;

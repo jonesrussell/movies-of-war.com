@@ -173,6 +173,18 @@ MD;
     @unlink($path);
 });
 
+it('finds review via base-slug fallback when movie slug has year suffix', function () {
+    $service = app(CuratorReviewService::class);
+
+    $result = $service->forMovie('gallipoli-1981');
+
+    expect($result)->toBeInstanceOf(CuratorReview::class);
+    expect($result->title)->toBe('Gallipoli');
+    expect($result->slug)->toBe('gallipoli-1981');
+    expect($result->year)->toBe(1981);
+    expect($result->director)->toBe('Peter Weir');
+});
+
 it('returns null for a review with missing required frontmatter', function () {
     $reviewContent = <<<'MD'
 ---

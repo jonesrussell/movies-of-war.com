@@ -57,7 +57,9 @@ import { useViewMode } from '@/composables/use-view-mode';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 /** Tags may be a plain array or a wrapped object { data: Tag[] } from API resource. */
-function normalizeFilterTags(tags: Tag[] | { data?: Tag[] } | undefined): Tag[] {
+function normalizeFilterTags(
+    tags: Tag[] | { data?: Tag[] } | undefined,
+): Tag[] {
     if (Array.isArray(tags)) {
         return tags;
     }
@@ -280,8 +282,8 @@ const activeChips = computed<Chip[]>(() => {
     }
     if (selectedTag.value) {
         const tagName =
-            filterTags.value.find((t) => t.slug === selectedTag.value)
-                ?.name ?? selectedTag.value;
+            filterTags.value.find((t) => t.slug === selectedTag.value)?.name ??
+            selectedTag.value;
         chips.push({ key: 'tag', label: `Tag: ${tagName}` });
     }
 

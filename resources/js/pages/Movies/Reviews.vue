@@ -237,6 +237,32 @@ const loginUrl = computed(
                                 :movie-slug="movie.slug"
                                 empty-message="No reviews yet. Be the first to share your thoughts!"
                             />
+                            <!-- Write a review directly below All reviews -->
+                            <div
+                                v-if="showWriteReviewSection"
+                                class="mt-6 space-y-4"
+                            >
+                                <Button
+                                    v-if="!showReviewForm"
+                                    variant="outline"
+                                    class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white focus-visible:ring-red-500"
+                                    @click="showReviewForm = true"
+                                >
+                                    Write a review
+                                </Button>
+                                <div
+                                    v-else
+                                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                                >
+                                    <h2 class="mb-4 text-lg font-semibold text-white">
+                                        Write a review
+                                    </h2>
+                                    <ReviewForm
+                                        :movie="movie"
+                                        :existing-review="null"
+                                    />
+                                </div>
+                            </div>
                         </template>
                     </div>
 
@@ -356,8 +382,11 @@ const loginUrl = computed(
                     />
                 </div>
 
-                <!-- Write review (authenticated only; hidden when only curator + no user reviews, CTA handles it) -->
-                <div v-if="showWriteReviewSection" class="space-y-4">
+                <!-- Write review below "More reviews" when curator present (no-curator case has it in main column below All reviews) -->
+                <div
+                    v-if="showWriteReviewSection && hasCuratorReview"
+                    class="space-y-4"
+                >
                     <Button
                         v-if="!showReviewForm"
                         variant="outline"

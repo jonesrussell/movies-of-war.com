@@ -52,6 +52,7 @@ onMounted(() => {
         <div
             ref="reviewEl"
             class="review-content prose prose-lg leading-relaxed break-words text-zinc-300 prose-neutral dark:prose-invert prose-headings:text-white prose-p:text-zinc-300 prose-a:text-red-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-hr:border-zinc-700"
+            <!-- eslint-disable-next-line vue/no-v-html -- curator content is sanitized server-side -->
             v-html="review.content_html"
         />
     </div>

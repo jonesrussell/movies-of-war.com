@@ -56,11 +56,19 @@ import { useInfiniteScroll } from '@/composables/use-infinite-scroll';
 import { useViewMode } from '@/composables/use-view-mode';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
+/** Tags may be a plain array or a wrapped object { data: Tag[] } from API resource. */
+function normalizeFilterTags(tags: Tag[] | { data?: Tag[] } | undefined): Tag[] {
+    if (Array.isArray(tags)) {
+        return tags;
+    }
+    return tags?.data ?? [];
+}
+
 interface Props {
     filters: {
         conflicts: string[];
         countries: string[];
-        tags: Tag[];
+        tags: Tag[] | { data?: Tag[] };
         years: number[];
     };
     movies: PaginatedMovies & { watchlisted_ids?: number[] };
@@ -68,6 +76,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const filterTags = computed(() => normalizeFilterTags(props.filters.tags));
 const page = usePage();
 const appUrl = computed(() => (page.props.appUrl as string) ?? '');
 const canonicalUrl = computed(() =>
@@ -271,7 +280,7 @@ const activeChips = computed<Chip[]>(() => {
     }
     if (selectedTag.value) {
         const tagName =
-            props.filters.tags.find((t) => t.slug === selectedTag.value)
+            filterTags.value.find((t) => t.slug === selectedTag.value)
                 ?.name ?? selectedTag.value;
         chips.push({ key: 'tag', label: `Tag: ${tagName}` });
     }
@@ -610,7 +619,7 @@ function cardEnterStyle(index: number) {
                                         :years="filters.years"
                                         :countries="filters.countries"
                                         :conflicts="filters.conflicts"
-                                        :tags="filters.tags"
+                                        :tags="filterTags"
                                         :year="selectedYear"
                                         :country="selectedCountry"
                                         :conflict="selectedConflict"
@@ -661,7 +670,7 @@ function cardEnterStyle(index: number) {
                         :years="filters.years"
                         :countries="filters.countries"
                         :conflicts="filters.conflicts"
-                        :tags="filters.tags"
+                        :tags="filterTags"
                         :year="selectedYear"
                         :country="selectedCountry"
                         :conflict="selectedConflict"

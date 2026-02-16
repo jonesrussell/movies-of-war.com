@@ -1,0 +1,85 @@
+# movies-of-war.com - included via import in main /etc/caddy/Caddyfile
+# Deploy path: ~/movies-of-war.com, current release: ~/movies-of-war.com/current
+
+movies-of-war.com {
+  root * /home/deployer/movies-of-war.com/current/public
+
+  encode gzip zstd
+
+  @build {
+    path /build/*
+  }
+  handle @build {
+    header Cache-Control "public, max-age=31536000, immutable"
+    file_server
+  }
+
+  @images {
+    path /images/*
+  }
+  handle @images {
+    header Cache-Control "public, max-age=31536000, immutable"
+    file_server
+  }
+
+  @png {
+    path *.png
+  }
+  handle @png {
+    header Cache-Control "public, max-age=31536000, immutable"
+    file_server
+  }
+
+  @ico {
+    path *.ico
+  }
+  handle @ico {
+    header Cache-Control "public, max-age=31536000, immutable"
+    file_server
+  }
+
+  @svg {
+    path *.svg
+  }
+  handle @svg {
+    header Cache-Control "public, max-age=31536000, immutable"
+    file_server
+  }
+
+  @webmanifest {
+    path *.webmanifest
+  }
+  handle @webmanifest {
+    header Cache-Control "public, max-age=86400"
+    file_server
+  }
+
+  @robots {
+    path /robots.txt
+  }
+  handle @robots {
+    header Cache-Control "public, max-age=3600"
+    file_server
+  }
+
+  file_server
+  php_fastcgi * unix//run/php/php8.4-fpm.sock {
+    resolve_root_symlink
+  }
+
+  log {
+    output file /home/deployer/movies-of-war.com/log/access.log {
+      mode 0644
+    }
+  }
+
+  handle_errors {
+    @404 {
+      expression {http.error.status_code} == 404
+    }
+    rewrite @404 /404.html
+    file_server {
+      root /var/deployer
+    }
+  }
+}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AppPageProps, Movie } from '@/types';
+import type { AppPageProps, FilesystemCuratorReview, Movie } from '@/types';
 import type { PaginationMeta, Review } from '@/types/models';
 
 import { Head, Link, usePage } from '@inertiajs/vue3';
@@ -12,6 +12,7 @@ import MovieFacts from '@/components/public/MovieFacts.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
 import SectionHeader from '@/components/public/SectionHeader.vue';
+import CuratorReviewComponent from '@/components/reviews/CuratorReview.vue';
 import ReviewCard from '@/components/reviews/ReviewCard.vue';
 import ReviewForm from '@/components/reviews/ReviewForm.vue';
 import ReviewList from '@/components/reviews/ReviewList.vue';
@@ -22,6 +23,7 @@ import { login, register } from '@/routes';
 interface Props {
     movie: Movie;
     curator_review?: Review | null;
+    curatorReview?: FilesystemCuratorReview | null;
     reviews: {
         data: Review[];
         meta: PaginationMeta;
@@ -91,7 +93,13 @@ const jsonLdBreadcrumb = computed(() =>
     }),
 );
 
-const hasCuratorReview = computed(() => Boolean(props.curator_review));
+const hasFilesystemCuratorReview = computed(
+    () => Boolean(props.curatorReview),
+);
+const hasDbCuratorReview = computed(() => Boolean(props.curator_review));
+const hasCuratorReview = computed(
+    () => hasFilesystemCuratorReview.value || hasDbCuratorReview.value,
+);
 const hasUserReviews = computed(() => (props.reviews?.data?.length ?? 0) > 0);
 const hasNoReviews = computed(
     () => !hasCuratorReview.value && (props.reviews?.data?.length ?? 0) === 0,
@@ -201,9 +209,25 @@ const loginUrl = computed(
                             </p>
                         </div>
 
-                        <!-- Curator review (featured; first content after poster on mobile, main column on desktop) -->
+                        <!-- Filesystem curator review (editorial from markdown) -->
                         <div
-                            v-if="hasCuratorReview && curator_review"
+                            v-if="hasFilesystemCuratorReview && curatorReview"
+                            class="mt-6 space-y-3 lg:mt-0"
+                            role="region"
+                            aria-label="Editorial review"
+                        >
+                            <div
+                                class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                            >
+                                <CuratorReviewComponent
+                                    :review="curatorReview"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- DB curator review (when no filesystem review) -->
+                        <div
+                            v-else-if="hasDbCuratorReview && curator_review"
                             class="mt-6 space-y-3 lg:mt-0"
                             role="region"
                             aria-label="Curator's review"

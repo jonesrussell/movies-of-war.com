@@ -17,8 +17,42 @@ test('guest can view reviews index for a published movie', function () {
         ->component('Movies/Reviews')
         ->has('movie')
         ->has('curator_review')
+        ->has('curatorReview')
         ->has('reviews')
     );
+});
+
+test('reviews index includes filesystem curator review when markdown file exists', function () {
+    $reviewContent = <<<'MD'
+---
+title: "FS Review Movie"
+year: 2020
+rating: 3.5
+director: "Test Director"
+starring: ["Actor One"]
+runtime: 90
+---
+
+A filesystem curator review.
+MD;
+
+    $path = resource_path('reviews/fs-review-reviews-test.md');
+    file_put_contents($path, $reviewContent);
+
+    $movie = Movie::factory()->published()->create(['slug' => 'fs-review-reviews-test']);
+
+    $response = $this->get(route('movies.reviews.index', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Reviews')
+        ->has('curatorReview')
+        ->where('curatorReview.title', 'FS Review Movie')
+        ->where('curatorReview.rating', 3.5)
+        ->where('curatorReview.director', 'Test Director')
+    );
+
+    @unlink($path);
 });
 
 test('reviews index includes curator_review and excludes it from paginated list when curator configured', function () {

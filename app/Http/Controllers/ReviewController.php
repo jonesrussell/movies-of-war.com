@@ -10,6 +10,7 @@ use App\Http\Resources\MovieResource;
 use App\Http\Resources\ReviewResource;
 use App\Models\Movie;
 use App\Models\Review;
+use App\Services\CuratorReviewService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,6 +18,10 @@ use Inertia\Response;
 
 class ReviewController extends Controller
 {
+    public function __construct(
+        private readonly CuratorReviewService $curatorReviewService,
+    ) {}
+
     public function myReviews(Request $request): Response
     {
         $reviews = $request->user()
@@ -64,11 +69,14 @@ class ReviewController extends Controller
 
         $reviews = $query->paginate(15)->withQueryString();
 
+        $fsCuratorReview = $this->curatorReviewService->forMovie($movie->slug);
+
         return Inertia::render('Movies/Reviews', [
             'movie' => (new MovieResource($movie->load('tags')))->resolve($request),
             'curator_review' => $curatorReview !== null
                 ? (new ReviewResource($curatorReview))->resolve($request)
                 : null,
+            'curatorReview' => $fsCuratorReview?->toArray(),
             'reviews' => ReviewResource::collection($reviews),
             'queryParams' => $request->only(['show_spoilers', 'sort']),
         ]);

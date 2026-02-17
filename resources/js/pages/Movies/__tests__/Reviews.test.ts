@@ -63,6 +63,14 @@ vi.mock('@/components/public/SectionHeader.vue', () => ({
     },
 }));
 
+vi.mock('@/components/reviews/CuratorReview.vue', () => ({
+    default: {
+        name: 'CuratorReviewComponent',
+        template: '<div data-testid="curator-review">Editorial review</div>',
+        props: ['review'],
+    },
+}));
+
 vi.mock('@/components/reviews/ReviewCard.vue', () => ({
     default: {
         name: 'ReviewCard',
@@ -225,6 +233,32 @@ describe('Movies/Reviews', () => {
         const wrapper = mountReviews();
         expect(wrapper.text()).toContain('Be the first to review');
         expect(wrapper.text()).toContain('Log in to review');
+    });
+
+    it('shows filesystem curator review when curatorReview prop is passed', () => {
+        const curatorReview = {
+            title: 'Gallipoli',
+            year: 1981,
+            rating: 3,
+            director: 'Peter Weir',
+            starring: ['Mark Lee', 'Mel Gibson'],
+            runtime: 110,
+            slug: 'gallipoli',
+            has_spoilers: false,
+            content_html: '<p>Editorial content.</p>',
+            content_excerpt: 'Editorial excerpt.',
+        };
+        const wrapper = mountReviews({
+            curatorReview,
+            reviews: {
+                data: [],
+                ...defaultPagination,
+            },
+        });
+        expect(wrapper.find('[data-testid="curator-review"]').exists()).toBe(
+            true,
+        );
+        expect(wrapper.text()).toContain('Editorial review');
     });
 
     it('shows CTA block and no "More reviews" or ReviewList when only curator review', () => {

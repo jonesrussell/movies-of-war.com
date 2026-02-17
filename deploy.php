@@ -44,7 +44,7 @@ task('deploy:install_services', function (): void {
     run("mkdir -p $serviceDir");
     run("cp {{release_path}}/deploy/systemd-user/*.service $serviceDir/");
     run('systemctl --user daemon-reload');
-    run('systemctl --user enable movies-of-war-inertia-ssr.service movies-of-war-schedule-work.service');
+    run('systemctl --user enable movies-of-war-inertia-ssr.service movies-of-war-schedule-work.service movies-of-war-articles-subscribe.service');
 });
 before('deploy:symlink', 'deploy:install_services');
 
@@ -60,7 +60,7 @@ after('deploy:copy_caddyfile', 'deploy:reload_caddy');
 
 task('deploy:restart_services', function (): void {
     run('cd {{release_path}} && {{bin/php}} artisan inertia:stop-ssr || true');
-    run('systemctl --user restart movies-of-war-schedule-work.service movies-of-war-inertia-ssr.service || true');
+    run('systemctl --user restart movies-of-war-schedule-work.service movies-of-war-inertia-ssr.service movies-of-war-articles-subscribe.service || true');
 });
 after('deploy:symlink', 'deploy:restart_services');
 

@@ -1,84 +1,39 @@
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | Redis Connection Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Configure the Redis connection and channel for article ingestion
-    | (North Cloud content platform).
-    |
-    */
+    'migrations' => [
+        'enabled' => false,
+    ],
+
     'redis' => [
-        'connection' => env('REDIS_ARTICLES_CONNECTION', 'default'),
-        'channel' => env('REDIS_ARTICLES_CHANNEL', 'articles:war'),
+        'connection' => env('NORTHCLOUD_REDIS_CONNECTION', env('REDIS_ARTICLES_CONNECTION', 'default')),
+        'channel' => env('NORTHCLOUD_CHANNEL', env('REDIS_ARTICLES_CHANNEL', 'articles:war')),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Quality Filtering
-    |--------------------------------------------------------------------------
-    |
-    | Filter articles based on quality score if enabled.
-    |
-    */
     'quality' => [
-        'min_score' => env('ARTICLES_MIN_QUALITY_SCORE', 70),
-        'enabled' => env('ARTICLES_QUALITY_FILTER', true),
+        'min_score' => (int) env('NORTHCLOUD_MIN_QUALITY_SCORE', 70),
+        'enabled' => (bool) env('NORTHCLOUD_QUALITY_FILTER', true),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Model Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Configure which models the package should use. Override these in your
-    | app's published config to use your custom models.
-    |
-    */
     'models' => [
         'article' => \App\Models\WarArticle::class,
         'news_source' => \JonesRussell\NorthcloudLaravel\Models\NewsSource::class,
         'tag' => \JonesRussell\NorthcloudLaravel\Models\Tag::class,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Processing Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Configure how articles are processed after being received.
-    |
-    */
     'processing' => [
         'processor' => \JonesRussell\NorthcloudLaravel\Services\ArticleIngestionService::class,
-        'sync' => env('ARTICLES_PROCESS_SYNC', true), // Sync vs queued processing
+        'sync' => (bool) env('NORTHCLOUD_PROCESS_SYNC', true),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Content Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Configure content sanitization and processing rules.
-    |
-    */
     'content' => [
         'allowed_tags' => ['p', 'br', 'a', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
         'max_excerpt_length' => 500,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Tag Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Configure tag behavior and types.
-    |
-    */
     'tags' => [
         'default_type' => 'theme',
         'auto_create' => true,
+        'allowed' => [],
     ],
 ];

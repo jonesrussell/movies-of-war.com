@@ -76,4 +76,4 @@ after('deploy:failed', 'deploy:unlock');
 // Disable view caching — Inertia renders views client-side and artisan:view:cache
 // tries to connect to the SSR server which isn't running during deploy.
 task('artisan:view:cache', function (): void {});
-before('deploy:symlink', 'artisan:migrate');
+// artisan:migrate is already run once by recipe/laravel.php (in the main deploy task list).

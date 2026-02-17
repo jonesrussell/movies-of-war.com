@@ -4,6 +4,7 @@ use App\Http\Resources\MovieResource;
 use App\Http\Resources\ReviewResource;
 use App\Models\FeaturedSlot;
 use App\Models\Movie;
+use App\Services\CuratorReviewService;
 use App\Support\UserReviewEnrichment;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,22 +26,32 @@ Route::get('/', function () {
     $pickOfWeekMovie = $pickOfWeekSlot?->movie;
     $pickOfWeekReview = null;
     if ($pickOfWeekMovie) {
-        $curatorUserId = config('app.curator_user_id');
-        $curatorReview = null;
-        if ($curatorUserId > 0) {
-            $curatorReview = $pickOfWeekMovie->reviews()
-                ->where('user_id', $curatorUserId)
-                ->published()
-                ->first();
-        }
-        if ($curatorReview === null) {
-            $curatorReview = $pickOfWeekMovie->reviews()
-                ->published()
-                ->orderByDesc('created_at')
-                ->first();
-        }
-        if ($curatorReview !== null) {
-            $pickOfWeekReview = (new ReviewResource($curatorReview))->resolve(request());
+        $curatorReviewService = app(CuratorReviewService::class);
+        $fsReview = $curatorReviewService->forMovie($pickOfWeekMovie->slug);
+
+        if ($fsReview !== null) {
+            $pickOfWeekReview = [
+                'rating' => $fsReview->rating,
+                'content_excerpt' => $fsReview->contentExcerpt,
+            ];
+        } else {
+            $curatorUserId = config('app.curator_user_id');
+            $curatorReview = null;
+            if ($curatorUserId > 0) {
+                $curatorReview = $pickOfWeekMovie->reviews()
+                    ->where('user_id', $curatorUserId)
+                    ->published()
+                    ->first();
+            }
+            if ($curatorReview === null) {
+                $curatorReview = $pickOfWeekMovie->reviews()
+                    ->published()
+                    ->orderByDesc('created_at')
+                    ->first();
+            }
+            if ($curatorReview !== null) {
+                $pickOfWeekReview = (new ReviewResource($curatorReview))->resolve(request());
+            }
         }
     }
 

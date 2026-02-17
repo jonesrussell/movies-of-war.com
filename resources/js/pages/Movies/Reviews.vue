@@ -93,9 +93,7 @@ const jsonLdBreadcrumb = computed(() =>
     }),
 );
 
-const hasFilesystemCuratorReview = computed(
-    () => Boolean(props.curatorReview),
-);
+const hasFilesystemCuratorReview = computed(() => Boolean(props.curatorReview));
 const hasDbCuratorReview = computed(() => Boolean(props.curator_review));
 const hasCuratorReview = computed(
     () => hasFilesystemCuratorReview.value || hasDbCuratorReview.value,

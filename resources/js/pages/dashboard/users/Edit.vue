@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { Head, router } from '@inertiajs/vue3';
+import { AlertTriangle, ArrowLeft, Trash2 } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+
 import DeleteConfirmDialog from '@/components/admin/DeleteConfirmDialog.vue';
 import UserForm from '@/components/admin/UserForm.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, router } from '@inertiajs/vue3';
-import { AlertTriangle, ArrowLeft, Trash2 } from 'lucide-vue-next';
-import { ref } from 'vue';
 
 interface FieldDefinition {
     name: string;
@@ -36,11 +37,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const routePrefix = '/dashboard/users';
-const breadcrumbs = [
+const breadcrumbs = computed(() => [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Users', href: routePrefix },
     { title: 'Edit', href: `${routePrefix}/${props.user.id}/edit` },
-];
+]);
 
 const initFormData = (): Record<string, unknown> => {
     const data: Record<string, unknown> = {};
@@ -69,22 +70,34 @@ const handleSubmit = () => {
 
     router.patch(`${routePrefix}/${props.user.id}`, form.value, {
         preserveScroll: true,
-        onError: (err) => { errors.value = err; },
-        onFinish: () => { processing.value = false; },
+        onError: (err) => {
+            errors.value = err;
+        },
+        onFinish: () => {
+            processing.value = false;
+        },
     });
 };
 
 const confirmDelete = () => {
     isDeleting.value = true;
     router.delete(`${routePrefix}/${props.user.id}`, {
-        onSuccess: () => { router.get(routePrefix); },
-        onFinish: () => { isDeleting.value = false; },
+        onSuccess: () => {
+            router.get(routePrefix);
+        },
+        onFinish: () => {
+            isDeleting.value = false;
+        },
     });
 };
 
 const formatDate = (date: string) => {
     return new Date(date).toLocaleString('en-US', {
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
     });
 };
 </script>
@@ -93,18 +106,32 @@ const formatDate = (date: string) => {
     <Head :title="`Edit: ${user.name} - Dashboard`" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6">
+        <div
+            class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6"
+        >
             <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
-                    <Button variant="ghost" size="sm" as="a" :href="routePrefix" class="mb-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        as="a"
+                        :href="routePrefix"
+                        class="mb-2"
+                    >
                         <ArrowLeft class="mr-2 h-4 w-4" />
                         Back to Users
                     </Button>
                     <h1 class="text-3xl font-bold tracking-tight">Edit User</h1>
-                    <p class="mt-1 text-muted-foreground">Update user details</p>
+                    <p class="mt-1 text-muted-foreground">
+                        Update user details
+                    </p>
                 </div>
-                <Button v-if="!isSelf" variant="destructive" @click="deleteDialogOpen = true">
+                <Button
+                    v-if="!isSelf"
+                    variant="destructive"
+                    @click="deleteDialogOpen = true"
+                >
                     <Trash2 class="mr-2 h-4 w-4" />
                     Delete User
                 </Button>
@@ -131,15 +158,23 @@ const formatDate = (date: string) => {
                     <div class="grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
                         <div>
                             <p class="text-muted-foreground">Created</p>
-                            <p class="font-medium">{{ formatDate(user.created_at) }}</p>
+                            <p class="font-medium">
+                                {{ formatDate(user.created_at) }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-muted-foreground">Last Updated</p>
-                            <p class="font-medium">{{ formatDate(user.updated_at) }}</p>
+                            <p class="font-medium">
+                                {{ formatDate(user.updated_at) }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-muted-foreground">Role</p>
-                            <Badge :variant="user.is_admin ? 'default' : 'secondary'">
+                            <Badge
+                                :variant="
+                                    user.is_admin ? 'default' : 'secondary'
+                                "
+                            >
                                 {{ user.is_admin ? 'Admin' : 'User' }}
                             </Badge>
                         </div>
@@ -158,7 +193,13 @@ const formatDate = (date: string) => {
                 />
 
                 <div class="mt-6 flex gap-3 border-t pt-4">
-                    <Button type="button" variant="outline" as="a" :href="routePrefix" :disabled="processing">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        as="a"
+                        :href="routePrefix"
+                        :disabled="processing"
+                    >
                         Cancel
                     </Button>
                     <Button type="submit" :disabled="processing">

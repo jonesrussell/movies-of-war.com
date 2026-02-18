@@ -5,7 +5,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { Clock, Search as SearchIcon } from 'lucide-vue-next';
 import { ref, toRef } from 'vue';
 
-import AppSidebarLayout from '@/layouts/AppSidebarLayout.vue';
+import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {
     articles: {
@@ -52,7 +52,7 @@ const formatDate = (dateStr: string | null): string => {
 </script>
 
 <template>
-    <AppSidebarLayout>
+    <PublicLayout>
         <Head title="Articles" />
 
         <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -176,5 +176,5 @@ const formatDate = (dateStr: string | null): string => {
                 </template>
             </nav>
         </div>
-    </AppSidebarLayout>
+    </PublicLayout>
 </template>

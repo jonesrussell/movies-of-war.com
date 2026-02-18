@@ -4,7 +4,7 @@ import type { Article } from '@/types/models';
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Calendar, ExternalLink, Eye, User } from 'lucide-vue-next';
 
-import AppSidebarLayout from '@/layouts/AppSidebarLayout.vue';
+import PublicLayout from '@/layouts/PublicLayout.vue';
 
 interface Props {
     article: Article;
@@ -23,7 +23,7 @@ const formatDate = (dateStr: string | null): string => {
 </script>
 
 <template>
-    <AppSidebarLayout>
+    <PublicLayout>
         <Head :title="article.title" />
 
         <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
@@ -131,5 +131,5 @@ const formatDate = (dateStr: string | null): string => {
                 </a>
             </div>
         </div>
-    </AppSidebarLayout>
+    </PublicLayout>
 </template>

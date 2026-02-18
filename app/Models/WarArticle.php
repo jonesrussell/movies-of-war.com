@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use JonesRussell\NorthCloud\Models\Article as BaseArticle;
 
 class WarArticle extends BaseArticle
@@ -30,12 +29,11 @@ class WarArticle extends BaseArticle
         'view_count',
         'is_featured',
         'war_era',
+        'articleable_type',
+        'articleable_id',
     ];
 
-    /**
-     * Override tags relationship to use article_tag table.
-     */
-    public function tags(): BelongsToMany
+    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         $tagModel = config('northcloud.models.tag');
 
@@ -44,29 +42,8 @@ class WarArticle extends BaseArticle
             ->withPivot('confidence');
     }
 
-    /**
-     * Many-to-many relationship with movies.
-     */
-    public function movies(): BelongsToMany
-    {
-        return $this->belongsToMany(Movie::class, 'article_movie', 'article_id', 'movie_id')
-            ->withTimestamps()
-            ->withPivot('confidence');
-    }
-
-    /**
-     * Scope articles by war era.
-     */
     public function scopeWarEra($query, string $era)
     {
         return $query->where('war_era', $era);
-    }
-
-    /**
-     * Get articles with related movies.
-     */
-    public function scopeWithMovies($query)
-    {
-        return $query->with('movies');
     }
 }

@@ -58,6 +58,32 @@ export interface Movie {
     user_review?: UserReviewSummary | null;
 }
 
+export interface Article {
+    id: number;
+    title: string;
+    slug: string;
+    excerpt: string | null;
+    content: string | null;
+    url: string;
+    image_url: string | null;
+    author: string | null;
+    status: string;
+    published_at: string | null;
+    view_count: number;
+    is_featured: boolean;
+    news_source?: {
+        id: number;
+        name: string;
+        slug: string;
+    };
+    tags?: Tag[];
+    articleable_type: string | null;
+    articleable_id: number | null;
+    articleable?: Movie | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface FilmographyEntry {
     movie_id: number;
     movie_title: string;

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use JonesRussell\NorthcloudLaravel\Models\Article as BaseArticle;
+use JonesRussell\NorthCloud\Models\Article as BaseArticle;
 
 class WarArticle extends BaseArticle
 {

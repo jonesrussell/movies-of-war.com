@@ -17,12 +17,12 @@ return [
 
     'models' => [
         'article' => \App\Models\WarArticle::class,
-        'news_source' => \JonesRussell\NorthcloudLaravel\Models\NewsSource::class,
-        'tag' => \JonesRussell\NorthcloudLaravel\Models\Tag::class,
+        'news_source' => \JonesRussell\NorthCloud\Models\NewsSource::class,
+        'tag' => \JonesRussell\NorthCloud\Models\Tag::class,
     ],
 
     'processing' => [
-        'processor' => \JonesRussell\NorthcloudLaravel\Services\ArticleIngestionService::class,
+        'processor' => \JonesRussell\NorthCloud\Services\ArticleIngestionService::class,
         'sync' => (bool) env('NORTHCLOUD_PROCESS_SYNC', true),
     ],
 
@@ -35,5 +35,16 @@ return [
         'default_type' => 'theme',
         'auto_create' => true,
         'allowed' => [],
+    ],
+
+    'articleable' => [
+        'enabled' => true,
+        'models' => [
+            \App\Models\Movie::class => [
+                'label' => 'Movie',
+                'display' => 'title',
+                'search' => ['title'],
+            ],
+        ],
     ],
 ];

@@ -190,11 +190,19 @@ class MovieController extends Controller
 
         $fsCuratorReview = $this->curatorReviewService->forMovie($movie->slug);
 
+        $relatedArticles = $movie->articles()
+            ->published()
+            ->with('newsSource')
+            ->latest('published_at')
+            ->limit(5)
+            ->get();
+
         return Inertia::render('Movies/Show', [
             'movie' => (new MovieResource($movie))->resolve(request()),
             'relatedMovies' => array_values(MovieResource::collection($relatedMovies)->resolve(request())),
             'reviews' => $reviewsPayload,
             'curatorReview' => $fsCuratorReview?->toArray(),
+            'relatedArticles' => $relatedArticles,
         ]);
     }
 }

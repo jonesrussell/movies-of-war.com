@@ -15,6 +15,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Public movie routes after admin so /movies/{slug} does not conflict with admin resource
 require __DIR__.'/web/movies.php';
 
+require __DIR__.'/web/articles.php';
+
 require __DIR__.'/web/people.php';
 
 require __DIR__.'/web/misc.php';

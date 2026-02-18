@@ -146,3 +146,58 @@ test('movie show page has null curatorReview when no review file exists', functi
         ->where('curatorReview', null)
     );
 });
+
+test('movie show page includes related articles', function () {
+    $source = \JonesRussell\NorthCloud\Models\NewsSource::create([
+        'name' => 'Test Source',
+        'slug' => 'test-source-rel',
+        'url' => 'https://example.com',
+    ]);
+
+    $movie = Movie::factory()->published()->create(['slug' => 'movie-with-articles']);
+
+    \App\Models\WarArticle::create([
+        'news_source_id' => $source->id,
+        'title' => 'Analysis of Movie With Articles',
+        'slug' => 'analysis-mwa',
+        'url' => 'https://example.com/analysis',
+        'content' => 'Deep analysis content.',
+        'status' => 'published',
+        'published_at' => now(),
+        'articleable_type' => Movie::class,
+        'articleable_id' => $movie->id,
+    ]);
+
+    \App\Models\WarArticle::create([
+        'news_source_id' => $source->id,
+        'title' => 'Draft Article About Movie',
+        'slug' => 'draft-mwa',
+        'url' => 'https://example.com/draft',
+        'content' => 'Draft content.',
+        'status' => 'draft',
+        'published_at' => null,
+        'articleable_type' => Movie::class,
+        'articleable_id' => $movie->id,
+    ]);
+
+    $response = $this->get(route('movies.show', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Show')
+        ->has('relatedArticles', 1)
+        ->where('relatedArticles.0.title', 'Analysis of Movie With Articles')
+    );
+});
+
+test('movie show page works when no related articles exist', function () {
+    $movie = Movie::factory()->published()->create(['slug' => 'movie-no-articles']);
+
+    $response = $this->get(route('movies.show', $movie->slug));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Movies/Show')
+        ->has('relatedArticles', 0)
+    );
+});

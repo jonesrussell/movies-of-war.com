@@ -13,6 +13,7 @@ import {
     Folder,
     LayoutGrid,
     MessageSquare,
+    Package,
     Reply,
     Search,
     Settings,
@@ -34,6 +35,7 @@ import {
     SidebarMenuItem,
     SidebarRail,
 } from '@/components/ui/sidebar';
+import { useNorthcloudNav } from '@/composables/use-northcloud-nav';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 
@@ -41,6 +43,7 @@ import AppLogo from './AppLogo.vue';
 
 const page = usePage();
 const auth = page.props.auth as { user?: User };
+const { items: northcloudItems } = useNorthcloudNav();
 
 const mainNavItems = computed<NavItem[]>(() => [
     {
@@ -76,6 +79,15 @@ const mainNavItems = computed<NavItem[]>(() => [
                   href: '/dashboard/reviews',
                   icon: BookOpen,
               },
+              ...(northcloudItems.value.length > 0
+                  ? [
+                        {
+                            title: 'NorthCloud',
+                            icon: Package,
+                            items: northcloudItems.value,
+                        },
+                    ]
+                  : []),
               {
                   title: 'TMDB',
                   icon: Database,

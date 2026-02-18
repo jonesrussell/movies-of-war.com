@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type {
     AppPageProps,
+    Article,
     FilesystemCuratorReview,
     Movie,
     MovieReviewsData,
@@ -36,6 +37,7 @@ interface Props {
     relatedMovies: Movie[];
     reviews?: MovieReviewsData;
     curatorReview?: FilesystemCuratorReview | null;
+    relatedArticles?: Article[];
 }
 
 interface PageProps extends AppPageProps {
@@ -43,6 +45,7 @@ interface PageProps extends AppPageProps {
     relatedMovies: Movie[];
     reviews?: MovieReviewsData;
     curatorReview?: FilesystemCuratorReview | null;
+    relatedArticles?: Article[];
 }
 
 const props = defineProps<Props>();
@@ -906,6 +909,48 @@ const jsonLdBreadcrumb = computed(() =>
                         class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-800 hover:text-white"
                     >
                         Write a review
+                    </Link>
+                </div>
+            </PublicContainer>
+        </PublicSection>
+
+        <!-- Related Articles -->
+        <PublicSection
+            v-if="relatedArticles && relatedArticles.length > 0"
+            spacing="md"
+        >
+            <PublicContainer class="flex flex-col gap-6">
+                <SectionHeader title="Related Articles" :level="2" />
+                <div class="space-y-4">
+                    <Link
+                        v-for="article in relatedArticles"
+                        :key="article.id"
+                        :href="`/articles/${article.slug}`"
+                        class="block rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700"
+                    >
+                        <h3 class="font-medium text-white">
+                            {{ article.title }}
+                        </h3>
+                        <p
+                            v-if="article.excerpt"
+                            class="mt-1 line-clamp-2 text-sm text-zinc-400"
+                        >
+                            {{ article.excerpt }}
+                        </p>
+                        <div
+                            class="mt-2 flex items-center gap-2 text-xs text-zinc-500"
+                        >
+                            <span v-if="article.published_at">
+                                {{
+                                    new Date(
+                                        article.published_at,
+                                    ).toLocaleDateString()
+                                }}
+                            </span>
+                            <span v-if="article.news_source">
+                                {{ article.news_source.name }}
+                            </span>
+                        </div>
                     </Link>
                 </div>
             </PublicContainer>

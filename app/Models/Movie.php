@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 
 /**
@@ -117,11 +118,12 @@ class Movie extends Model
         return $this->belongsToMany(User::class, 'watchlists')->withTimestamps();
     }
 
-    public function articles(): BelongsToMany
+    public function articles(): MorphMany
     {
-        return $this->belongsToMany(WarArticle::class, 'article_movie')
-            ->withTimestamps()
-            ->withPivot('confidence');
+        return $this->morphMany(
+            config('northcloud.models.article', \JonesRussell\NorthCloud\Models\Article::class),
+            'articleable'
+        );
     }
 
     public function people(): BelongsToMany

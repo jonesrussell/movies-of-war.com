@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "713bf94d49c2b3baf15f2293fe9db2d3",
+    "content-hash": "9ccd307e59847dbe3f6b16401b7cd949",
     "packages": [
         {
             "name": "atymic/twitter",
@@ -1587,16 +1587,16 @@
         },
         {
             "name": "jonesrussell/northcloud-laravel",
-            "version": "0.4.0",
+            "version": "0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jonesrussell/northcloud-laravel.git",
-                "reference": "d1aa9988429ca8dd832ee2f9a45c6e33ecd88cad"
+                "reference": "e87c22122e51b99e1d70ba175bbd5987548d922f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jonesrussell/northcloud-laravel/zipball/d1aa9988429ca8dd832ee2f9a45c6e33ecd88cad",
-                "reference": "d1aa9988429ca8dd832ee2f9a45c6e33ecd88cad",
+                "url": "https://api.github.com/repos/jonesrussell/northcloud-laravel/zipball/e87c22122e51b99e1d70ba175bbd5987548d922f",
+                "reference": "e87c22122e51b99e1d70ba175bbd5987548d922f",
                 "shasum": ""
             },
             "require": {
@@ -1637,9 +1637,9 @@
             "description": "Shared article ingestion pipeline for North Cloud-connected Laravel sites",
             "support": {
                 "issues": "https://github.com/jonesrussell/northcloud-laravel/issues",
-                "source": "https://github.com/jonesrussell/northcloud-laravel/tree/v0.4.0"
+                "source": "https://github.com/jonesrussell/northcloud-laravel/tree/v0.5.0"
             },
-            "time": "2026-02-18T06:10:19+00:00"
+            "time": "2026-02-18T16:37:19+00:00"
         },
         {
             "name": "jonesrussell/x-suite-laravel",

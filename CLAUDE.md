@@ -65,6 +65,7 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 | **FeaturedSlot** | `belongsTo(Movie)`. Slots: `hero`, `pick_of_week`. Scopes: `active()`, `slot($type)`. |
 | **Tag** | Types: `genre`, `theme`, `era`. Used for filtering. |
 | **User** | `is_admin` flag for dashboard access. `belongsToMany(Movie, 'watchlists')`. |
+| **WarArticle** | Extends `JonesRussell\NorthCloud\Models\Article`. `morphTo(articleable)`, `belongsToMany(Tag)`, `belongsTo(NewsSource)`. Scopes: `published()`, `warEra()`. Config: `config/northcloud.php`. |
 | **XPost** | Status: `draft` → `scheduled` → `published` (or `failed`/`cancelled`). Threads via `thread_parts` JSON, media via `media_urls` JSON. 280 char limit. |
 
 ### TMDB Integration
@@ -80,6 +81,13 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 - **Command:** `tmdb:refresh-stale` – `--limit`, `--force-backfill` (null timestamps), `--force` (ignore cadence), `--dry-run`. Dispatches jobs for stale movies (cadence + max-age cap).
 - **Scheduler:** `routes/console.php` – `tmdb:refresh-stale --limit=50` runs `everyFifteenMinutes()->between('03:00', '05:00')`.
 - **Scope:** `Movie::staleForTmdbRefresh($limit, $maxAgeDays)` – cadence by `tmdb_vote_count` (popular 7d, normal 30d, obscure 90d) plus max-age cap (default 120d).
+
+### NorthCloud Package (`jonesrussell/northcloud-laravel`)
+
+- **Namespace:** `JonesRussell\NorthCloud` (NOT `JonesRussell\NorthcloudLaravel`)
+- **Config:** `config/northcloud.php` — models, navigation, articleable settings
+- **Testing gotcha:** Package factories (e.g. `NewsSourceFactory`) are NOT autoloaded in this app's test suite. Use `NewsSource::create([...])` instead of `NewsSource::factory()->create()`.
+- **Sidebar nav:** Auto-registered via `Inertia::share('northcloud.navigation', ...)` — consumed by `useNorthcloudNav` composable in `AppSidebar.vue`
 
 ### X (Twitter) Integration
 
@@ -103,8 +111,13 @@ Admin workflow: `tmdb:import` → drafts in `/dashboard` → Publish/Archive →
 
 ### Frontend Structure
 
+**Layouts** (`resources/js/layouts/`):
+- Public pages (Movies, Articles, Welcome, Watchlist): `PublicLayout` from `@/layouts/PublicLayout.vue`
+- Dashboard/Admin pages: `AppSidebarLayout` from `@/layouts/app/AppSidebarLayout.vue` (note `app/` subdirectory)
+- Auth pages (login, register): `AuthLayout` from `@/layouts/AuthLayout.vue`
+
 **Pages** (`resources/js/pages/`):
-- Public: `Welcome.vue` (homepage), `Movies/Index.vue` (browse), `Movies/Show.vue` (detail)
+- Public: `Welcome.vue` (homepage), `Movies/Index.vue` (browse), `Movies/Show.vue` (detail), `Articles/Index.vue`, `Articles/Show.vue`
 - Auth: `Dashboard.vue` (stats + admin), `Watchlist/Index.vue`
 - Admin: `Admin/*` management pages
 
@@ -124,7 +137,7 @@ interface Movie {
 ### Routes
 
 - **Entry:** `routes/web.php` – requires `routes/web/*.php` (home, movies, dashboard, watchlist, admin, misc) and `routes/settings.php`. Auth group `['auth', 'verified']` wraps dashboard, watchlist, admin; public movie routes loaded after admin to avoid slug/resource conflicts.
-- **Web split:** `routes/web/home.php` (Welcome), `routes/web/movies.php` (public index/show), `routes/web/dashboard.php`, `routes/web/watchlist.php`, `routes/web/admin.php` (admin middleware + TMDB, movies, featured slots, X), `routes/web/misc.php` (api/x-feed, /admin redirect).
+- **Web split:** `routes/web/home.php` (Welcome), `routes/web/movies.php` (public index/show), `routes/web/articles.php` (public articles index/show), `routes/web/dashboard.php`, `routes/web/watchlist.php`, `routes/web/admin.php` (admin middleware + TMDB, movies, featured slots, X), `routes/web/misc.php` (api/x-feed, /admin redirect).
 - **Public:** Movies filtered with `->published()`, featured slots with `->active()`
 - **Auth:** Dashboard, watchlist CRUD
 - **Admin:** Middleware `['auth', 'verified', 'admin']` - publish/archive, featured slots
@@ -168,6 +181,8 @@ const auth = page.props.auth as { user: any }
 **Migration order:** Featured slots and watchlists depend on movies table.
 
 **Wayfinder / lint:** Wayfinder-generated files under `resources/js/actions/**`, `resources/js/routes/**`, `resources/js/wayfinder/**` are excluded from ESLint and Prettier (see `eslint.config.js` ignores and `.prettierignore`). Do not manually edit those files; run `php artisan wayfinder:generate` after route changes.
+
+**ESLint filename convention:** `unicorn/filename-case` enforces **kebab-case** for all TS/Vue files. Use `use-northcloud-nav.ts` not `useNorthcloudNav.ts`.
 
 ===
 

@@ -91,19 +91,23 @@ const handleSubmit = (publish: boolean = false) => {
         published_at: publish
             ? (form.value.published_at as string) || new Date().toISOString()
             : isPublished.value
-              ? (form.value.published_at as string | null) ?? null
+              ? ((form.value.published_at as string | null) ?? null)
               : null,
     };
 
-    router.patch(`${routePrefix}/${props.article.id}`, data as Record<string, import('@inertiajs/core').FormDataConvertible>, {
-        preserveScroll: true,
-        onError: (err) => {
-            errors.value = err;
+    router.patch(
+        `${routePrefix}/${props.article.id}`,
+        data as Record<string, import('@inertiajs/core').FormDataConvertible>,
+        {
+            preserveScroll: true,
+            onError: (err) => {
+                errors.value = err;
+            },
+            onFinish: () => {
+                processing.value = false;
+            },
         },
-        onFinish: () => {
-            processing.value = false;
-        },
-    });
+    );
 };
 
 const handleUnpublish = () => {

@@ -190,7 +190,9 @@ const getCellValue = (article: Article, column: ColumnDefinition) => {
                     >
                         <td class="px-4 py-3">
                             <Checkbox
-                                :model-value="articleCheckedStates[article.id] ?? false"
+                                :model-value="
+                                    articleCheckedStates[article.id] ?? false
+                                "
                                 @update:model-value="
                                     () => toggleSelect(article.id)
                                 "

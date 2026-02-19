@@ -245,7 +245,12 @@ const isVisible = (field: FieldDefinition): boolean => {
                                 >
                             </Label>
                             <Select
-                                :model-value="(modelValue[field.name] as string | number | undefined) ?? ''"
+                                :model-value="
+                                    (modelValue[field.name] as
+                                        | string
+                                        | number
+                                        | undefined) ?? ''
+                                "
                                 @update:model-value="
                                     updateField(field.name, $event)
                                 "
@@ -313,7 +318,12 @@ const isVisible = (field: FieldDefinition): boolean => {
                                 >
                             </Label>
                             <Select
-                                :model-value="(modelValue[field.name] as string | number | undefined) ?? ''"
+                                :model-value="
+                                    (modelValue[field.name] as
+                                        | string
+                                        | number
+                                        | undefined) ?? ''
+                                "
                                 @update:model-value="
                                     updateField(field.name, $event)
                                 "
@@ -344,7 +354,8 @@ const isVisible = (field: FieldDefinition): boolean => {
                         <!-- Error message -->
                         <p
                             v-if="
-                                errors?.[field.name] && field.type !== 'checkbox'
+                                errors?.[field.name] &&
+                                field.type !== 'checkbox'
                             "
                             class="text-sm text-destructive"
                         >

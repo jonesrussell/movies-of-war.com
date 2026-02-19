@@ -115,7 +115,9 @@ const emit = defineEmits<{
             </label>
             <Select
                 :model-value="tag"
-                @update:model-value="emit('update:tag', $event != null ? String($event) : '')"
+                @update:model-value="
+                    emit('update:tag', $event != null ? String($event) : '')
+                "
             >
                 <SelectTrigger class="w-full">
                     <SelectValue placeholder="All tags" />

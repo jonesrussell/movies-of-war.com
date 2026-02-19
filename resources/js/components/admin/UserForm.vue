@@ -207,9 +207,9 @@ const isAdminCheckboxDisabled = (field: FieldDefinition): boolean => {
                         <!-- Error message (for non-password, non-checkbox fields) -->
                         <p
                             v-if="
-errors?.[field.name] &&
-                                    field.type !== 'checkbox' &&
-                                    field.type !== 'password'
+                                errors?.[field.name] &&
+                                field.type !== 'checkbox' &&
+                                field.type !== 'password'
                             "
                             class="text-sm text-destructive"
                         >

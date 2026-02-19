@@ -68,15 +68,19 @@ const handleSubmit = () => {
     processing.value = true;
     errors.value = {};
 
-    router.patch(`${routePrefix}/${props.user.id}`, form.value as import('@inertiajs/core').RequestPayload, {
-        preserveScroll: true,
-        onError: (err) => {
-            errors.value = err;
+    router.patch(
+        `${routePrefix}/${props.user.id}`,
+        form.value as import('@inertiajs/core').RequestPayload,
+        {
+            preserveScroll: true,
+            onError: (err) => {
+                errors.value = err;
+            },
+            onFinish: () => {
+                processing.value = false;
+            },
         },
-        onFinish: () => {
-            processing.value = false;
-        },
-    });
+    );
 };
 
 const confirmDelete = () => {

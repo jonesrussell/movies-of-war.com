@@ -94,7 +94,7 @@ async function toggleWatchlist() {
 
 <template>
     <article
-        class="group flex gap-4 rounded-xl bg-zinc-900/50 p-3 ring-1 ring-zinc-800/70 transition-all duration-200 hover:bg-zinc-900 hover:ring-zinc-700/70"
+        class="group flex gap-4 border-b border-[--intel-border] p-3 transition-colors duration-150 hover:bg-[--intel-bg-elevated]"
     >
         <!-- Poster -->
         <Link
@@ -122,10 +122,10 @@ async function toggleWatchlist() {
         <div class="flex min-w-0 flex-1 flex-col justify-between py-1">
             <div>
                 <!-- Title -->
-                <h3 class="mb-1 font-semibold text-white">
+                <h3 class="mb-1 font-semibold text-[--intel-text-primary]">
                     <Link
                         :href="`/movies/${movie.slug}`"
-                        class="transition-colors hover:text-red-500"
+                        class="transition-colors hover:text-blue-400"
                     >
                         {{ movie.title }}
                     </Link>
@@ -133,7 +133,7 @@ async function toggleWatchlist() {
 
                 <!-- Meta info -->
                 <div
-                    class="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400"
+                    class="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-muted]"
                 >
                     <span
                         v-if="movie.release_date || movie.release_year != null"
@@ -164,7 +164,7 @@ async function toggleWatchlist() {
                 <!-- Synopsis -->
                 <p
                     v-if="movie.synopsis"
-                    class="mb-2 line-clamp-2 text-sm text-zinc-400"
+                    class="mb-2 line-clamp-2 text-sm text-[--intel-text-body]"
                 >
                     {{ movie.synopsis }}
                 </p>
@@ -178,7 +178,7 @@ async function toggleWatchlist() {
                         v-for="tag in displayedTags"
                         :key="tag.id"
                         variant="secondary"
-                        class="bg-zinc-800 px-2 py-0 text-[10px] text-zinc-300"
+                        class="bg-[--intel-bg-elevated] px-2 py-0 text-[10px] text-[--intel-text-body]"
                     >
                         {{ tag.name }}
                     </Badge>
@@ -190,14 +190,14 @@ async function toggleWatchlist() {
                 <Button
                     variant="ghost"
                     size="sm"
-                    class="h-8 px-2 text-zinc-400 hover:text-white"
+                    class="h-8 px-2 text-[--intel-text-muted] hover:text-[--intel-text-primary]"
                     :disabled="isToggling"
                     @click="toggleWatchlist"
                 >
                     <Loader2 v-if="isToggling" class="size-4 animate-spin" />
                     <BookmarkCheck
                         v-else-if="isCurrentlyWatchlisted"
-                        class="size-4 text-red-500"
+                        class="size-4 text-blue-500"
                     />
                     <Bookmark v-else class="size-4" />
                 </Button>
@@ -205,7 +205,7 @@ async function toggleWatchlist() {
                 <Button
                     variant="ghost"
                     size="sm"
-                    class="h-8 px-2 text-zinc-400 hover:text-white"
+                    class="h-8 px-2 text-[--intel-text-muted] hover:text-[--intel-text-primary]"
                     @click="emit('preview')"
                 >
                     <Eye class="size-4" />

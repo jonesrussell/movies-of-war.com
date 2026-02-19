@@ -180,20 +180,21 @@ describe('Welcome', () => {
         });
     });
 
-    describe('call to action section', () => {
-        it('renders CTA section', () => {
+    describe('intel summary section', () => {
+        it('renders Intel Summary section', () => {
             const wrapper = mountWelcome();
 
-            expect(wrapper.text()).toContain('Explore the curated collection');
-            expect(wrapper.text()).toContain('Filter by conflict');
+            expect(wrapper.text()).toContain('Films Indexed');
         });
 
-        it('renders Browse All Movies link', () => {
+        it('renders Access Full Database link', () => {
             const wrapper = mountWelcome();
 
             const browseLink = wrapper
                 .findAll('a')
-                .find((a) => a.text().toLowerCase().includes('browse all'));
+                .find((a) =>
+                    a.text().toLowerCase().includes('access full database'),
+                );
             expect(browseLink).toBeDefined();
             expect(browseLink?.attributes('href')).toBe('/movies');
         });
@@ -231,8 +232,8 @@ describe('Welcome', () => {
                 4,
             );
 
-            // CTA
-            expect(wrapper.text()).toContain('Browse all movies');
+            // Intel Summary
+            expect(wrapper.text()).toContain('Access Full Database');
         });
 
         it('renders minimal page without optional content', () => {
@@ -254,8 +255,8 @@ describe('Welcome', () => {
                 0,
             );
 
-            // CTA still shows
-            expect(wrapper.text()).toContain('Browse all movies');
+            // Intel Summary still shows
+            expect(wrapper.text()).toContain('Access Full Database');
         });
     });
 });

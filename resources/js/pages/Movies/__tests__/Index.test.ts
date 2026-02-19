@@ -161,7 +161,7 @@ describe('Movies/Index', () => {
                 meta: { ...defaultPaginatedMovies.meta, total: 42 },
             };
             const wrapper = mountMoviesIndex({ movies });
-            expect(wrapper.text()).toContain('42 films');
+            expect(wrapper.text()).toContain('OF 42');
         });
     });
 
@@ -170,7 +170,9 @@ describe('Movies/Index', () => {
             const wrapper = mountMoviesIndex();
             const searchInput = wrapper.find('input[type="text"]');
             expect(searchInput.exists()).toBe(true);
-            expect(searchInput.attributes('placeholder')).toContain('Search');
+            expect(searchInput.attributes('placeholder')).toContain(
+                'SEARCH FILMS...',
+            );
         });
 
         it('displays existing search value from queryParams', () => {
@@ -201,73 +203,73 @@ describe('Movies/Index', () => {
 
             await filterButton?.trigger('click');
 
-            // Should show filter dropdowns
-            const selects = wrapper.findAll('select');
-            expect(selects.length).toBeGreaterThan(0);
+            // Should show filter panel with shadcn Select trigger buttons
+            const triggers = wrapper.findAll('[data-slot="select-trigger"]');
+            expect(triggers.length).toBeGreaterThan(0);
         });
 
-        it('renders year filter options', async () => {
+        it('renders year filter trigger', async () => {
             const wrapper = mountMoviesIndex();
             const filterButton = wrapper
                 .findAll('button')
                 .find((b) => b.text().includes('Filters'));
             await filterButton?.trigger('click');
 
-            const yearSelect = wrapper.findAll('select').find((s) => {
-                const options = s.findAll('option');
-                return options.some((o) => o.text() === 'All years');
-            });
-            expect(yearSelect).toBeDefined();
-            expect(yearSelect?.text()).toContain('2024');
-            expect(yearSelect?.text()).toContain('2023');
+            // Verify the Year label and its Select trigger exist
+            expect(wrapper.text()).toContain('Year');
+            const triggers = wrapper.findAll('[data-slot="select-trigger"]');
+            const yearTrigger = triggers.find((t) =>
+                t.text().includes('All years'),
+            );
+            expect(yearTrigger).toBeDefined();
         });
 
-        it('renders country filter options', async () => {
+        it('renders country filter trigger', async () => {
             const wrapper = mountMoviesIndex();
             const filterButton = wrapper
                 .findAll('button')
                 .find((b) => b.text().includes('Filters'));
             await filterButton?.trigger('click');
 
-            const countrySelect = wrapper.findAll('select').find((s) => {
-                const options = s.findAll('option');
-                return options.some((o) => o.text() === 'All countries');
-            });
-            expect(countrySelect).toBeDefined();
-            expect(countrySelect?.text()).toContain('USA');
-            expect(countrySelect?.text()).toContain('UK');
+            // Verify the Country label and its Select trigger exist
+            expect(wrapper.text()).toContain('Country');
+            const triggers = wrapper.findAll('[data-slot="select-trigger"]');
+            const countryTrigger = triggers.find((t) =>
+                t.text().includes('All countries'),
+            );
+            expect(countryTrigger).toBeDefined();
         });
 
-        it('renders conflict filter options', async () => {
+        it('renders conflict filter trigger', async () => {
             const wrapper = mountMoviesIndex();
             const filterButton = wrapper
                 .findAll('button')
                 .find((b) => b.text().includes('Filters'));
             await filterButton?.trigger('click');
 
-            const conflictSelect = wrapper.findAll('select').find((s) => {
-                const options = s.findAll('option');
-                return options.some((o) => o.text() === 'All conflicts');
-            });
-            expect(conflictSelect).toBeDefined();
-            expect(conflictSelect?.text()).toContain('WWII');
-            expect(conflictSelect?.text()).toContain('Vietnam');
+            // Verify the Conflict label and its Select trigger exist
+            expect(wrapper.text()).toContain('Conflict');
+            const triggers = wrapper.findAll('[data-slot="select-trigger"]');
+            const conflictTrigger = triggers.find((t) =>
+                t.text().includes('All conflicts'),
+            );
+            expect(conflictTrigger).toBeDefined();
         });
 
-        it('renders tag filter options', async () => {
+        it('renders tag filter trigger', async () => {
             const wrapper = mountMoviesIndex();
             const filterButton = wrapper
                 .findAll('button')
                 .find((b) => b.text().includes('Filters'));
             await filterButton?.trigger('click');
 
-            const tagSelect = wrapper.findAll('select').find((s) => {
-                const options = s.findAll('option');
-                return options.some((o) => o.text() === 'All tags');
-            });
-            expect(tagSelect).toBeDefined();
-            expect(tagSelect?.text()).toContain('Action');
-            expect(tagSelect?.text()).toContain('Drama');
+            // Verify the Tag label and its Select trigger exist
+            expect(wrapper.text()).toContain('Tag');
+            const triggers = wrapper.findAll('[data-slot="select-trigger"]');
+            const tagTrigger = triggers.find((t) =>
+                t.text().includes('All tags'),
+            );
+            expect(tagTrigger).toBeDefined();
         });
     });
 

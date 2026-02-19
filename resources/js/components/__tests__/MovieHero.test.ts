@@ -133,7 +133,7 @@ describe('MovieHero', () => {
             const wrapper = mountMovieHero();
             const detailsLink = wrapper
                 .findAll('a')
-                .find((a) => a.text().includes('More Details'));
+                .find((a) => a.text().includes('VIEW DOSSIER'));
             expect(detailsLink).toBeDefined();
             expect(detailsLink?.attributes('href')).toBe(
                 `/movies/${defaultMovie.slug}`,

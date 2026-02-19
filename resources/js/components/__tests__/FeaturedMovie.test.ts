@@ -44,12 +44,12 @@ describe('FeaturedMovie', () => {
     describe('rendering', () => {
         it('renders the title badge', () => {
             const wrapper = mountFeaturedMovie();
-            expect(wrapper.text()).toContain('Pick of the Week');
+            expect(wrapper.text()).toContain('INCOMING // PICK OF THE WEEK');
         });
 
         it('renders custom title', () => {
             const wrapper = mountFeaturedMovie({ title: 'Editors Choice' });
-            expect(wrapper.text()).toContain('Editors Choice');
+            expect(wrapper.text()).toContain('INCOMING // EDITORS CHOICE');
         });
 
         it('renders movie title', () => {

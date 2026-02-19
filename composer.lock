@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6b8fc91100a0768ce120f0806e1509ed",
+    "content-hash": "7d4bc30b0e29ee59a3ed3402311b0804",
     "packages": [
         {
             "name": "atymic/twitter",
@@ -1587,16 +1587,16 @@
         },
         {
             "name": "jonesrussell/northcloud-laravel",
-            "version": "0.6.0",
+            "version": "0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jonesrussell/northcloud-laravel.git",
-                "reference": "7cd9cd4837040f36dfbe773936443a59953e66c8"
+                "reference": "7302ddd1ee097722bab0f759c9d51c870cb71687"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jonesrussell/northcloud-laravel/zipball/7cd9cd4837040f36dfbe773936443a59953e66c8",
-                "reference": "7cd9cd4837040f36dfbe773936443a59953e66c8",
+                "url": "https://api.github.com/repos/jonesrussell/northcloud-laravel/zipball/7302ddd1ee097722bab0f759c9d51c870cb71687",
+                "reference": "7302ddd1ee097722bab0f759c9d51c870cb71687",
                 "shasum": ""
             },
             "require": {
@@ -1620,6 +1620,9 @@
             "type": "library",
             "extra": {
                 "laravel": {
+                    "aliases": {
+                        "NorthCloud": "JonesRussell\\NorthCloud\\Facades\\NorthCloud"
+                    },
                     "providers": [
                         "JonesRussell\\NorthCloud\\NorthCloudServiceProvider"
                     ]
@@ -1627,7 +1630,8 @@
             },
             "autoload": {
                 "psr-4": {
-                    "JonesRussell\\NorthCloud\\": "src/"
+                    "JonesRussell\\NorthCloud\\": "src/",
+                    "JonesRussell\\NorthCloud\\Database\\Factories\\": "database/factories/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1637,9 +1641,9 @@
             "description": "Shared article ingestion pipeline for North Cloud-connected Laravel sites",
             "support": {
                 "issues": "https://github.com/jonesrussell/northcloud-laravel/issues",
-                "source": "https://github.com/jonesrussell/northcloud-laravel/tree/v0.6.0"
+                "source": "https://github.com/jonesrussell/northcloud-laravel/tree/v0.7.0"
             },
-            "time": "2026-02-18T20:35:53+00:00"
+            "time": "2026-02-19T01:10:42+00:00"
         },
         {
             "name": "jonesrussell/x-suite-laravel",

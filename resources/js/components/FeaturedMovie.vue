@@ -20,14 +20,17 @@ const posterImage =
 
 <template>
     <div
-        class="featured-movie relative overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50"
+        class="featured-movie relative overflow-hidden rounded-md border border-[--intel-border] bg-[--intel-bg-surface]"
         style="container-type: inline-size"
     >
         <div class="absolute top-4 right-4 z-10">
             <span
-                class="inline-flex rounded-full bg-red-600/90 px-3 py-1 text-xs font-bold tracking-wider text-white uppercase backdrop-blur-sm"
+                class="inline-flex items-center font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-blue-500 uppercase"
             >
-                {{ title }}
+                <span
+                    class="mr-3 inline-block h-px w-6 bg-blue-500 align-middle"
+                ></span>
+                INCOMING // {{ title.toUpperCase() }}
             </span>
         </div>
 
@@ -35,19 +38,19 @@ const posterImage =
             <div
                 class="featured-movie-content order-1 flex flex-col justify-center p-6 md:col-span-8"
             >
-                <h3 class="mb-2 text-2xl font-bold text-white">
+                <h3 class="mb-2 text-2xl font-bold text-[--intel-text-primary]">
                     {{ movie.title }}
                 </h3>
 
                 <div
-                    class="mb-3 flex flex-wrap items-center gap-2 text-sm text-zinc-300"
+                    class="mb-3 flex flex-wrap items-center gap-2 font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-body]"
                 >
                     <span>{{ movie.release_year }}</span>
-                    <span v-if="movie.runtime">• {{ movie.runtime }} min</span>
-                    <span v-if="movie.country">• {{ movie.country }}</span>
+                    <span v-if="movie.runtime">// {{ movie.runtime }} min</span>
+                    <span v-if="movie.country">// {{ movie.country }}</span>
                 </div>
 
-                <p class="mb-4 line-clamp-2 text-sm text-zinc-300">
+                <p class="mb-4 line-clamp-2 text-sm text-[--intel-text-body]">
                     {{ movie.synopsis }}
                 </p>
 
@@ -58,7 +61,7 @@ const posterImage =
                     <span
                         v-for="tag in movie.tags.slice(0, 3)"
                         :key="tag.id"
-                        class="rounded bg-zinc-800 px-2 py-1 text-xs text-zinc-300"
+                        class="rounded-sm border border-[--intel-border] bg-[--intel-bg-elevated] px-2 py-1 font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-body]"
                     >
                         {{ tag.name }}
                     </span>
@@ -66,9 +69,9 @@ const posterImage =
 
                 <div
                     v-if="movie.user_review"
-                    class="mb-4 flex flex-wrap items-center gap-2 text-sm text-zinc-300"
+                    class="mb-4 flex flex-wrap items-center gap-2 text-sm text-[--intel-text-body]"
                 >
-                    <span class="text-zinc-500">Your rating:</span>
+                    <span class="text-[--intel-text-muted]">Your rating:</span>
                     <StarRating
                         :rating="movie.user_review.rating"
                         :max-stars="4"
@@ -76,7 +79,7 @@ const posterImage =
                     />
                     <Link
                         :href="`/movies/${movie.slug}#reviews`"
-                        class="font-medium text-red-500 transition-colors hover:text-red-400"
+                        class="font-medium text-blue-500 transition-colors hover:text-blue-400"
                     >
                         Your review
                     </Link>
@@ -85,7 +88,7 @@ const posterImage =
                 <div class="flex flex-wrap gap-2">
                     <Link
                         :href="`/movies/${movie.slug}`"
-                        class="inline-flex items-center gap-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+                        class="inline-flex items-center gap-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
                     >
                         <Info class="size-4" />
                         Details
@@ -96,7 +99,7 @@ const posterImage =
                         :href="movie.trailer_url"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="inline-flex items-center gap-1 rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
+                        class="inline-flex items-center gap-1 rounded-md border border-[--intel-border] bg-[--intel-bg-elevated] px-4 py-2 text-sm font-semibold text-[--intel-text-primary] transition-colors hover:bg-[--intel-bg-surface]"
                     >
                         <Play class="size-4" />
                         Trailer
@@ -105,7 +108,7 @@ const posterImage =
             </div>
 
             <div
-                class="featured-movie-poster order-2 flex items-center justify-center border-t border-zinc-800 bg-zinc-950/20 p-6 md:col-span-4 md:border-t-0 md:border-l"
+                class="featured-movie-poster order-2 flex items-center justify-center border-t border-[--intel-border] bg-[--intel-bg-elevated]/20 p-6 md:col-span-4 md:border-t-0 md:border-l"
             >
                 <div class="aspect-[2/3] w-full max-w-[260px]">
                     <Poster
@@ -114,7 +117,7 @@ const posterImage =
                         :poster-path="movie.poster_path"
                         context="grid"
                         aspect-ratio="2/3"
-                        class="rounded-md"
+                        class="rounded-sm"
                     >
                         <div
                             v-if="movie.is_upcoming"

@@ -38,15 +38,18 @@ const headingTag = computed(() => `h${props.level}` as const);
     >
         <p
             v-if="kicker"
-            class="text-xs font-semibold tracking-[0.2em] text-red-500 uppercase"
+            class="font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-blue-500 uppercase"
         >
-            {{ kicker }}
+            <span
+                class="mr-3 inline-block h-px w-6 bg-blue-500 align-middle"
+            ></span
+            >{{ kicker }}
         </p>
 
         <div class="flex items-end justify-between gap-4">
             <component
                 :is="headingTag"
-                class="text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl lg:text-5xl"
+                class="font-[family-name:var(--font-mono-display)] text-3xl font-semibold tracking-tight text-balance text-[--intel-text-primary] sm:text-4xl lg:text-5xl"
                 :class="align === 'center' ? 'mx-auto' : ''"
             >
                 {{ title }}
@@ -59,7 +62,7 @@ const headingTag = computed(() => `h${props.level}` as const);
 
         <p
             v-if="description"
-            class="max-w-prose text-base leading-relaxed text-pretty text-zinc-300 sm:text-lg"
+            class="max-w-prose text-base leading-relaxed text-pretty text-[--intel-text-body] sm:text-lg"
             :class="align === 'center' ? 'mx-auto' : ''"
         >
             {{ description }}

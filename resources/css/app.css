@@ -208,18 +208,18 @@
 
     /* Curator review shortcodes */
     .pull-quote {
-        border-left: 3px solid var(--color-destructive, theme(--color-red-500));
+        border-left: 3px solid var(--intel-accent);
         padding: 0.75em 1.25em;
         margin: 1.5em 0;
         font-style: italic;
         font-size: 1.125em;
-        color: theme(--color-zinc-200);
-        background: theme(--color-zinc-900/50);
+        color: var(--intel-text-primary);
+        background: var(--intel-bg-surface);
         border-radius: 0 0.5rem 0.5rem 0;
     }
 
     .spoiler-block {
-        background: theme(--color-zinc-700);
+        background: var(--intel-bg-elevated);
         color: transparent;
         border-radius: 0.25rem;
         padding: 0 0.25em;
@@ -229,22 +229,22 @@
     }
     .spoiler-block.revealed,
     .spoiler-block:focus {
-        color: theme(--color-zinc-300);
+        color: var(--intel-text-body);
         background: transparent;
     }
 
     .film-ref {
-        color: theme(--color-red-500);
+        color: var(--intel-accent);
         text-decoration: none;
         font-weight: 500;
         transition: color 0.15s;
     }
     .film-ref:hover {
-        color: theme(--color-red-400);
+        color: #60a5fa;
         text-decoration: underline;
     }
     .film-ref--missing {
-        color: theme(--color-zinc-500);
+        color: var(--intel-text-muted);
         font-style: italic;
     }
 

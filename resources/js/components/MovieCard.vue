@@ -27,12 +27,14 @@ const displayedTags = computed(() => {
 </script>
 
 <template>
-    <article class="group flex flex-col gap-2">
+    <article
+        class="group flex flex-col gap-2 rounded-md border border-[--intel-border] bg-[--intel-bg-surface] transition-all duration-200 hover:border-[--intel-accent] hover:shadow-[0_0_12px_var(--intel-accent-glow)]"
+    >
         <div class="flex flex-col gap-2">
             <Link
                 :href="`/movies/${movie.slug}`"
                 :aria-label="`View details for ${movie.title} (${movie.release_year})`"
-                class="relative block overflow-hidden rounded-xl ring-1 ring-zinc-800/70 transition-all duration-300 [transition-timing-function:var(--ease-cinematic)] hover:scale-[1.01] hover:shadow-xl hover:shadow-black/20 hover:ring-zinc-700/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                class="relative block overflow-hidden rounded-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
                 <Poster
                     :src="movie.poster_url"
@@ -40,7 +42,7 @@ const displayedTags = computed(() => {
                     :poster-path="movie.poster_path"
                     context="grid"
                     aspect-ratio="2/3"
-                    class="transition-transform duration-500 [transition-timing-function:var(--ease-smooth-out)] group-hover:scale-[1.03]"
+                    class="rounded-sm transition-transform duration-500 [transition-timing-function:var(--ease-smooth-out)] group-hover:scale-[1.03]"
                 >
                     <!-- Upcoming badge -->
                     <div
@@ -56,17 +58,21 @@ const displayedTags = computed(() => {
             </Link>
 
             <!-- Movie details - always visible -->
-            <div class="px-1">
-                <h3 class="mb-1 truncate text-sm font-semibold text-white">
+            <div class="px-2 pb-2">
+                <h3
+                    class="mb-1 truncate text-sm font-semibold text-[--intel-text-primary]"
+                >
                     <Link
                         :href="`/movies/${movie.slug}`"
-                        class="transition-colors hover:text-red-500"
+                        class="transition-colors hover:text-blue-400"
                     >
                         {{ movie.title }}
                     </Link>
                 </h3>
 
-                <div class="flex items-center gap-2 text-xs text-zinc-300">
+                <div
+                    class="flex items-center gap-2 text-xs text-[--intel-text-muted]"
+                >
                     <span>{{
                         formatReleaseDate(
                             movie.release_date,
@@ -74,11 +80,11 @@ const displayedTags = computed(() => {
                         )
                     }}</span>
                     <template v-if="movie.runtime">
-                        <span class="text-zinc-500">•</span>
+                        <span class="text-[--intel-text-faint]">•</span>
                         <span>{{ movie.runtime }} min</span>
                     </template>
                     <template v-if="movie.country">
-                        <span class="text-zinc-500">•</span>
+                        <span class="text-[--intel-text-faint]">•</span>
                         <span>{{ movie.country }}</span>
                     </template>
                 </div>
@@ -90,7 +96,7 @@ const displayedTags = computed(() => {
                     <span
                         v-for="tag in displayedTags"
                         :key="tag.id"
-                        class="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
+                        class="rounded-sm border border-[--intel-border] bg-[--intel-bg-elevated] px-2 py-0.5 font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-body]"
                     >
                         {{ tag.name }}
                     </span>
@@ -98,9 +104,12 @@ const displayedTags = computed(() => {
 
                 <div
                     v-if="movie.user_review"
-                    class="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-zinc-300"
+                    class="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-[--intel-text-body]"
                 >
-                    <span class="text-zinc-500">Your rating:</span>
+                    <span
+                        class="font-[family-name:var(--font-mono-display)] text-[--intel-text-muted]"
+                        >Your rating:</span
+                    >
                     <StarRating
                         :rating="movie.user_review.rating"
                         :max-stars="4"
@@ -108,7 +117,7 @@ const displayedTags = computed(() => {
                     />
                     <Link
                         :href="`/movies/${movie.slug}#reviews`"
-                        class="font-medium text-red-500 transition-colors hover:text-red-400"
+                        class="font-medium text-blue-500 transition-colors hover:text-blue-400"
                     >
                         Your review
                     </Link>

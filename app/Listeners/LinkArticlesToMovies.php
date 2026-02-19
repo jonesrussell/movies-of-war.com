@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Listeners;
 
 use App\Models\Movie;
+use App\Models\WarArticle;
 use Illuminate\Support\Str;
 use JonesRussell\NorthCloud\Events\ArticleProcessed;
 
@@ -10,67 +13,73 @@ class LinkArticlesToMovies
 {
     public function handle(ArticleProcessed $event): void
     {
+        /** @var WarArticle $article */
         $article = $event->article;
-
-        // Extract keywords from article title and content
         $keywords = $this->extractKeywords($article);
 
-        // Find movies that match article keywords/tags
         $movies = Movie::query()
             ->published()
-            ->where(function ($query) use ($article, $keywords) {
-                // Match by movie title in article content/title
+            ->where(function ($query) use ($article, $keywords): void {
                 foreach ($keywords as $keyword) {
                     $query->orWhere('title', 'like', "%{$keyword}%");
                 }
 
-                // Match by shared tags
                 if ($article->tags()->exists()) {
                     $tagSlugs = $article->tags->pluck('slug')->toArray();
-                    $query->orWhereHas('tags', function ($tagQuery) use ($tagSlugs) {
+                    $query->orWhereHas('tags', function ($tagQuery) use ($tagSlugs): void {
                         $tagQuery->whereIn('slug', $tagSlugs);
                     });
                 }
             })
             ->get();
 
-        // Attach movies with confidence scores
+        $threshold = (float) config('northcloud.linking.threshold', 0.3);
         $movieData = [];
+
         foreach ($movies as $movie) {
             $confidence = $this->calculateConfidence($article, $movie, $keywords);
 
-            if ($confidence > 0.3) { // Only link if confidence > 30%
+            if ($confidence > $threshold) {
                 $movieData[$movie->id] = ['confidence' => $confidence];
             }
         }
 
-        if (! empty($movieData)) {
+        if ($movieData !== []) {
             $article->movies()->sync($movieData);
         }
     }
 
-    protected function extractKeywords($article): array
+    /**
+     * @return list<string>
+     */
+    protected function extractKeywords(WarArticle $article): array
     {
-        $text = $article->title.' '.$article->content;
-
-        // Remove common words and extract meaningful keywords (3+ chars)
+        $text = $article->title . ' ' . $article->content;
         $words = str_word_count(strtolower($text), 1);
-        $stopWords = ['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use'];
+        $minLength = (int) config('northcloud.linking.min_keyword_length', 3);
 
-        return array_values(array_filter($words, function ($word) use ($stopWords) {
-            return strlen($word) >= 3 && ! in_array($word, $stopWords);
+        $stopWords = ['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can',
+            'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how',
+            'man', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its',
+            'let', 'put', 'say', 'she', 'too', 'use'];
+
+        return array_values(array_filter($words, function ($word) use ($stopWords, $minLength): bool {
+            return strlen($word) >= $minLength && ! in_array($word, $stopWords, true);
         }));
     }
 
-    protected function calculateConfidence($article, Movie $movie, array $keywords): float
+    protected function calculateConfidence(WarArticle $article, Movie $movie, array $keywords): float
     {
         $confidence = 0.0;
+        $titleWeight = (float) config('northcloud.linking.weights.title_match', 0.5);
+        $tagWeight = (float) config('northcloud.linking.weights.tag_overlap', 0.3);
+        $metadataWeight = (float) config('northcloud.linking.weights.metadata_match', 0.2);
 
-        // Title match (highest weight)
+        // Title match
         $movieTitleWords = explode(' ', strtolower($movie->title));
         $matchingWords = array_intersect($keywords, $movieTitleWords);
         if (count($matchingWords) > 0) {
-            $confidence += 0.5 * (count($matchingWords) / count($movieTitleWords));
+            $confidence += $titleWeight * (count($matchingWords) / count($movieTitleWords));
         }
 
         // Tag overlap
@@ -80,14 +89,14 @@ class LinkArticlesToMovies
             $sharedTags = array_intersect($articleTagSlugs, $movieTagSlugs);
 
             if (count($sharedTags) > 0) {
-                $confidence += 0.3 * (count($sharedTags) / count($movieTagSlugs));
+                $confidence += $tagWeight * (count($sharedTags) / count($movieTagSlugs));
             }
         }
 
-        // War era match
+        // War era / metadata match
         if (isset($article->war_era) && isset($movie->conflict)) {
             if (Str::contains(strtolower($movie->conflict), strtolower($article->war_era))) {
-                $confidence += 0.2;
+                $confidence += $metadataWeight;
             }
         }
 

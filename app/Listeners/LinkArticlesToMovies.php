@@ -54,7 +54,7 @@ class LinkArticlesToMovies
      */
     protected function extractKeywords(WarArticle $article): array
     {
-        $text = $article->title . ' ' . $article->content;
+        $text = $article->title.' '.$article->content;
         $words = str_word_count(strtolower($text), 1);
         $minLength = (int) config('northcloud.linking.min_keyword_length', 3);
 

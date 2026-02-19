@@ -22,6 +22,7 @@ use Inertia\Response;
 class DashboardController extends Controller
 {
     use Concerns\ResolvesPagination;
+
     public function __construct(
         protected DashboardStatsService $statsService,
         protected TMDBService $tmdbService,

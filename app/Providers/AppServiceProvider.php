@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use JonesRussell\NorthCloud\Events\ArticleProcessed;
+use JonesRussell\NorthCloud\Facades\NorthCloud;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,6 +37,10 @@ class AppServiceProvider extends ServiceProvider
         $this->registerPolicies();
         $this->registerEvents();
         $this->registerObservers();
+
+        NorthCloud::registerNavigation([
+            ['title' => 'X Posts', 'route' => 'admin.x-posts.index', 'icon' => 'MessageCircle'],
+        ]);
     }
 
     /**

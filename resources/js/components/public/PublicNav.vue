@@ -25,12 +25,13 @@ const { navItems } = usePublicNav(canRegisterRef.value);
             :key="item.href"
             :href="item.href"
             :class="[
+                'tracking-wide',
                 item.isButton
-                    ? 'rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700'
+                    ? 'rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-700'
                     : activeClass(
                           item.href,
-                          'text-red-500',
-                          'text-zinc-300 transition-colors hover:text-white',
+                          'border-b-2 border-blue-500 text-white',
+                          'text-[--intel-text-body] transition-colors hover:text-[--intel-text-primary]',
                       ),
             ]"
         >

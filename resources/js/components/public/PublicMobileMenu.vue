@@ -40,24 +40,24 @@ function handleLinkClick() {
                 <span class="sr-only">Open menu</span>
             </Button>
         </SheetTrigger>
-        <SheetContent side="right" class="w-[300px] bg-zinc-900">
+        <SheetContent side="right" class="w-[300px] bg-[--intel-bg-surface]">
             <SheetHeader>
                 <SheetTitle class="sr-only">Navigation Menu</SheetTitle>
             </SheetHeader>
-            <nav class="mt-8 flex flex-col gap-4">
+            <nav class="mt-8 flex flex-col">
                 <Link
                     v-for="item in navItems"
                     :key="item.href"
                     :href="item.href"
                     @click="handleLinkClick"
                     :class="[
-                        'block rounded-lg px-4 py-3 text-base font-medium transition-colors',
+                        'block border-b border-[--intel-border] px-4 py-3 text-base font-medium transition-colors',
                         item.isButton
-                            ? 'bg-red-600 text-white hover:bg-red-700'
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
                             : activeClass(
                                   item.href,
-                                  'bg-zinc-800 text-red-500',
-                                  'text-zinc-300 hover:bg-zinc-800 hover:text-white',
+                                  'bg-[--intel-bg-surface] text-blue-500',
+                                  'text-[--intel-text-body] hover:bg-[--intel-bg-surface] hover:text-[--intel-text-primary]',
                               ),
                     ]"
                 >

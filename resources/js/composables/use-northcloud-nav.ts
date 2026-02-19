@@ -1,7 +1,16 @@
 import type { NavItem } from '@/types';
 
 import { usePage } from '@inertiajs/vue3';
-import { FileText, type LucideIcon, Users } from 'lucide-vue-next';
+import {
+    Download,
+    FileText,
+    Film,
+    type LucideIcon,
+    MessageCircle,
+    MessageSquare,
+    Star,
+    Users,
+} from 'lucide-vue-next';
 import { computed, type ComputedRef } from 'vue';
 
 interface NorthcloudNavItem {
@@ -11,7 +20,12 @@ interface NorthcloudNavItem {
 }
 
 const iconMap: Record<string, LucideIcon> = {
+    Download,
     FileText,
+    Film,
+    MessageCircle,
+    MessageSquare,
+    Star,
     Users,
 };
 

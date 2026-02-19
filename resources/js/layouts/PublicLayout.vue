@@ -4,11 +4,11 @@ import PublicHeader from '@/components/public/PublicHeader.vue';
 </script>
 
 <template>
-    <div class="min-h-screen bg-zinc-950">
+    <div class="min-h-screen bg-[--intel-bg-base]">
         <!-- Skip link for keyboard accessibility -->
         <a
             href="#main-content"
-            class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-red-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+            class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-blue-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
         >
             Skip to main content
         </a>

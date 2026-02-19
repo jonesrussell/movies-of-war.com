@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { RequestPayload } from '@inertiajs/core';
 import { Head, router } from '@inertiajs/vue3';
 import { ArrowLeft } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -48,7 +49,7 @@ const handleSubmit = () => {
 
     router.post(
         routePrefix,
-        form.value as import('@inertiajs/core').RequestPayload,
+        form.value as RequestPayload,
         {
             preserveScroll: true,
             onError: (err) => {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { RequestPayload } from '@inertiajs/core';
 import { Head, router } from '@inertiajs/vue3';
 import { AlertTriangle, ArrowLeft, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
@@ -70,7 +71,7 @@ const handleSubmit = () => {
 
     router.patch(
         `${routePrefix}/${props.user.id}`,
-        form.value as import('@inertiajs/core').RequestPayload,
+        form.value as RequestPayload,
         {
             preserveScroll: true,
             onError: (err) => {

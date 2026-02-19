@@ -3,13 +3,14 @@ import type { Movie } from '@/types';
 
 import {
     Calendar,
+    Clapperboard,
     Clock,
     DollarSign,
-    Film,
     Globe,
     MapPin,
     PenLine,
     Star,
+    Swords,
     User,
 } from 'lucide-vue-next';
 
@@ -24,127 +25,225 @@ defineProps<{ movie: Movie }>();
 
 <template>
     <dl
-        class="grid gap-3 rounded-2xl bg-zinc-950/60 p-5 ring-1 ring-zinc-800/70 sm:grid-cols-2"
+        class="grid gap-0 rounded-xl border border-[--intel-border] bg-[--intel-bg-surface] sm:grid-cols-2"
     >
-        <dt class="sr-only">Release</dt>
-        <dd class="flex items-center gap-2 text-sm font-semibold text-zinc-200">
-            <Calendar
-                class="size-4 shrink-0 text-zinc-300"
-                aria-hidden="true"
-            />
-            {{ formatReleaseDate(movie.release_date, movie.release_year) }}
-        </dd>
-
-        <template v-if="movie.tmdb_vote_average">
-            <dt class="sr-only">TMDB rating</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
-                <Star
-                    class="size-4 shrink-0 text-zinc-300"
+        <div
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
+                <Calendar
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Release
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
+                {{ formatReleaseDate(movie.release_date, movie.release_year) }}
+            </dd>
+        </div>
+
+        <div
+            v-if="movie.tmdb_vote_average"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
+                <Star
+                    class="size-4 text-[--intel-text-muted]"
+                    aria-hidden="true"
+                />
+                Rating
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ movie.tmdb_vote_average }}/10 (TMDB)
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.runtime">
-            <dt class="sr-only">Runtime</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+        <div
+            v-if="movie.runtime"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
                 <Clock
-                    class="size-4 shrink-0 text-zinc-300"
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Runtime
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ movie.runtime }} min
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.country">
-            <dt class="sr-only">Country</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+        <div
+            v-if="movie.country"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
                 <MapPin
-                    class="size-4 shrink-0 text-zinc-300"
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Country
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ movie.country }}
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.production_status">
-            <dt class="sr-only">Status</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
-                <Film
-                    class="size-4 shrink-0 text-zinc-300"
+        <div
+            v-if="movie.production_status"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
+                <Clapperboard
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Status
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ movie.production_status }}
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.original_language">
-            <dt class="sr-only">Original language</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+        <div
+            v-if="movie.original_language"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
                 <Globe
-                    class="size-4 shrink-0 text-zinc-300"
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Language
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ getLanguageName(movie.original_language) }}
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.budget">
-            <dt class="sr-only">Budget</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+        <div
+            v-if="movie.budget"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
                 <DollarSign
-                    class="size-4 shrink-0 text-zinc-300"
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Budget
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ formatCurrency(movie.budget) }}
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.revenue">
-            <dt class="sr-only">Revenue</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+        <div
+            v-if="movie.revenue"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
                 <DollarSign
-                    class="size-4 shrink-0 text-zinc-300"
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Revenue
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ formatCurrency(movie.revenue) }}
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.conflict">
-            <dt class="sr-only">Conflict</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
-                <Film
-                    class="size-4 shrink-0 text-zinc-300"
+        <div
+            v-if="movie.conflict"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
+                <Swords
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Conflict
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ movie.conflict }}
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.director">
-            <dt class="sr-only">Director</dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+        <div
+            v-if="movie.director"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
                 <User
-                    class="size-4 shrink-0 text-zinc-300"
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                Director
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ movie.director }}
             </dd>
-        </template>
+        </div>
 
-        <template v-if="movie.writers && movie.writers.length">
-            <dt class="sr-only">
-                {{ movie.writers.length === 1 ? 'Writer' : 'Writers' }}
-            </dt>
-            <dd class="flex items-center gap-2 text-sm text-zinc-200">
+        <div
+            v-if="movie.writers && movie.writers.length"
+            class="flex items-center gap-3 border-b border-[--intel-border] px-5 py-3 last:border-b-0"
+        >
+            <dt
+                class="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-wide text-[--intel-text-muted] uppercase"
+            >
                 <PenLine
-                    class="size-4 shrink-0 text-zinc-300"
+                    class="size-4 text-[--intel-text-muted]"
                     aria-hidden="true"
                 />
+                {{ movie.writers.length === 1 ? 'Writer' : 'Writers' }}
+            </dt>
+            <dd
+                class="font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-primary]"
+            >
                 {{ movie.writers.join(', ') }}
             </dd>
-        </template>
+        </div>
     </dl>
 </template>

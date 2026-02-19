@@ -52,9 +52,15 @@ const breadcrumbs = [
     { title: 'Articles', href: routePrefix },
 ];
 
-const filterValues = ref<Record<string, string | undefined>>({
-    ...props.filters,
-});
+const filterValues = ref<Record<string, string | undefined>>({});
+
+watch(
+    () => props.filters,
+    (filters) => {
+        filterValues.value = { ...filters };
+    },
+    { immediate: true },
+);
 const selectedIds = ref<number[]>([]);
 const deleteDialogOpen = ref(false);
 const articleToDelete = ref<Article | null>(null);

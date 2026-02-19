@@ -46,11 +46,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const routePrefix = '/dashboard/articles';
-const breadcrumbs = [
+const breadcrumbs = computed(() => [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Articles', href: routePrefix },
     { title: 'Edit', href: `${routePrefix}/${props.article.id}/edit` },
-];
+]);
 
 // Initialize form from article data
 const initFormData = (): Record<string, unknown> => {

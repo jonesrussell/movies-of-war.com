@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { ArrowLeft, Calendar, Edit, ExternalLink, User } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 import ArticleStatusBadge from '@/components/admin/ArticleStatusBadge.vue';
 import { Badge } from '@/components/ui/badge';
@@ -33,19 +34,21 @@ interface Props {
 const props = defineProps<Props>();
 
 const routePrefix = '/dashboard/articles';
-const breadcrumbs = [
+const breadcrumbs = computed(() => [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Articles', href: routePrefix },
     { title: props.article.title, href: '#' },
-];
+]);
 
-const formattedDate = props.article.published_at
-    ? new Date(props.article.published_at).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-      })
-    : 'Not published';
+const formattedDate = computed(() =>
+    props.article.published_at
+        ? new Date(props.article.published_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+          })
+        : 'Not published',
+);
 
 const formatDateTime = (date: string) => {
     return new Date(date).toLocaleString('en-US', {

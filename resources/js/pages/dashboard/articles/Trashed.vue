@@ -63,8 +63,17 @@ const breadcrumbs = [
     { title: 'Trashed', href: trashedUrl },
 ];
 
-const searchQuery = ref(props.filters.search ?? '');
-const sourceFilter = ref(props.filters.source ?? 'all');
+const searchQuery = ref('');
+const sourceFilter = ref('all');
+
+watch(
+    () => props.filters,
+    (filters) => {
+        searchQuery.value = filters.search ?? '';
+        sourceFilter.value = filters.source ?? 'all';
+    },
+    { immediate: true },
+);
 const selectedIds = ref<number[]>([]);
 const isRestoring = ref(false);
 const isForceDeleting = ref(false);

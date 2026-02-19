@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,12 +29,20 @@ class FeaturedSlot extends Model
         return $this->belongsTo(Movie::class);
     }
 
-    public function scopeActive($query)
+    /**
+     * @param  Builder<FeaturedSlot>  $query
+     * @return Builder<FeaturedSlot>
+     */
+    public function scopeActive(Builder $query): Builder
     {
         return $query; // All slots are active
     }
 
-    public function scopeSlot($query, string $slot)
+    /**
+     * @param  Builder<FeaturedSlot>  $query
+     * @return Builder<FeaturedSlot>
+     */
+    public function scopeSlot(Builder $query, string $slot): Builder
     {
         return $query->where('slot', $slot);
     }

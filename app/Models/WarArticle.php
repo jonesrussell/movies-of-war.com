@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use JonesRussell\NorthCloud\Models\Article as BaseArticle;
 
@@ -44,7 +45,11 @@ class WarArticle extends BaseArticle
             ->withPivot('confidence');
     }
 
-    public function scopeWarEra($query, string $era)
+    /**
+     * @param  Builder<WarArticle>  $query
+     * @return Builder<WarArticle>
+     */
+    public function scopeWarEra(Builder $query, string $era): Builder
     {
         return $query->where('war_era', $era);
     }

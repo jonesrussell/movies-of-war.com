@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import type { Tag } from '@/types';
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+
 type MaybeNumber = number | string;
 
 interface Props {
@@ -17,7 +25,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), { class: '' });
 
-defineEmits<{
+const emit = defineEmits<{
     'update:year': [value: MaybeNumber];
     'update:country': [value: string];
     'update:conflict': [value: string];
@@ -28,91 +36,97 @@ defineEmits<{
 <template>
     <div
         :class="[
-            'filters-panel grid gap-4 rounded-2xl bg-zinc-950 p-4 ring-1 ring-zinc-800/70',
+            'filters-panel grid gap-4 rounded-xl border border-[--intel-border] bg-[--intel-bg-surface] p-4',
             $props.class,
         ]"
         style="container-type: inline-size"
     >
         <div class="flex flex-col gap-2">
-            <label class="text-xs font-semibold tracking-wide text-zinc-300">
+            <label
+                class="text-xs font-semibold tracking-wide text-[--intel-text-muted]"
+            >
                 Year
             </label>
-            <select
-                :value="year"
-                class="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:border-red-600 focus:ring-2 focus:ring-red-600/40 focus:outline-none"
-                @change="
-                    $emit(
-                        'update:year',
-                        ($event.target as HTMLSelectElement).value,
-                    )
-                "
+            <Select
+                :model-value="String(year)"
+                @update:model-value="emit('update:year', $event)"
             >
-                <option value="">All years</option>
-                <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
-            </select>
+                <SelectTrigger class="w-full">
+                    <SelectValue placeholder="All years" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="">All years</SelectItem>
+                    <SelectItem v-for="y in years" :key="y" :value="String(y)">
+                        {{ y }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
         </div>
 
         <div class="flex flex-col gap-2">
-            <label class="text-xs font-semibold tracking-wide text-zinc-300">
+            <label
+                class="text-xs font-semibold tracking-wide text-[--intel-text-muted]"
+            >
                 Country
             </label>
-            <select
-                :value="country"
-                class="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:border-red-600 focus:ring-2 focus:ring-red-600/40 focus:outline-none"
-                @change="
-                    $emit(
-                        'update:country',
-                        ($event.target as HTMLSelectElement).value,
-                    )
-                "
+            <Select
+                :model-value="country"
+                @update:model-value="emit('update:country', $event)"
             >
-                <option value="">All countries</option>
-                <option v-for="c in countries" :key="c" :value="c">
-                    {{ c }}
-                </option>
-            </select>
+                <SelectTrigger class="w-full">
+                    <SelectValue placeholder="All countries" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="">All countries</SelectItem>
+                    <SelectItem v-for="c in countries" :key="c" :value="c">
+                        {{ c }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
         </div>
 
         <div class="flex flex-col gap-2">
-            <label class="text-xs font-semibold tracking-wide text-zinc-300">
+            <label
+                class="text-xs font-semibold tracking-wide text-[--intel-text-muted]"
+            >
                 Conflict
             </label>
-            <select
-                :value="conflict"
-                class="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:border-red-600 focus:ring-2 focus:ring-red-600/40 focus:outline-none"
-                @change="
-                    $emit(
-                        'update:conflict',
-                        ($event.target as HTMLSelectElement).value,
-                    )
-                "
+            <Select
+                :model-value="conflict"
+                @update:model-value="emit('update:conflict', $event)"
             >
-                <option value="">All conflicts</option>
-                <option v-for="c in conflicts" :key="c" :value="c">
-                    {{ c }}
-                </option>
-            </select>
+                <SelectTrigger class="w-full">
+                    <SelectValue placeholder="All conflicts" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="">All conflicts</SelectItem>
+                    <SelectItem v-for="c in conflicts" :key="c" :value="c">
+                        {{ c }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
         </div>
 
         <div class="flex flex-col gap-2">
-            <label class="text-xs font-semibold tracking-wide text-zinc-300">
+            <label
+                class="text-xs font-semibold tracking-wide text-[--intel-text-muted]"
+            >
                 Tag
             </label>
-            <select
-                :value="tag"
-                class="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-white focus:border-red-600 focus:ring-2 focus:ring-red-600/40 focus:outline-none"
-                @change="
-                    $emit(
-                        'update:tag',
-                        ($event.target as HTMLSelectElement).value,
-                    )
-                "
+            <Select
+                :model-value="tag"
+                @update:model-value="emit('update:tag', $event)"
             >
-                <option value="">All tags</option>
-                <option v-for="t in tags" :key="t.id" :value="t.slug">
-                    {{ t.name }}
-                </option>
-            </select>
+                <SelectTrigger class="w-full">
+                    <SelectValue placeholder="All tags" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="">All tags</SelectItem>
+                    <SelectItem v-for="t in tags" :key="t.id" :value="t.slug">
+                        {{ t.name }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
         </div>
     </div>
 </template>

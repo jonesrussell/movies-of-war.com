@@ -120,11 +120,13 @@ const formatDate = (dateStr: string | null): string => {
                     />
                 </div>
 
-                <!-- Article content -->
+                <!-- Article content (trusted CMS content from backend) -->
+                <!-- eslint-disable vue/no-v-html -->
                 <div
                     class="prose max-w-none prose-invert prose-headings:font-[family-name:var(--font-mono-display)] prose-headings:text-[--intel-text-primary] prose-p:text-[--intel-text-secondary] prose-a:text-blue-500 prose-a:no-underline hover:prose-a:text-blue-400 prose-strong:text-[--intel-text-primary]"
                     v-html="article.content"
                 />
+                <!-- eslint-enable vue/no-v-html -->
 
                 <!-- Source link -->
                 <div

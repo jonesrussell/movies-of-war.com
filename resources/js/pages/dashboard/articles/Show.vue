@@ -209,11 +209,13 @@ const formatDateTime = (date: string) => {
                     <CardTitle>Content</CardTitle>
                 </CardHeader>
                 <CardContent>
+                    <!-- eslint-disable vue/no-v-html -->
                     <div
                         v-if="article.content"
                         class="prose max-w-none prose-gray dark:prose-invert"
                         v-html="article.content"
                     />
+                    <!-- eslint-enable vue/no-v-html -->
                     <p
                         v-else-if="article.excerpt"
                         class="text-muted-foreground"

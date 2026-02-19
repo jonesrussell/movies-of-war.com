@@ -176,13 +176,13 @@ const formatDate = (dateStr: string | null): string => {
                                     : 'text-[--intel-text-muted] hover:bg-[--intel-bg-elevated] hover:text-[--intel-text-primary]'
                             "
                         >
-                            <span v-html="link.label" />
+                            {{ link.label }}
                         </Link>
                         <span
                             v-else
                             class="rounded-md px-3 py-2 text-sm text-[--intel-text-muted]/50"
                         >
-                            <span v-html="link.label" />
+                            {{ link.label }}
                         </span>
                     </template>
                 </nav>

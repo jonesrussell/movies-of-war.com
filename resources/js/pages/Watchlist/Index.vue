@@ -5,6 +5,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { Bookmark } from 'lucide-vue-next';
 
 import MovieCard from '@/components/MovieCard.vue';
+import CoordinateGrid from '@/components/primitives/CoordinateGrid.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import PublicSection from '@/components/public/PublicSection.vue';
@@ -32,7 +33,7 @@ defineProps<Props>();
                     } saved`"
                 >
                     <template #action>
-                        <Bookmark class="size-6 text-red-500" />
+                        <Bookmark class="size-6 text-blue-500" />
                     </template>
                 </SectionHeader>
 
@@ -48,11 +49,9 @@ defineProps<Props>();
 
                 <div
                     v-else
-                    class="relative overflow-hidden rounded-2xl bg-zinc-950 p-10 text-center ring-1 ring-zinc-800/70"
+                    class="relative overflow-hidden rounded-md border border-[--intel-border] bg-[--intel-bg-surface] p-10 text-center"
                 >
-                    <div
-                        class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px] opacity-[0.10]"
-                    />
+                    <CoordinateGrid :opacity="0.06" />
                     <div class="relative">
                         <img
                             src="/images/illustrations/watchlist-placeholder.png"
@@ -62,17 +61,22 @@ defineProps<Props>();
                             decoding="async"
                         />
                         <h2
-                            class="text-2xl font-semibold tracking-tight text-balance text-white"
+                            class="font-[family-name:var(--font-mono-display)] text-2xl font-semibold tracking-tight text-balance text-[--intel-text-primary]"
                         >
-                            Your watchlist is empty
+                            NO TARGETS ACQUIRED
                         </h2>
-                        <p class="mx-auto mt-3 max-w-lg text-zinc-400">
-                            Save films you want to revisit later—then come back
-                            when you’re ready for a deep dive.
+                        <p
+                            class="mx-auto mt-3 max-w-lg text-[--intel-text-muted]"
+                        >
+                            Your watchlist is empty. Browse the database to add
+                            films.
                         </p>
                         <div class="mt-7 flex justify-center">
-                            <Button as-child>
-                                <Link href="/movies">Browse movies</Link>
+                            <Button
+                                as-child
+                                class="bg-blue-600 hover:bg-blue-700"
+                            >
+                                <Link href="/movies">BROWSE DATABASE</Link>
                             </Button>
                         </div>
                     </div>

@@ -38,13 +38,14 @@ export function useNorthcloudNav(): { items: ComputedRef<NavItem[]> } {
             | undefined;
         const nav = northcloud?.navigation ?? [];
 
-        return nav
-            .map((item) => ({
+        return nav.map((item): NavItem => {
+            const icon = iconMap[item.icon];
+            return {
                 title: item.title,
                 href: item.href,
-                icon: iconMap[item.icon],
-            }))
-            .filter((item) => item.icon !== undefined);
+                ...(icon !== undefined && { icon }),
+            };
+        });
     });
 
     return { items };

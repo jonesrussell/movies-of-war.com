@@ -68,7 +68,7 @@ const isAdminCheckboxDisabled = (field: FieldDefinition): boolean => {
                                 type="text"
                                 :placeholder="`Enter ${field.label.toLowerCase()}`"
                                 :class="{
-                                    'border-destructive': errors[field.name],
+                                    'border-destructive': errors?.[field.name],
                                 }"
                                 @update:model-value="
                                     updateField(field.name, $event)
@@ -94,7 +94,7 @@ const isAdminCheckboxDisabled = (field: FieldDefinition): boolean => {
                                 type="email"
                                 :placeholder="`Enter ${field.label.toLowerCase()}`"
                                 :class="{
-                                    'border-destructive': errors[field.name],
+                                    'border-destructive': errors?.[field.name],
                                 }"
                                 @update:model-value="
                                     updateField(field.name, $event)
@@ -120,17 +120,17 @@ const isAdminCheckboxDisabled = (field: FieldDefinition): boolean => {
                                 type="password"
                                 :placeholder="`Enter ${field.label.toLowerCase()}`"
                                 :class="{
-                                    'border-destructive': errors[field.name],
+                                    'border-destructive': errors?.[field.name],
                                 }"
                                 @update:model-value="
                                     updateField(field.name, $event)
                                 "
                             />
                             <p
-                                v-if="errors[field.name]"
+                                v-if="errors?.[field.name]"
                                 class="text-sm text-destructive"
                             >
-                                {{ errors[field.name] }}
+                                {{ errors?.[field.name] }}
                             </p>
 
                             <!-- Password confirmation field -->
@@ -153,7 +153,7 @@ const isAdminCheckboxDisabled = (field: FieldDefinition): boolean => {
                                     placeholder="Confirm password"
                                     :class="{
                                         'border-destructive':
-                                            errors.password_confirmation,
+                                            errors?.password_confirmation,
                                     }"
                                     @update:model-value="
                                         updateField(
@@ -163,10 +163,10 @@ const isAdminCheckboxDisabled = (field: FieldDefinition): boolean => {
                                     "
                                 />
                                 <p
-                                    v-if="errors.password_confirmation"
+                                    v-if="errors?.password_confirmation"
                                     class="text-sm text-destructive"
                                 >
-                                    {{ errors.password_confirmation }}
+                                    {{ errors?.password_confirmation }}
                                 </p>
                             </div>
                         </template>
@@ -207,13 +207,13 @@ const isAdminCheckboxDisabled = (field: FieldDefinition): boolean => {
                         <!-- Error message (for non-password, non-checkbox fields) -->
                         <p
                             v-if="
-                                errors[field.name] &&
-                                field.type !== 'checkbox' &&
-                                field.type !== 'password'
+errors?.[field.name] &&
+                                    field.type !== 'checkbox' &&
+                                    field.type !== 'password'
                             "
                             class="text-sm text-destructive"
                         >
-                            {{ errors[field.name] }}
+                            {{ errors?.[field.name] }}
                         </p>
                     </div>
                 </template>

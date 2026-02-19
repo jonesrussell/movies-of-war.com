@@ -2,7 +2,7 @@
 import type { SelectGroupProps } from "reka-ui"
 import { SelectGroup } from "reka-ui"
 
-const props = defineProps<SelectGroupProps>()
+const props = withDefaults(defineProps<SelectGroupProps>(), { as: "div" })
 </script>
 
 <template>

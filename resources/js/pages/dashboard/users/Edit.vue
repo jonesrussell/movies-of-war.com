@@ -68,7 +68,7 @@ const handleSubmit = () => {
     processing.value = true;
     errors.value = {};
 
-    router.patch(`${routePrefix}/${props.user.id}`, form.value, {
+    router.patch(`${routePrefix}/${props.user.id}`, form.value as import('@inertiajs/core').RequestPayload, {
         preserveScroll: true,
         onError: (err) => {
             errors.value = err;

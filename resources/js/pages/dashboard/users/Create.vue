@@ -46,7 +46,7 @@ const handleSubmit = () => {
     processing.value = true;
     errors.value = {};
 
-    router.post(routePrefix, form.value, {
+    router.post(routePrefix, form.value as import('@inertiajs/core').RequestPayload, {
         preserveScroll: true,
         onError: (err) => {
             errors.value = err;

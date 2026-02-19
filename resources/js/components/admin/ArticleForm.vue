@@ -91,7 +91,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                 type="text"
                                 :placeholder="`Enter ${field.label.toLowerCase()}`"
                                 :class="{
-                                    'border-destructive': errors[field.name],
+                                    'border-destructive': errors?.[field.name],
                                 }"
                                 @update:model-value="
                                     updateField(field.name, $event)
@@ -120,7 +120,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                     `https://example.com/${field.name}`
                                 "
                                 :class="{
-                                    'border-destructive': errors[field.name],
+                                    'border-destructive': errors?.[field.name],
                                 }"
                                 @update:model-value="
                                     updateField(field.name, $event)
@@ -147,7 +147,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                 :placeholder="`Enter ${field.label.toLowerCase()}...`"
                                 class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                 :class="{
-                                    'border-destructive': errors[field.name],
+                                    'border-destructive': errors?.[field.name],
                                 }"
                                 @input="
                                     updateField(
@@ -178,7 +178,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                 :placeholder="`Enter ${field.label.toLowerCase()}...`"
                                 class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                 :class="{
-                                    'border-destructive': errors[field.name],
+                                    'border-destructive': errors?.[field.name],
                                 }"
                                 @input="
                                     updateField(
@@ -207,7 +207,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                 "
                                 type="datetime-local"
                                 :class="{
-                                    'border-destructive': errors[field.name],
+                                    'border-destructive': errors?.[field.name],
                                 }"
                                 @update:model-value="
                                     updateField(field.name, $event)
@@ -245,7 +245,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                 >
                             </Label>
                             <Select
-                                :model-value="modelValue[field.name]"
+                                :model-value="(modelValue[field.name] as string | number | undefined) ?? ''"
                                 @update:model-value="
                                     updateField(field.name, $event)
                                 "
@@ -254,7 +254,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                     :id="field.name"
                                     :class="{
                                         'border-destructive':
-                                            errors[field.name],
+                                            errors?.[field.name],
                                     }"
                                 >
                                     <SelectValue
@@ -313,7 +313,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                 >
                             </Label>
                             <Select
-                                :model-value="modelValue[field.name]"
+                                :model-value="(modelValue[field.name] as string | number | undefined) ?? ''"
                                 @update:model-value="
                                     updateField(field.name, $event)
                                 "
@@ -322,7 +322,7 @@ const isVisible = (field: FieldDefinition): boolean => {
                                     :id="field.name"
                                     :class="{
                                         'border-destructive':
-                                            errors[field.name],
+                                            errors?.[field.name],
                                     }"
                                 >
                                     <SelectValue
@@ -344,11 +344,11 @@ const isVisible = (field: FieldDefinition): boolean => {
                         <!-- Error message -->
                         <p
                             v-if="
-                                errors[field.name] && field.type !== 'checkbox'
+                                errors?.[field.name] && field.type !== 'checkbox'
                             "
                             class="text-sm text-destructive"
                         >
-                            {{ errors[field.name] }}
+                            {{ errors?.[field.name] }}
                         </p>
                     </div>
                 </template>

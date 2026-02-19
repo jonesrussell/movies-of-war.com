@@ -86,16 +86,16 @@ const handleSubmit = (publish: boolean = false) => {
     processing.value = true;
     errors.value = {};
 
-    const data = {
+    const data: Record<string, string | number | boolean | null | undefined> = {
         ...form.value,
         published_at: publish
-            ? form.value.published_at || new Date().toISOString()
+            ? (form.value.published_at as string) || new Date().toISOString()
             : isPublished.value
-              ? form.value.published_at
+              ? (form.value.published_at as string | null) ?? null
               : null,
     };
 
-    router.patch(`${routePrefix}/${props.article.id}`, data, {
+    router.patch(`${routePrefix}/${props.article.id}`, data as Record<string, import('@inertiajs/core').FormDataConvertible>, {
         preserveScroll: true,
         onError: (err) => {
             errors.value = err;

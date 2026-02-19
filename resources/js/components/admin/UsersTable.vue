@@ -182,7 +182,7 @@ const isSelf = (user: User) => {
                     >
                         <td class="px-4 py-3">
                             <Checkbox
-                                :model-value="userCheckedStates[user.id]"
+                                :model-value="userCheckedStates[user.id] ?? false"
                                 @update:model-value="
                                     () => toggleSelect(user.id)
                                 "

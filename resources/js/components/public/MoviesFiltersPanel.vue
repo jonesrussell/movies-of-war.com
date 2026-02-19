@@ -49,7 +49,7 @@ const emit = defineEmits<{
             </label>
             <Select
                 :model-value="String(year)"
-                @update:model-value="emit('update:year', $event)"
+                @update:model-value="emit('update:year', $event as MaybeNumber)"
             >
                 <SelectTrigger class="w-full">
                     <SelectValue placeholder="All years" />
@@ -71,7 +71,7 @@ const emit = defineEmits<{
             </label>
             <Select
                 :model-value="country"
-                @update:model-value="emit('update:country', $event)"
+                @update:model-value="emit('update:country', $event as string)"
             >
                 <SelectTrigger class="w-full">
                     <SelectValue placeholder="All countries" />
@@ -93,7 +93,7 @@ const emit = defineEmits<{
             </label>
             <Select
                 :model-value="conflict"
-                @update:model-value="emit('update:conflict', $event)"
+                @update:model-value="emit('update:conflict', $event as string)"
             >
                 <SelectTrigger class="w-full">
                     <SelectValue placeholder="All conflicts" />
@@ -115,7 +115,7 @@ const emit = defineEmits<{
             </label>
             <Select
                 :model-value="tag"
-                @update:model-value="emit('update:tag', $event)"
+                @update:model-value="emit('update:tag', $event != null ? String($event) : '')"
             >
                 <SelectTrigger class="w-full">
                     <SelectValue placeholder="All tags" />

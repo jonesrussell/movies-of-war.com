@@ -14,6 +14,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import JsonLdScript from '@/components/JsonLdScript.vue';
 import MovieCard from '@/components/MovieCard.vue';
 import { Poster, StarRating } from '@/components/primitives';
+import CoordinateGrid from '@/components/primitives/CoordinateGrid.vue';
 import MovieFacts from '@/components/public/MovieFacts.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import PublicContainer from '@/components/public/PublicContainer.vue';
@@ -349,7 +350,7 @@ const jsonLdBreadcrumb = computed(() =>
         <JsonLdScript :content="jsonLdMovie" />
         <JsonLdScript :content="jsonLdBreadcrumb" />
 
-        <div class="relative overflow-hidden bg-zinc-950">
+        <div class="relative overflow-hidden bg-[--intel-bg-base]">
             <!-- Background layers -->
             <div class="absolute inset-0">
                 <!-- Blurred poster background with scale animation -->
@@ -386,13 +387,11 @@ const jsonLdBreadcrumb = computed(() =>
                 />
                 <!-- Multiple gradient layers for depth -->
                 <div
-                    class="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950/80 to-zinc-950"
+                    class="absolute inset-0 bg-gradient-to-b from-[--intel-bg-base] via-[--intel-bg-base]/80 to-[--intel-bg-base]"
                 />
-                <div class="absolute inset-0 bg-zinc-950/20" />
-                <!-- Film texture pattern -->
-                <div
-                    class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:18px_18px] opacity-[0.07]"
-                />
+                <div class="absolute inset-0 bg-[--intel-bg-base]/20" />
+                <!-- Coordinate grid pattern -->
+                <CoordinateGrid density="sparse" :opacity="0.05" />
             </div>
 
             <PublicContainer class="relative py-12 sm:py-14 lg:py-16">
@@ -400,12 +399,12 @@ const jsonLdBreadcrumb = computed(() =>
                 <div class="mb-6">
                     <Link
                         href="/movies"
-                        class="group inline-flex items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-white focus:outline-none focus-visible:text-white"
+                        class="group inline-flex items-center gap-2 font-[family-name:var(--font-mono-display)] text-sm text-[--intel-text-muted] transition-colors hover:text-[--intel-text-primary] focus:outline-none focus-visible:text-[--intel-text-primary]"
                     >
                         <ArrowLeft
                             class="size-4 transition-transform duration-200 group-hover:-translate-x-1"
                         />
-                        Back to Movies
+                        &lt; BACK TO INDEX
                     </Link>
                 </div>
 
@@ -418,12 +417,12 @@ const jsonLdBreadcrumb = computed(() =>
                         class="movie-detail-poster w-full transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                         :class="
                             isVisible
-                                ? 'translate-y-0 opacity-100'
-                                : 'translate-y-8 opacity-0'
+                                ? 'translate-x-0 opacity-100'
+                                : '-translate-x-3 opacity-0'
                         "
                     >
                         <div
-                            class="overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]"
+                            class="overflow-hidden rounded-md border border-[--intel-border] transition-all duration-300 hover:shadow-[0_0_20px_var(--intel-accent-glow)]"
                         >
                             <Poster
                                 :src="posterImage"
@@ -432,7 +431,7 @@ const jsonLdBreadcrumb = computed(() =>
                                 context="detail"
                                 aspect-ratio="2/3"
                                 :priority="true"
-                                class="shadow-2xl ring-1 ring-white/10 transition-all duration-300 hover:scale-[1.02] hover:ring-white/20"
+                                class="shadow-2xl ring-1 ring-[--intel-border] transition-all duration-300 hover:scale-[1.02] hover:ring-[--intel-border-bright]"
                             />
                         </div>
 
@@ -441,17 +440,17 @@ const jsonLdBreadcrumb = computed(() =>
                             class="mt-4 transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                             :class="
                                 isVisible
-                                    ? 'translate-y-0 opacity-100'
-                                    : 'translate-y-4 opacity-0'
+                                    ? 'translate-x-0 opacity-100'
+                                    : '-translate-x-3 opacity-0'
                             "
                             :style="{ transitionDelay: '500ms' }"
                         >
                             <Button
                                 v-if="auth.user"
-                                class="w-full transition-all duration-200 hover:scale-[1.02]"
+                                class="w-full border border-[--intel-border] text-[--intel-text-primary] transition-all duration-200 hover:scale-[1.02] hover:border-[--intel-accent]"
                                 :class="
                                     movie.is_watchlisted
-                                        ? 'hover:shadow-lg hover:shadow-red-600/10'
+                                        ? 'hover:shadow-lg hover:shadow-blue-600/10'
                                         : ''
                                 "
                                 :variant="
@@ -471,7 +470,7 @@ const jsonLdBreadcrumb = computed(() =>
                             </Button>
                             <Button
                                 v-else
-                                class="w-full transition-all duration-200 hover:scale-[1.02]"
+                                class="w-full border border-[--intel-border] text-[--intel-text-primary] transition-all duration-200 hover:scale-[1.02] hover:border-[--intel-accent]"
                                 variant="default"
                                 @click="toggleWatchlist"
                             >
@@ -490,8 +489,8 @@ const jsonLdBreadcrumb = computed(() =>
                                 class="mb-3 inline-flex transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
-                                        ? 'translate-y-0 opacity-100'
-                                        : 'translate-y-4 opacity-0'
+                                        ? 'translate-x-0 opacity-100'
+                                        : '-translate-x-3 opacity-0'
                                 "
                                 :style="{ transitionDelay: '100ms' }"
                             >
@@ -500,11 +499,11 @@ const jsonLdBreadcrumb = computed(() =>
 
                             <!-- Title with entrance animation -->
                             <h1
-                                class="mb-5 transform font-semibold tracking-tight text-balance text-white transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
+                                class="mb-5 transform font-[family-name:var(--font-mono-display)] font-semibold tracking-tight text-balance text-[--intel-text-primary] transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
-                                        ? 'translate-y-0 opacity-100'
-                                        : 'translate-y-4 opacity-0'
+                                        ? 'translate-x-0 opacity-100'
+                                        : '-translate-x-3 opacity-0'
                                 "
                                 :style="{ transitionDelay: '100ms' }"
                                 style="
@@ -519,8 +518,8 @@ const jsonLdBreadcrumb = computed(() =>
                                 class="mb-8 transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
-                                        ? 'translate-y-0 opacity-100'
-                                        : 'translate-y-4 opacity-0'
+                                        ? 'translate-x-0 opacity-100'
+                                        : '-translate-x-3 opacity-0'
                                 "
                                 :style="{ transitionDelay: '200ms' }"
                                 :movie="movie"
@@ -529,9 +528,10 @@ const jsonLdBreadcrumb = computed(() =>
                             <!-- Your rating and review (when user has reviewed) -->
                             <div
                                 v-if="reviewsData.user_review"
-                                class="mb-6 flex flex-wrap items-center gap-3 text-sm text-zinc-300"
+                                class="mb-6 flex flex-wrap items-center gap-3 text-sm text-[--intel-text-body]"
                             >
-                                <span class="font-medium text-zinc-400"
+                                <span
+                                    class="font-medium text-[--intel-text-muted]"
                                     >Your rating:</span
                                 >
                                 <StarRating
@@ -541,7 +541,7 @@ const jsonLdBreadcrumb = computed(() =>
                                 />
                                 <Link
                                     href="#reviews"
-                                    class="font-medium text-red-500 transition-colors hover:text-red-400"
+                                    class="font-medium text-blue-500 transition-colors hover:text-blue-400"
                                 >
                                     Your review
                                 </Link>
@@ -553,8 +553,8 @@ const jsonLdBreadcrumb = computed(() =>
                                 class="mb-6 flex transform flex-wrap gap-2 transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
-                                        ? 'translate-y-0 opacity-100'
-                                        : 'translate-y-4 opacity-0'
+                                        ? 'translate-x-0 opacity-100'
+                                        : '-translate-x-3 opacity-0'
                                 "
                                 :style="{ transitionDelay: '300ms' }"
                             >
@@ -562,7 +562,7 @@ const jsonLdBreadcrumb = computed(() =>
                                     v-for="tag in movie.tags"
                                     :key="tag.id"
                                     :href="`/movies?tag=${tag.slug}`"
-                                    class="rounded-full bg-zinc-950 px-4 py-1.5 text-sm text-zinc-200 ring-1 ring-zinc-800/70 transition-all duration-200 hover:-translate-y-0.5 hover:bg-zinc-800 hover:text-white hover:ring-zinc-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                    class="rounded-full border border-[--intel-border] bg-[--intel-bg-elevated] px-4 py-1.5 font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-body] transition-all duration-200 hover:-translate-y-0.5 hover:border-[--intel-border-bright] hover:text-[--intel-text-primary] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                                 >
                                     {{ tag.name }}
                                 </Link>
@@ -573,15 +573,19 @@ const jsonLdBreadcrumb = computed(() =>
                                 class="mb-8 transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
-                                        ? 'translate-y-0 opacity-100'
-                                        : 'translate-y-4 opacity-0'
+                                        ? 'translate-x-0 opacity-100'
+                                        : '-translate-x-3 opacity-0'
                                 "
                                 :style="{ transitionDelay: '400ms' }"
                             >
-                                <h2 class="text-xl font-semibold text-white">
+                                <h2
+                                    class="text-xl font-semibold text-[--intel-text-primary]"
+                                >
                                     Synopsis
                                 </h2>
-                                <p class="leading-relaxed text-zinc-300">
+                                <p
+                                    class="leading-relaxed text-[--intel-text-body]"
+                                >
                                     {{ movie.synopsis }}
                                 </p>
                             </div>
@@ -592,13 +596,13 @@ const jsonLdBreadcrumb = computed(() =>
                                 class="mb-8 transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
-                                        ? 'translate-y-0 opacity-100'
-                                        : 'translate-y-4 opacity-0'
+                                        ? 'translate-x-0 opacity-100'
+                                        : '-translate-x-3 opacity-0'
                                 "
                                 :style="{ transitionDelay: '450ms' }"
                             >
                                 <h2
-                                    class="mb-4 text-xl font-semibold text-white"
+                                    class="mb-4 text-xl font-semibold text-[--intel-text-primary]"
                                 >
                                     Cast
                                 </h2>
@@ -613,7 +617,7 @@ const jsonLdBreadcrumb = computed(() =>
                                                 ? `/people/${member.slug}`
                                                 : '#'
                                         "
-                                        class="group flex flex-col items-center gap-2 rounded-xl p-3 ring-1 ring-zinc-800/70 transition-all hover:bg-zinc-900/60 hover:ring-zinc-700"
+                                        class="group flex flex-col items-center gap-2 rounded-xl p-3 ring-1 ring-[--intel-border] transition-all hover:bg-[--intel-bg-surface] hover:ring-[--intel-border-bright]"
                                     >
                                         <img
                                             :src="
@@ -622,17 +626,17 @@ const jsonLdBreadcrumb = computed(() =>
                                                 )
                                             "
                                             :alt="member.name"
-                                            class="size-16 shrink-0 overflow-hidden rounded-full object-cover ring-1 ring-zinc-700"
+                                            class="size-16 shrink-0 overflow-hidden rounded-full object-cover ring-1 ring-[--intel-border]"
                                         />
                                         <div class="min-w-0 text-center">
                                             <span
-                                                class="block truncate text-sm font-medium text-white group-hover:text-red-400"
+                                                class="block truncate font-[family-name:var(--font-mono-display)] text-xs font-medium text-[--intel-text-primary] group-hover:text-blue-400"
                                             >
                                                 {{ member.name }}
                                             </span>
                                             <span
                                                 v-if="member.character"
-                                                class="block truncate text-xs text-zinc-400"
+                                                class="block truncate text-xs text-[--intel-text-muted]"
                                             >
                                                 {{ member.character }}
                                             </span>
@@ -647,13 +651,13 @@ const jsonLdBreadcrumb = computed(() =>
                                 class="mb-8 transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
-                                        ? 'translate-y-0 opacity-100'
-                                        : 'translate-y-4 opacity-0'
+                                        ? 'translate-x-0 opacity-100'
+                                        : '-translate-x-3 opacity-0'
                                 "
                                 :style="{ transitionDelay: '500ms' }"
                             >
                                 <h2
-                                    class="mb-4 text-xl font-semibold text-white"
+                                    class="mb-4 text-xl font-semibold text-[--intel-text-primary]"
                                 >
                                     Crew
                                 </h2>
@@ -661,18 +665,20 @@ const jsonLdBreadcrumb = computed(() =>
                                     <div
                                         v-for="(member, idx) in keyCrew"
                                         :key="`${member.tmdb_id}-${member.job}-${idx}`"
-                                        class="flex justify-between gap-4 rounded-lg bg-zinc-900/40 px-3 py-2"
+                                        class="flex justify-between gap-4 rounded-lg bg-[--intel-bg-surface] px-3 py-2"
                                     >
-                                        <dt class="text-sm text-zinc-400">
+                                        <dt
+                                            class="font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-muted] uppercase"
+                                        >
                                             {{ member.job }}
                                         </dt>
                                         <dd
-                                            class="text-sm font-medium text-zinc-200"
+                                            class="text-sm font-medium text-[--intel-text-body]"
                                         >
                                             <Link
                                                 v-if="member.slug"
                                                 :href="`/people/${member.slug}`"
-                                                class="hover:text-red-400"
+                                                class="hover:text-blue-400"
                                             >
                                                 {{ member.name }}
                                             </Link>
@@ -689,8 +695,8 @@ const jsonLdBreadcrumb = computed(() =>
                                 class="flex transform flex-wrap items-center gap-4 transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                                 :class="
                                     isVisible
-                                        ? 'translate-y-0 opacity-100'
-                                        : 'translate-y-4 opacity-0'
+                                        ? 'translate-x-0 opacity-100'
+                                        : '-translate-x-3 opacity-0'
                                 "
                                 :style="{ transitionDelay: '500ms' }"
                             >
@@ -700,10 +706,10 @@ const jsonLdBreadcrumb = computed(() =>
                                     :href="movie.trailer_url"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all duration-200 hover:scale-105 hover:bg-red-700 hover:shadow-xl hover:shadow-red-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold tracking-wide text-white uppercase shadow-lg shadow-blue-600/20 transition-all duration-200 hover:scale-105 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                                 >
                                     <Play class="size-5" />
-                                    Watch Trailer
+                                    WATCH TRAILER
                                 </a>
 
                                 <!-- IMDb link with underline animation -->
@@ -712,12 +718,9 @@ const jsonLdBreadcrumb = computed(() =>
                                     :href="`https://www.imdb.com/title/${movie.imdb_id}/`"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="group relative text-sm text-zinc-300 transition-colors hover:text-zinc-200"
+                                    class="group relative inline-flex items-center rounded-lg border border-[--intel-border] px-4 py-2.5 text-sm text-[--intel-text-primary] transition-colors hover:border-[--intel-accent]"
                                 >
                                     <span>View on IMDb</span>
-                                    <span
-                                        class="absolute bottom-0 left-0 h-px w-0 bg-zinc-300 transition-all duration-300 group-hover:w-full"
-                                    />
                                 </a>
                             </div>
                         </div>
@@ -736,8 +739,8 @@ const jsonLdBreadcrumb = computed(() =>
                         class="transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                         :class="
                             relatedVisible
-                                ? 'translate-y-0 opacity-100'
-                                : 'translate-y-8 opacity-0'
+                                ? 'translate-x-0 opacity-100'
+                                : '-translate-x-3 opacity-0'
                         "
                     />
                     <MovieGrid>
@@ -748,8 +751,8 @@ const jsonLdBreadcrumb = computed(() =>
                             class="transform transition-all duration-700 [transition-timing-function:var(--ease-smooth-out)]"
                             :class="
                                 relatedVisible
-                                    ? 'translate-y-0 opacity-100'
-                                    : 'translate-y-8 opacity-0'
+                                    ? 'translate-x-0 opacity-100'
+                                    : '-translate-x-3 opacity-0'
                             "
                             :style="{
                                 transitionDelay: `${100 + index * 50}ms`,
@@ -768,7 +771,7 @@ const jsonLdBreadcrumb = computed(() =>
                 <!-- Filesystem curator review (editorial) -->
                 <div
                     v-if="hasFilesystemCuratorReview && curatorReview"
-                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                    class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface] p-6"
                     role="region"
                     aria-label="Editorial review"
                 >
@@ -778,12 +781,12 @@ const jsonLdBreadcrumb = computed(() =>
                 <!-- One-line summary when only curator review -->
                 <div
                     v-if="showOneLineReviewSummary && movie.slug"
-                    class="flex flex-wrap items-center gap-2 text-sm text-zinc-400"
+                    class="flex flex-wrap items-center gap-2 text-sm text-[--intel-text-muted]"
                 >
                     <span>1 review</span>
                     <Link
                         :href="`/movies/${movie.slug}/reviews`"
-                        class="font-medium text-red-500 hover:underline"
+                        class="font-medium text-blue-500 hover:underline"
                     >
                         Read full review
                     </Link>
@@ -792,7 +795,7 @@ const jsonLdBreadcrumb = computed(() =>
                 <!-- Full rating summary when multiple reviews -->
                 <div
                     v-else-if="totalReviewCount > 1"
-                    class="flex flex-wrap items-center gap-6 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4"
+                    class="flex flex-wrap items-center gap-6 rounded-lg border border-[--intel-border] bg-[--intel-bg-surface] p-4"
                 >
                     <div v-if="hasUserRatings" class="flex items-center gap-2">
                         <StarRating
@@ -802,13 +805,13 @@ const jsonLdBreadcrumb = computed(() =>
                             :max-stars="4"
                             size="md"
                         />
-                        <span class="text-sm text-zinc-400">
+                        <span class="text-sm text-[--intel-text-muted]">
                             {{ totalReviewCount }} reviews
                         </span>
                     </div>
                     <div
                         v-if="movie.tmdb_vote_average != null"
-                        class="flex items-center gap-2 text-sm text-zinc-400"
+                        class="flex items-center gap-2 text-sm text-[--intel-text-muted]"
                     >
                         <span
                             >TMDB:
@@ -826,7 +829,7 @@ const jsonLdBreadcrumb = computed(() =>
                     <Link
                         v-if="movie.slug"
                         :href="`/movies/${movie.slug}/reviews`"
-                        class="text-sm font-medium text-red-500 hover:underline"
+                        class="text-sm font-medium text-blue-500 hover:underline"
                     >
                         View all reviews
                     </Link>
@@ -835,22 +838,26 @@ const jsonLdBreadcrumb = computed(() =>
                 <!-- Guest empty state: no reviews -->
                 <div
                     v-if="hasNoReviews && !auth.user"
-                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 text-center"
+                    class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface] p-6 text-center"
                 >
-                    <p class="mb-4 text-zinc-300">Be the first to review</p>
+                    <p class="mb-4 text-[--intel-text-body]">
+                        Be the first to review
+                    </p>
                     <div
                         class="flex flex-wrap items-center justify-center gap-3"
                     >
                         <Link
                             :href="loginUrl"
-                            class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                             Log in to review
                         </Link>
-                        <span class="text-sm text-zinc-500">or</span>
+                        <span class="text-sm text-[--intel-text-faint]"
+                            >or</span
+                        >
                         <Link
                             :href="register().url"
-                            class="text-sm font-medium text-red-500 hover:underline"
+                            class="text-sm font-medium text-blue-500 hover:underline"
                         >
                             Sign up
                         </Link>
@@ -860,7 +867,7 @@ const jsonLdBreadcrumb = computed(() =>
                 <!-- Curator review teaser (excerpt + link to full review) -->
                 <div
                     v-if="hasCuratorReview && reviewsData.curator_review"
-                    class="space-y-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                    class="space-y-3 rounded-lg border border-[--intel-border] bg-[--intel-bg-surface] p-6"
                     role="region"
                     aria-label="Curator review"
                 >
@@ -870,7 +877,7 @@ const jsonLdBreadcrumb = computed(() =>
                             :max-stars="4"
                             size="md"
                         />
-                        <span class="text-sm text-zinc-400">
+                        <span class="text-sm text-[--intel-text-muted]">
                             {{
                                 reviewsData.curator_review.user?.name ??
                                 'Curator'
@@ -879,7 +886,7 @@ const jsonLdBreadcrumb = computed(() =>
                     </div>
                     <p
                         v-if="reviewsData.curator_review.content_excerpt"
-                        class="line-clamp-3 text-zinc-300"
+                        class="line-clamp-3 text-[--intel-text-body]"
                     >
                         {{ reviewsData.curator_review.content_excerpt }}
                     </p>
@@ -887,7 +894,7 @@ const jsonLdBreadcrumb = computed(() =>
                         <Link
                             v-if="movie.slug"
                             :href="`/movies/${movie.slug}/reviews`"
-                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-red-500 transition-colors hover:text-red-400"
+                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-500 transition-colors hover:text-blue-400"
                         >
                             Read full review
                             <ArrowRight class="size-4" />
@@ -895,7 +902,7 @@ const jsonLdBreadcrumb = computed(() =>
                         <Link
                             v-if="movie.slug && totalReviewCount > 1"
                             :href="`/movies/${movie.slug}/reviews`"
-                            class="text-sm font-medium text-red-500 hover:underline"
+                            class="text-sm font-medium text-blue-500 hover:underline"
                         >
                             View all reviews
                         </Link>
@@ -906,7 +913,7 @@ const jsonLdBreadcrumb = computed(() =>
                 <div v-if="canWriteReview">
                     <Link
                         :href="`/movies/${movie.slug}/reviews`"
-                        class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-800 hover:text-white"
+                        class="inline-flex items-center gap-2 rounded-lg border border-[--intel-border] px-4 py-2 text-sm font-medium text-[--intel-text-body] transition-colors hover:border-[--intel-accent] hover:bg-[--intel-bg-elevated] hover:text-[--intel-text-primary]"
                     >
                         Write a review
                     </Link>
@@ -926,19 +933,19 @@ const jsonLdBreadcrumb = computed(() =>
                         v-for="article in relatedArticles"
                         :key="article.id"
                         :href="`/articles/${article.slug}`"
-                        class="block rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700"
+                        class="block rounded-md border border-[--intel-border] bg-[--intel-bg-surface] p-4 transition-colors hover:border-[--intel-border-bright]"
                     >
-                        <h3 class="font-medium text-white">
+                        <h3 class="font-medium text-[--intel-text-primary]">
                             {{ article.title }}
                         </h3>
                         <p
                             v-if="article.excerpt"
-                            class="mt-1 line-clamp-2 text-sm text-zinc-400"
+                            class="mt-1 line-clamp-2 text-sm text-[--intel-text-muted]"
                         >
                             {{ article.excerpt }}
                         </p>
                         <div
-                            class="mt-2 flex items-center gap-2 text-xs text-zinc-500"
+                            class="mt-2 flex items-center gap-2 font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-faint]"
                         >
                             <span v-if="article.published_at">
                                 {{

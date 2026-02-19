@@ -16,7 +16,7 @@ use App\Policies\ReviewPolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use JonesRussell\NorthcloudLaravel\Events\ArticleProcessed;
+use JonesRussell\NorthCloud\Events\ArticleProcessed;
 
 class AppServiceProvider extends ServiceProvider
 {

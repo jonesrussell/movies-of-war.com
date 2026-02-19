@@ -29,6 +29,7 @@ import { computed, ref, watch } from 'vue';
 import MovieCard from '@/components/MovieCard.vue';
 import MovieCardActions from '@/components/MovieCardActions.vue';
 import MoviePreviewDialog from '@/components/MoviePreviewDialog.vue';
+import CoordinateGrid from '@/components/primitives/CoordinateGrid.vue';
 import FilterChip from '@/components/public/FilterChip.vue';
 import MovieGrid from '@/components/public/MovieGrid.vue';
 import MovieGridSkeleton from '@/components/public/MovieGridSkeleton.vue';
@@ -414,10 +415,7 @@ function cardEnterStyle(index: number) {
             spacing="md"
             class="relative overflow-hidden pt-10 md:pt-14 lg:pt-20"
         >
-            <div
-                class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] bg-size-[20px_20px] opacity-[0.04]"
-                aria-hidden="true"
-            />
+            <CoordinateGrid aria-hidden="true" />
             <PublicContainer class="relative flex flex-col gap-8">
                 <SectionHeader
                     kicker="Browse"
@@ -434,7 +432,7 @@ function cardEnterStyle(index: number) {
                     class="scrollbar-none flex snap-x snap-mandatory items-center gap-2 overflow-x-auto pb-1 whitespace-nowrap"
                 >
                     <span
-                        class="shrink-0 snap-start text-xs font-medium tracking-wider text-zinc-500 uppercase"
+                        class="shrink-0 snap-start font-[family-name:var(--font-mono-display)] text-xs font-medium tracking-wider text-[--intel-text-muted] uppercase"
                     >
                         Quick filters
                     </span>
@@ -444,10 +442,10 @@ function cardEnterStyle(index: number) {
                         type="button"
                         :aria-pressed="selectedConflict === conflict"
                         :class="[
-                            'shrink-0 snap-start rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600',
+                            'shrink-0 snap-start rounded-md border px-3 py-1.5 font-[family-name:var(--font-mono-display)] text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600',
                             selectedConflict === conflict
-                                ? 'bg-red-600 text-white'
-                                : 'bg-zinc-800/80 text-zinc-300 ring-1 ring-zinc-700/70 hover:bg-zinc-800 hover:text-white',
+                                ? 'border-blue-600 bg-blue-600 text-white'
+                                : 'border-[--intel-border] bg-transparent text-[--intel-text-body] hover:bg-[--intel-bg-elevated]',
                         ]"
                         @click="
                             selectedConflict =
@@ -463,7 +461,7 @@ function cardEnterStyle(index: number) {
                         "
                     >
                         <span
-                            class="mx-1 h-1 w-1 shrink-0 rounded-full bg-zinc-600"
+                            class="mx-1 h-1 w-1 shrink-0 rounded-full bg-[--intel-text-muted]"
                             aria-hidden="true"
                         />
                         <button
@@ -472,10 +470,10 @@ function cardEnterStyle(index: number) {
                                 selectedYear === String(recentDecadeStart)
                             "
                             :class="[
-                                'shrink-0 snap-start rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600',
+                                'shrink-0 snap-start rounded-md border px-3 py-1.5 font-[family-name:var(--font-mono-display)] text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600',
                                 selectedYear === String(recentDecadeStart)
-                                    ? 'bg-red-600 text-white'
-                                    : 'bg-zinc-800/80 text-zinc-300 ring-1 ring-zinc-700/70 hover:bg-zinc-800 hover:text-white',
+                                    ? 'border-blue-600 bg-blue-600 text-white'
+                                    : 'border-[--intel-border] bg-transparent text-[--intel-text-body] hover:bg-[--intel-bg-elevated]',
                             ]"
                             @click="
                                 selectedYear =
@@ -492,17 +490,17 @@ function cardEnterStyle(index: number) {
                 <div class="flex flex-col gap-4">
                     <nav
                         aria-label="Movie browsing controls"
-                        class="flex flex-col gap-3 rounded-2xl bg-zinc-950/60 p-4 ring-1 ring-zinc-800/70 backdrop-blur-sm lg:flex-row lg:items-center lg:gap-4"
+                        class="flex flex-col gap-3 rounded-md border border-[--intel-border] bg-[--intel-bg-surface] p-4 backdrop-blur-sm lg:flex-row lg:items-center lg:gap-4"
                     >
                         <div class="relative w-full lg:flex-1">
                             <Search
-                                class="pointer-events-none absolute top-1/2 left-3 z-10 size-5 -translate-y-1/2 text-zinc-400"
+                                class="pointer-events-none absolute top-1/2 left-3 z-10 size-5 -translate-y-1/2 text-[--intel-text-muted]"
                             />
                             <Input
                                 v-model="search"
                                 type="text"
-                                placeholder="Search movies..."
-                                class="w-full pl-10"
+                                placeholder="SEARCH FILMS..."
+                                class="w-full pl-10 font-[family-name:var(--font-mono-display)] uppercase placeholder:text-[--intel-text-muted]"
                             />
                         </div>
 
@@ -531,7 +529,7 @@ function cardEnterStyle(index: number) {
                                         :key="option.value"
                                         :class="
                                             selectedSort === option.value
-                                                ? 'bg-zinc-800'
+                                                ? 'bg-[--intel-bg-elevated]'
                                                 : ''
                                         "
                                         @click="selectedSort = option.value"
@@ -549,7 +547,7 @@ function cardEnterStyle(index: number) {
                             <div
                                 role="group"
                                 aria-label="View mode"
-                                class="hidden items-center rounded-lg border border-zinc-800 p-1 sm:flex"
+                                class="hidden items-center rounded-md border border-[--intel-border] p-1 sm:flex"
                             >
                                 <Button
                                     variant="ghost"
@@ -557,8 +555,8 @@ function cardEnterStyle(index: number) {
                                     class="size-8"
                                     :class="
                                         isGridView
-                                            ? 'bg-zinc-800 text-white'
-                                            : 'text-zinc-400'
+                                            ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                                            : 'text-[--intel-text-muted]'
                                     "
                                     @click="setGridView"
                                 >
@@ -570,8 +568,8 @@ function cardEnterStyle(index: number) {
                                     class="size-8"
                                     :class="
                                         isListView
-                                            ? 'bg-zinc-800 text-white'
-                                            : 'text-zinc-400'
+                                            ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                                            : 'text-[--intel-text-muted]'
                                     "
                                     @click="setListView"
                                 >
@@ -588,7 +586,7 @@ function cardEnterStyle(index: number) {
                                 Filters
                                 <span
                                     v-if="activeChips.length"
-                                    class="rounded-full bg-red-600 px-2 py-0.5 text-xs text-white"
+                                    class="rounded-full bg-blue-600 px-2 py-0.5 text-xs text-white"
                                 >
                                     {{ activeChips.length }}
                                 </span>
@@ -601,7 +599,7 @@ function cardEnterStyle(index: number) {
                                         Filters
                                         <span
                                             v-if="activeChips.length"
-                                            class="rounded-full bg-red-600 px-2 py-0.5 text-xs text-white"
+                                            class="rounded-full bg-blue-600 px-2 py-0.5 text-xs text-white"
                                         >
                                             {{ activeChips.length }}
                                         </span>
@@ -609,10 +607,12 @@ function cardEnterStyle(index: number) {
                                 </SheetTrigger>
                                 <SheetContent
                                     side="right"
-                                    class="w-[320px] bg-zinc-950"
+                                    class="w-[320px] bg-[--intel-bg-base]"
                                 >
                                     <SheetHeader>
-                                        <SheetTitle class="text-white">
+                                        <SheetTitle
+                                            class="text-[--intel-text-primary]"
+                                        >
                                             Filters
                                         </SheetTitle>
                                     </SheetHeader>
@@ -658,7 +658,7 @@ function cardEnterStyle(index: number) {
                             <Button
                                 v-if="hasActiveFilters()"
                                 variant="ghost"
-                                class="text-zinc-300 hover:text-white"
+                                class="text-[--intel-text-body] hover:text-[--intel-text-primary]"
                                 @click="clearFilters"
                             >
                                 <X class="size-4" />
@@ -693,21 +693,23 @@ function cardEnterStyle(index: number) {
                     </div>
 
                     <div
-                        class="flex items-center justify-between border-t border-zinc-800/60 pt-4"
+                        class="flex items-center justify-between border-t border-[--intel-border] pt-4"
                     >
                         <p
-                            class="text-xs font-medium tracking-wide text-zinc-400 uppercase"
+                            class="font-[family-name:var(--font-mono-display)] text-xs tracking-wider text-[--intel-text-muted] uppercase"
                         >
                             <span class="sr-only">Results count:</span>
-                            {{ movies.meta?.total ?? 0 }} films
+                            SHOWING {{ displayedMovies.length }} OF
+                            {{ movies.meta?.total ?? 0 }} // SORTED BY:
+                            {{ currentSortOption.label.toUpperCase() }}
                         </p>
                         <label
-                            class="flex cursor-pointer items-center gap-2 text-xs font-medium tracking-wide text-zinc-400 uppercase"
+                            class="flex cursor-pointer items-center gap-2 font-[family-name:var(--font-mono-display)] text-xs tracking-wider text-[--intel-text-muted] uppercase"
                         >
                             <input
                                 v-model="useInfiniteScrollMode"
                                 type="checkbox"
-                                class="size-4 rounded border-zinc-700 bg-zinc-900 text-red-600 focus:ring-red-500"
+                                class="size-4 rounded border-[--intel-border] bg-[--intel-bg-surface] text-blue-600 focus:ring-blue-500"
                             />
                             Infinite scroll
                         </label>
@@ -763,7 +765,7 @@ function cardEnterStyle(index: number) {
                     >
                         <Loader2
                             v-if="isLoadingMore"
-                            class="size-8 animate-spin text-zinc-500"
+                            class="size-8 animate-spin text-[--intel-text-muted]"
                         />
                     </div>
 
@@ -781,12 +783,12 @@ function cardEnterStyle(index: number) {
                             :key="link.label"
                             :href="link.url || '#'"
                             :class="[
-                                'rounded-xl px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500',
+                                'rounded-md px-4 py-2 font-[family-name:var(--font-mono-display)] text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
                                 link.active
-                                    ? 'bg-red-600 text-white'
+                                    ? 'bg-blue-600 text-white'
                                     : link.url
-                                      ? 'bg-zinc-950 text-zinc-200 ring-1 ring-zinc-800/70 hover:bg-zinc-900'
-                                      : 'cursor-not-allowed bg-zinc-950 text-zinc-600 ring-1 ring-zinc-800/70',
+                                      ? 'bg-[--intel-bg-base] text-[--intel-text-body] ring-1 ring-[--intel-border] hover:bg-[--intel-bg-surface]'
+                                      : 'cursor-not-allowed bg-[--intel-bg-base] text-[--intel-text-faint] ring-1 ring-[--intel-border]',
                             ]"
                             :preserve-scroll="true"
                             :preserve-state="true"
@@ -803,7 +805,7 @@ function cardEnterStyle(index: number) {
                         alt="No movies found"
                         class="mx-auto mb-6 h-32 w-32 opacity-50"
                     />
-                    <p class="text-xl text-zinc-300">
+                    <p class="text-xl text-[--intel-text-body]">
                         No movies found matching your filters.
                     </p>
                     <Button

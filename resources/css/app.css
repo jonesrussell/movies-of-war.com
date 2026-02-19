@@ -130,6 +130,21 @@
     --ease-smooth-out: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-dramatic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
+    /* Intelligence palette — Slate Command */
+    --intel-bg-base: #0c1222;
+    --intel-bg-surface: #131c31;
+    --intel-bg-elevated: #1a2540;
+    --intel-border: #1e3050;
+    --intel-border-bright: #2a4060;
+    --intel-accent: #3b82f6;
+    --intel-accent-dim: #2563eb;
+    --intel-accent-glow: rgba(59, 130, 246, 0.15);
+    --intel-alert: #ef4444;
+    --intel-text-primary: #e2e8f0;
+    --intel-text-body: #94a3b8;
+    --intel-text-muted: #64748b;
+    --intel-text-faint: #475569;
+
     /* Container sizes - explicitly set to prevent Tailwind v4 bug where max-w-* uses --spacing-* instead of --container-* */
     /* See: https://github.com/tailwindlabs/tailwindcss/discussions/17777 */
     --container-3xs: 16rem;
@@ -430,7 +445,7 @@
 
     /* Focus ring utility for consistent accessibility */
     .focus-ring {
-        @apply outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950;
+        @apply outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1222];
     }
 
     /* Override max-width utilities to use container sizes instead of spacing (Tailwind v4 bug workaround) */
@@ -505,39 +520,39 @@
 }
 
 .dark {
-    --background: hsl(0 0% 3.9%);
-    --foreground: hsl(0 0% 98%);
-    --card: hsl(0 0% 3.9%);
-    --card-foreground: hsl(0 0% 98%);
-    --popover: hsl(0 0% 3.9%);
-    --popover-foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(0 0% 9%);
-    --secondary: hsl(0 0% 14.9%);
-    --secondary-foreground: hsl(0 0% 98%);
-    --muted: hsl(0 0% 16.08%);
-    --muted-foreground: hsl(0 0% 63.9%);
-    --accent: hsl(0 0% 14.9%);
-    --accent-foreground: hsl(0 0% 98%);
-    --destructive: hsl(0 84% 60%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 14.9%);
-    --input: hsl(0 0% 14.9%);
-    --ring: hsl(0 0% 83.1%);
-    --chart-1: hsl(220 70% 50%);
-    --chart-2: hsl(160 60% 45%);
-    --chart-3: hsl(30 80% 55%);
-    --chart-4: hsl(280 65% 60%);
-    --chart-5: hsl(340 75% 55%);
-    --sidebar-background: hsl(0 0% 7%);
-    --sidebar-foreground: hsl(0 0% 95.9%);
-    --sidebar-primary: hsl(360, 100%, 100%);
-    --sidebar-primary-foreground: hsl(0 0% 100%);
-    --sidebar-accent: hsl(0 0% 15.9%);
-    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-border: hsl(0 0% 15.9%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(240 5.9% 10%);
+    --background: #0c1222;
+    --foreground: #e2e8f0;
+    --card: #131c31;
+    --card-foreground: #e2e8f0;
+    --popover: #131c31;
+    --popover-foreground: #e2e8f0;
+    --primary: #3b82f6;
+    --primary-foreground: #ffffff;
+    --secondary: #1a2540;
+    --secondary-foreground: #e2e8f0;
+    --muted: #1a2540;
+    --muted-foreground: #64748b;
+    --accent: #1a2540;
+    --accent-foreground: #e2e8f0;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: #1e3050;
+    --input: #1e3050;
+    --ring: #3b82f6;
+    --chart-1: #3b82f6;
+    --chart-2: #22d3ee;
+    --chart-3: #f59e0b;
+    --chart-4: #8b5cf6;
+    --chart-5: #ef4444;
+    --sidebar-background: #0a0f1a;
+    --sidebar-foreground: #e2e8f0;
+    --sidebar-primary: #3b82f6;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #1a2540;
+    --sidebar-accent-foreground: #e2e8f0;
+    --sidebar-border: #1e3050;
+    --sidebar-ring: #3b82f6;
+    --sidebar: #0a0f1a;
 }
 
 @layer base {

@@ -17,7 +17,7 @@ use Inertia\Response;
 
 final class MovieController extends Controller
 {
-    private const PER_PAGE_OPTIONS = [10, 20, 50, 100];
+    use \App\Http\Controllers\Concerns\ResolvesPagination;
 
     private const INDEX_SORT_MAP = [
         'title_asc' => [['title', 'asc']],
@@ -155,13 +155,6 @@ final class MovieController extends Controller
         }
 
         return $params;
-    }
-
-    private function resolvePerPage(Request $request): int
-    {
-        $perPage = (int) $request->get('per_page', 20);
-
-        return in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : 20;
     }
 
     public function show(Movie $movie): Response

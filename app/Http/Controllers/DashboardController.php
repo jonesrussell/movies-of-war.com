@@ -21,6 +21,7 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
+    use Concerns\ResolvesPagination;
     public function __construct(
         protected DashboardStatsService $statsService,
         protected TMDBService $tmdbService,
@@ -91,7 +92,7 @@ class DashboardController extends Controller
             $query->latest('updated_at');
         }
 
-        $perPage = $this->resolveTmdbImportsPerPage($request);
+        $perPage = $this->resolvePerPage($request, default: 24, allowed: [10, 20, 24, 50, 100]);
         $tmdbDrafts = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Dashboard/TmdbImports', [
@@ -111,14 +112,6 @@ class DashboardController extends Controller
         }
 
         return $params;
-    }
-
-    private function resolveTmdbImportsPerPage(Request $request): int
-    {
-        $allowed = [10, 20, 24, 50, 100];
-        $perPage = (int) $request->get('per_page', 24);
-
-        return in_array($perPage, $allowed, true) ? $perPage : 24;
     }
 
     public function tmdbSearch(): Response

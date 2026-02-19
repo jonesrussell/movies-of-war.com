@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { RequestPayload } from '@inertiajs/core';
+
 import { Head, router } from '@inertiajs/vue3';
 import { AlertTriangle, ArrowLeft, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';

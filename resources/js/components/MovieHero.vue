@@ -6,7 +6,7 @@ import { ArrowRight, Info, Play } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
 import {
-    DotPattern,
+    CoordinateGrid,
     GradientOverlay,
     Poster,
     StarRating,
@@ -92,7 +92,7 @@ onMounted(() => {
 <template>
     <section
         data-testid="movie-hero"
-        class="relative overflow-hidden bg-zinc-950"
+        class="relative overflow-hidden bg-[--intel-bg-base]"
     >
         <!-- Background layers -->
         <div class="absolute inset-0">
@@ -132,10 +132,10 @@ onMounted(() => {
             <!-- Multiple gradient layers for depth -->
             <GradientOverlay direction="to-r" intensity="heavy" />
             <GradientOverlay direction="to-t" intensity="medium" />
-            <div class="absolute inset-0 bg-zinc-950/20" />
+            <div class="absolute inset-0 bg-[--intel-bg-base]/20" />
 
-            <!-- Film texture pattern -->
-            <DotPattern size="md" :opacity="0.06" />
+            <!-- Coordinate grid pattern -->
+            <CoordinateGrid :opacity="0.03" density="normal" />
         </div>
 
         <PublicContainer as="div" class="relative py-14 sm:py-16 lg:py-20">
@@ -145,8 +145,8 @@ onMounted(() => {
                     class="transition-all delay-150 duration-700 [transition-timing-function:var(--ease-smooth-out)] lg:col-span-4"
                     :class="
                         isVisible
-                            ? 'translate-y-0 opacity-100'
-                            : 'translate-y-8 opacity-0'
+                            ? 'translate-x-0 opacity-100'
+                            : '-translate-x-3 opacity-0'
                     "
                 >
                     <Poster
@@ -165,26 +165,29 @@ onMounted(() => {
                     class="flex flex-col justify-center transition-all delay-300 duration-700 [transition-timing-function:var(--ease-smooth-out)] lg:col-span-8 lg:pr-8"
                     :class="
                         isVisible
-                            ? 'translate-y-0 opacity-100'
-                            : 'translate-y-8 opacity-0'
+                            ? 'translate-x-0 opacity-100'
+                            : '-translate-x-3 opacity-0'
                     "
                 >
                     <div
                         v-if="subtitle"
-                        class="mb-2 text-xs font-semibold tracking-[0.25em] text-red-500 uppercase"
+                        class="mb-2 font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-blue-500 uppercase"
                     >
+                        <span
+                            class="mr-3 inline-block h-px w-6 bg-blue-500 align-middle"
+                        ></span>
                         {{ subtitle }}
                     </div>
 
                     <h1
-                        class="mb-4 font-bold tracking-tight text-balance text-white"
+                        class="mb-4 font-[family-name:var(--font-mono-display)] font-bold tracking-tight text-balance text-[--intel-text-primary]"
                         style="font-size: clamp(2rem, 4vw + 1rem, 3.75rem)"
                     >
                         {{ movie.title }}
                     </h1>
 
                     <div
-                        class="mb-6 flex flex-wrap items-center gap-4 text-sm text-zinc-300"
+                        class="mb-6 flex flex-wrap items-center gap-4 text-sm text-[--intel-text-body]"
                     >
                         <span class="text-lg font-semibold">{{
                             movie.release_year
@@ -193,12 +196,12 @@ onMounted(() => {
                             v-if="movie.runtime"
                             class="flex items-center gap-1"
                         >
-                            <span class="text-zinc-600">|</span>
+                            <span class="text-[--intel-text-muted]">|</span>
                             {{ movie.runtime }} min
                         </span>
                         <span
                             v-if="movie.conflict"
-                            class="rounded-full bg-zinc-900/80 px-4 py-1.5 text-xs font-semibold ring-1 ring-zinc-800/70 backdrop-blur-sm"
+                            class="rounded-full bg-[--intel-bg-elevated] px-4 py-1.5 text-xs font-semibold ring-1 ring-[--intel-border] backdrop-blur-sm"
                         >
                             {{ movie.conflict }}
                         </span>
@@ -210,9 +213,11 @@ onMounted(() => {
                         />
                         <span
                             v-if="userReview"
-                            class="flex items-center gap-2 text-sm text-zinc-300"
+                            class="flex items-center gap-2 text-sm text-[--intel-text-body]"
                         >
-                            <span class="text-zinc-500">Your rating:</span>
+                            <span class="text-[--intel-text-muted]"
+                                >Your rating:</span
+                            >
                             <StarRating
                                 :rating="userReview.rating"
                                 :max-stars="4"
@@ -220,7 +225,7 @@ onMounted(() => {
                             />
                             <Link
                                 :href="`/movies/${movie.slug}/reviews`"
-                                class="font-medium text-red-500 transition-colors hover:text-red-400"
+                                class="font-medium text-blue-500 transition-colors hover:text-blue-400"
                             >
                                 Your review
                             </Link>
@@ -228,21 +233,21 @@ onMounted(() => {
                     </div>
 
                     <p
-                        class="mb-8 line-clamp-4 text-lg leading-relaxed text-zinc-300"
+                        class="mb-8 line-clamp-4 text-lg leading-relaxed text-[--intel-text-body]"
                     >
                         {{ movie.synopsis }}
                     </p>
 
                     <div
                         v-if="review?.content_excerpt"
-                        class="mb-8 rounded-lg border border-zinc-800/80 bg-zinc-900/50 p-6"
+                        class="mb-8 rounded-lg border border-[--intel-border] bg-[--intel-bg-elevated]/50 p-6"
                     >
-                        <p class="mb-4 line-clamp-3 text-zinc-300">
+                        <p class="mb-4 line-clamp-3 text-[--intel-text-body]">
                             {{ review.content_excerpt }}
                         </p>
                         <Link
                             :href="`/movies/${movie.slug}/reviews`"
-                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-red-500 transition-colors hover:text-red-400"
+                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-500 transition-colors hover:text-blue-400"
                         >
                             Read full review
                             <ArrowRight class="size-4" />
@@ -256,7 +261,7 @@ onMounted(() => {
                         <span
                             v-for="tag in movie.tags"
                             :key="tag.id"
-                            class="rounded-full bg-zinc-900/80 px-4 py-1.5 text-sm text-zinc-300 ring-1 ring-zinc-800/70 backdrop-blur-sm transition-colors hover:bg-zinc-800"
+                            class="rounded-full border border-[--intel-border] bg-[--intel-bg-elevated] px-4 py-1.5 font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-body] backdrop-blur-sm transition-colors hover:border-[--intel-accent]"
                         >
                             {{ tag.name }}
                         </span>
@@ -265,10 +270,10 @@ onMounted(() => {
                     <div class="flex flex-wrap gap-4">
                         <Link
                             :href="`/movies/${movie.slug}`"
-                            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:bg-red-700 hover:shadow-red-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 hover:shadow-blue-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                             <Info class="size-5" />
-                            More Details
+                            VIEW DOSSIER
                         </Link>
 
                         <a
@@ -276,7 +281,7 @@ onMounted(() => {
                             :href="movie.trailer_url"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex items-center gap-2 rounded-xl bg-zinc-900/80 px-6 py-3.5 text-sm font-semibold text-white ring-1 ring-zinc-800/70 backdrop-blur-sm transition-all hover:bg-zinc-800 hover:ring-zinc-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="inline-flex items-center gap-2 rounded-xl border border-[--intel-border] bg-[--intel-bg-elevated]/80 px-6 py-3.5 text-sm font-semibold text-[--intel-text-primary] backdrop-blur-sm transition-all hover:border-[--intel-accent] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                             <Play class="size-5" />
                             Watch Trailer

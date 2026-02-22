@@ -6,8 +6,19 @@ return [
     ],
 
     'redis' => [
-        'connection' => env('NORTHCLOUD_REDIS_CONNECTION', env('REDIS_ARTICLES_CONNECTION', 'default')),
-        'channels' => [env('NORTHCLOUD_CHANNEL', env('REDIS_ARTICLES_CHANNEL', 'articles:war'))],
+        'connection' => env('NORTHCLOUD_REDIS_CONNECTION', 'northcloud'),
+        'channels' => array_filter(array_map(
+            'trim',
+            explode(',', env('NORTHCLOUD_CHANNELS', implode(',', [
+                // Layer 6: Entertainment (publisher does not emit articles:war)
+                'entertainment:homepage',
+                'entertainment:peripheral',
+                'entertainment:category:film',
+                'entertainment:category:music',
+                'entertainment:category:gaming',
+                'entertainment:category:reviews',
+            ])))
+        )),
     ],
 
     'quality' => [

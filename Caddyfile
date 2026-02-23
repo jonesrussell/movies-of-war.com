@@ -73,7 +73,7 @@ movies-of-war.com {
   }
 
   log {
-    output file /home/deployer/movies-of-war.com/log/access.log {
+    output file /var/log/caddy/movies-of-war.com.access.log {
       mode 0644
     }
   }

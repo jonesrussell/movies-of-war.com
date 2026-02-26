@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\FeaturedHistoryController;
 use App\Http\Controllers\Admin\FeaturedQueueController;
 use App\Http\Controllers\Admin\FeaturedSlotController;
 use App\Http\Controllers\Admin\MovieController as AdminMovieController;
@@ -34,6 +35,9 @@ Route::middleware('northcloud-admin')->group(function () {
     Route::post('/dashboard/featured-queue', [FeaturedQueueController::class, 'store'])->name('dashboard.featured-queue.store');
     Route::delete('/dashboard/featured-queue/{featuredSlotQueue}', [FeaturedQueueController::class, 'destroy'])->name('dashboard.featured-queue.destroy');
     Route::post('/dashboard/featured-queue/refill', [FeaturedQueueController::class, 'refill'])->name('dashboard.featured-queue.refill');
+
+    // Featured slot history
+    Route::get('/dashboard/featured-history', [FeaturedHistoryController::class, 'index'])->name('dashboard.featured-history');
 
     // Reviews (moderation)
     Route::get('/dashboard/reviews', [AdminReviewController::class, 'index'])->name('dashboard.reviews');

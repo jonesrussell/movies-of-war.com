@@ -14,6 +14,7 @@ import {
 import PublicContainer from '@/components/public/PublicContainer.vue';
 import {
     extractPosterPath,
+    getLocalPosterSrcset,
     getTmdbPosterSizes,
     getTmdbPosterSrcset,
     isTmdbImageUrl,
@@ -36,7 +37,18 @@ const posterImage = computed(
         props.movie.poster_url || '/images/placeholders/poster-placeholder.png',
 );
 
+const localPosterPath = computed(() => {
+    const pp = props.movie.poster_path;
+    if (pp && (pp.startsWith('posters/') || pp.includes('/storage/posters/'))) {
+        const match = pp.match(/posters\/(.+)$/);
+        return match ? `posters/${match[1]}` : null;
+    }
+    return null;
+});
+
 const tmdbPosterPath = computed(() => {
+    if (localPosterPath.value) return null;
+
     if (props.movie.poster_path) {
         return props.movie.poster_path;
     }
@@ -48,34 +60,42 @@ const tmdbPosterPath = computed(() => {
     return null;
 });
 
-const backgroundWebpSrcset = computed(() => {
-    if (!tmdbPosterPath.value) {
-        return '';
-    }
+const backgroundAvifSrcset = computed(() => {
+    if (!localPosterPath.value) return '';
+    return getLocalPosterSrcset(localPosterPath.value, 'hero', 'avif');
+});
 
-    return getTmdbPosterSrcset(tmdbPosterPath.value, 'hero', true);
+const backgroundWebpSrcset = computed(() => {
+    if (localPosterPath.value) {
+        return getLocalPosterSrcset(localPosterPath.value, 'hero', 'webp');
+    }
+    if (tmdbPosterPath.value) {
+        return getTmdbPosterSrcset(tmdbPosterPath.value, 'hero', true);
+    }
+    return '';
 });
 
 const backgroundJpegSrcset = computed(() => {
-    if (!tmdbPosterPath.value) {
-        return '';
+    if (localPosterPath.value) {
+        return getLocalPosterSrcset(localPosterPath.value, 'hero', 'original');
     }
-
-    return getTmdbPosterSrcset(tmdbPosterPath.value, 'hero', false);
+    if (tmdbPosterPath.value) {
+        return getTmdbPosterSrcset(tmdbPosterPath.value, 'hero', false);
+    }
+    return '';
 });
 
 const backgroundSizes = computed(() => {
-    if (!tmdbPosterPath.value) {
-        return undefined;
-    }
-
+    if (!localPosterPath.value && !tmdbPosterPath.value) return undefined;
     return getTmdbPosterSizes('hero');
 });
 
 const useResponsiveBackground = computed(() => {
     return Boolean(
-        tmdbPosterPath.value &&
-        (backgroundWebpSrcset.value || backgroundJpegSrcset.value),
+        (localPosterPath.value || tmdbPosterPath.value) &&
+        (backgroundAvifSrcset.value ||
+            backgroundWebpSrcset.value ||
+            backgroundJpegSrcset.value),
     );
 });
 
@@ -98,6 +118,12 @@ onMounted(() => {
         <div class="absolute inset-0">
             <!-- Blurred poster background with scale animation -->
             <picture v-if="useResponsiveBackground">
+                <source
+                    v-if="backgroundAvifSrcset"
+                    type="image/avif"
+                    :srcset="backgroundAvifSrcset"
+                    :sizes="backgroundSizes"
+                />
                 <source
                     v-if="backgroundWebpSrcset"
                     type="image/webp"

@@ -105,12 +105,26 @@ function getSlotBadge(slot: string): string {
                         Manage homepage hero and pick of the week
                     </p>
                 </div>
-                <Link
-                    :href="'/featured-slots/create'"
-                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-                >
-                    Add Featured Slot
-                </Link>
+                <div class="flex gap-3">
+                    <Link
+                        href="/dashboard/featured-queue"
+                        class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
+                    >
+                        View Queue
+                    </Link>
+                    <Link
+                        href="/dashboard/featured-history"
+                        class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
+                    >
+                        View History
+                    </Link>
+                    <Link
+                        href="/featured-slots/create"
+                        class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                    >
+                        Add Featured Slot
+                    </Link>
+                </div>
             </div>
 
             <!-- Filters -->

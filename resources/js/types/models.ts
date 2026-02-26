@@ -197,13 +197,40 @@ export interface MovieReviewsData {
     curator_review?: Review | null;
 }
 
+export type SlotType = 'hero' | 'pick_of_week';
+export type SelectionMethod = 'auto' | 'manual';
+
 export interface FeaturedSlot {
     id: number;
     movie_id: number;
-    slot: 'hero' | 'pick_of_week';
+    slot: SlotType;
     created_at: string;
     updated_at: string;
     movie?: Movie;
+}
+
+export interface FeaturedSlotQueue {
+    id: number;
+    movie_id: number;
+    slot: SlotType;
+    position: number;
+    selection_method: SelectionMethod;
+    scheduled_for: string;
+    created_at: string;
+    updated_at: string;
+    movie?: Movie;
+}
+
+export interface FeaturedSlotHistory {
+    id: number;
+    movie_id: number | null;
+    slot: SlotType;
+    selection_method: SelectionMethod;
+    started_at: string;
+    ended_at: string | null;
+    created_at: string;
+    updated_at: string;
+    movie?: Movie | null;
 }
 
 export interface PaginatedMovies {

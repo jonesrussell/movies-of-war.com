@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\SlotType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +22,9 @@ class FeaturedSlot extends Model
 
     protected function casts(): array
     {
-        return [];
+        return [
+            'slot' => SlotType::class,
+        ];
     }
 
     public function movie(): BelongsTo
@@ -42,8 +45,8 @@ class FeaturedSlot extends Model
      * @param  Builder<FeaturedSlot>  $query
      * @return Builder<FeaturedSlot>
      */
-    public function scopeSlot(Builder $query, string $slot): Builder
+    public function scopeSlot(Builder $query, SlotType|string $slot): Builder
     {
-        return $query->where('slot', $slot);
+        return $query->where('slot', $slot instanceof SlotType ? $slot->value : $slot);
     }
 }

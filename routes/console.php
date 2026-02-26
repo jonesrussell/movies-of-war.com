@@ -85,3 +85,10 @@ Schedule::command('tmdb:refresh-people --limit=20')
     ->dailyAt('04:00')
     ->name('tmdb-refresh-people')
     ->withoutOverlapping();
+
+// Rotate featured slots every Sunday at 6 AM UTC
+Schedule::command('featured:rotate')
+    ->weeklyOn(0, '06:00')
+    ->timezone('UTC')
+    ->name('rotate-featured-slots')
+    ->withoutOverlapping();

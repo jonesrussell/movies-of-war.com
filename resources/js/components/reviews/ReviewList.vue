@@ -140,7 +140,7 @@ function buildReviewsUrl(
             v-else
             class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface]/50 p-12 text-center"
         >
-            <p class="text-zinc-400">{{ emptyMessage }}</p>
+            <p class="text-[--intel-text-muted]">{{ emptyMessage }}</p>
         </div>
 
         <Pagination

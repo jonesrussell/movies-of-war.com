@@ -361,7 +361,7 @@ const loginUrl = computed(
                     >
                         <Button
                             v-if="!showReviewForm"
-                            class="bg-red-600 text-white hover:bg-[--intel-alert-dim] focus-visible:ring-[--intel-alert]"
+                            class="bg-[--intel-alert] text-white hover:bg-[--intel-alert-dim] focus-visible:ring-[--intel-alert]"
                             @click="showReviewForm = true"
                         >
                             Write a review

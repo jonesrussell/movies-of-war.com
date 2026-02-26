@@ -121,7 +121,7 @@ const jsonLdWebSite = computed(() =>
                     <div class="mt-8 flex flex-wrap justify-center gap-3">
                         <Link
                             href="/movies"
-                            class="inline-flex items-center justify-center rounded-xl bg-[--intel-accent] px-5 py-3 text-sm font-semibold text-[--intel-text-primary] transition-colors hover:bg-[--intel-accent-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
+                            class="inline-flex items-center justify-center rounded-xl bg-[--intel-accent] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[--intel-accent-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                         >
                             Browse movies
                         </Link>
@@ -212,7 +212,7 @@ const jsonLdWebSite = computed(() =>
                     </div>
                     <Link
                         href="/movies"
-                        class="inline-flex items-center justify-center rounded-xl bg-[--intel-accent] px-6 py-3 text-sm font-semibold text-[--intel-text-primary] transition-colors hover:bg-[--intel-accent-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
+                        class="inline-flex items-center justify-center rounded-xl bg-[--intel-accent] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[--intel-accent-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                     >
                         Access Full Database
                     </Link>

@@ -471,7 +471,7 @@
 
     /* Focus ring utility for consistent accessibility */
     .focus-ring {
-        @apply outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
+        @apply outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent] focus-visible:ring-offset-2;
         --tw-ring-offset-color: var(--intel-bg-base);
     }
 

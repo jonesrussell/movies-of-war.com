@@ -123,7 +123,7 @@ const formatDate = (dateStr: string | null): string => {
                 <!-- Article content (trusted CMS content from backend) -->
                 <!-- eslint-disable vue/no-v-html -->
                 <div
-                    class="prose max-w-none prose-invert prose-headings:font-[family-name:var(--font-mono-display)] prose-headings:text-[--intel-text-primary] prose-p:text-[--intel-text-secondary] prose-a:text-[--intel-accent] prose-a:no-underline hover:prose-a:text-[--intel-accent-hover] prose-strong:text-[--intel-text-primary]"
+                    class="prose max-w-none prose-neutral prose-headings:font-[family-name:var(--font-mono-display)] prose-headings:text-[--intel-text-primary] prose-p:text-[--intel-text-body] prose-a:text-[--intel-accent] prose-a:no-underline hover:prose-a:text-[--intel-accent-hover] prose-strong:text-[--intel-text-primary]"
                     v-html="article.content"
                 />
                 <!-- eslint-enable vue/no-v-html -->

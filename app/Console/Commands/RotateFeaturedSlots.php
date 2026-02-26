@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\SlotType;
 use App\Models\FeaturedSlot;
 use App\Models\FeaturedSlotHistory;
 use App\Models\FeaturedSlotQueue;
@@ -25,13 +26,14 @@ class RotateFeaturedSlots extends Command
 
         $this->info('Rotating featured slots...');
 
-        $slots = ['hero', 'pick_of_week'];
+        $slots = [SlotType::Hero, SlotType::PickOfWeek];
+        $failed = false;
 
         foreach ($slots as $slotType) {
             $next = FeaturedSlotQueue::slot($slotType)->nextUp()->first();
 
             if (! $next) {
-                $this->line("  No queue entry for {$slotType}, auto-selecting...");
+                $this->line("  No queue entry for {$slotType->value}, auto-selecting...");
                 if (! $dryRun) {
                     $service->fillQueue();
                     $next = FeaturedSlotQueue::slot($slotType)->nextUp()->first();
@@ -39,7 +41,7 @@ class RotateFeaturedSlots extends Command
             }
 
             if (! $next) {
-                $this->warn("  No eligible movie for {$slotType}. Keeping current.");
+                $this->warn("  No eligible movie for {$slotType->value}. Keeping current.");
 
                 continue;
             }
@@ -48,49 +50,55 @@ class RotateFeaturedSlots extends Command
             $movieTitle = $next->movie?->title ?? 'Unknown';
 
             if ($dryRun) {
-                $this->line("  [DRY RUN] {$slotType}: would swap to \"{$movieTitle}\"");
+                $this->line("  [DRY RUN] {$slotType->value}: would swap to \"{$movieTitle}\"");
 
                 continue;
             }
 
-            DB::transaction(function () use ($slotType, $next): void {
-                // Archive current
-                FeaturedSlotHistory::current()->slot($slotType)->update([
-                    'ended_at' => now(),
-                ]);
+            try {
+                DB::transaction(function () use ($slotType, $next, $service, $movieTitle): void {
+                    // Archive current
+                    FeaturedSlotHistory::current()->slot($slotType)->update([
+                        'ended_at' => now(),
+                    ]);
 
-                // Swap in
-                FeaturedSlot::where('slot', $slotType)->delete();
-                FeaturedSlot::create([
+                    // Swap in
+                    FeaturedSlot::where('slot', $slotType)->delete();
+                    FeaturedSlot::create([
+                        'movie_id' => $next->movie_id,
+                        'slot' => $slotType,
+                    ]);
+
+                    // Log to history
+                    FeaturedSlotHistory::create([
+                        'movie_id' => $next->movie_id,
+                        'slot' => $slotType,
+                        'selection_method' => $next->selection_method,
+                        'started_at' => now(),
+                    ]);
+
+                    // Remove consumed entry
+                    $next->delete();
+
+                    // Reindex remaining positions for this slot
+                    $service->reindexPositions($slotType);
+
+                    Log::info("Featured slot rotated: {$slotType->value}", [
+                        'movie_id' => $next->movie_id,
+                        'movie_title' => $movieTitle,
+                        'selection_method' => $next->selection_method->value,
+                    ]);
+                });
+
+                $this->line("  {$slotType->value}: swapped to \"{$movieTitle}\"");
+            } catch (\Throwable $e) {
+                $failed = true;
+                Log::error("Featured slot rotation failed for {$slotType->value}", [
                     'movie_id' => $next->movie_id,
-                    'slot' => $slotType,
+                    'error' => $e->getMessage(),
                 ]);
-
-                // Log to history
-                FeaturedSlotHistory::create([
-                    'movie_id' => $next->movie_id,
-                    'slot' => $slotType,
-                    'selection_method' => $next->selection_method,
-                    'started_at' => now(),
-                ]);
-
-                // Remove consumed entry
-                $next->delete();
-
-                // Reindex remaining positions for this slot
-                FeaturedSlotQueue::slot($slotType)
-                    ->orderBy('position')
-                    ->get()
-                    ->each(function (FeaturedSlotQueue $entry, int $index): void {
-                        $entry->update(['position' => $index + 1]);
-                    });
-            });
-
-            $this->line("  {$slotType}: swapped to \"{$movieTitle}\"");
-            Log::info("Featured slot rotated: {$slotType}", [
-                'movie_id' => $next->movie_id,
-                'selection_method' => $next->selection_method,
-            ]);
+                $this->error("  {$slotType->value}: rotation FAILED - {$e->getMessage()}");
+            }
         }
 
         // Refill queue
@@ -101,6 +109,6 @@ class RotateFeaturedSlots extends Command
 
         $this->info('Rotation complete.');
 
-        return self::SUCCESS;
+        return $failed ? self::FAILURE : self::SUCCESS;
     }
 }

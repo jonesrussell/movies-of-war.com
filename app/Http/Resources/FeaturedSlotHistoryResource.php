@@ -20,8 +20,8 @@ class FeaturedSlotHistoryResource extends JsonResource
         return [
             'id' => $this->id,
             'movie_id' => $this->movie_id,
-            'slot' => $this->slot,
-            'selection_method' => $this->selection_method,
+            'slot' => $this->slot->value,
+            'selection_method' => $this->selection_method->value,
             'started_at' => $this->started_at->toIso8601String(),
             'ended_at' => $this->ended_at?->toIso8601String(),
             'created_at' => $this->created_at->toIso8601String(),

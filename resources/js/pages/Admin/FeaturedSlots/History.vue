@@ -3,6 +3,8 @@ import type { FeaturedSlotHistory, PaginationMeta } from '@/types/models';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 
+import { index as historyIndex } from '@/actions/App/Http/Controllers/Admin/FeaturedHistoryController';
+import { index as queueIndex } from '@/actions/App/Http/Controllers/Admin/FeaturedQueueController';
 import Pagination from '@/components/Pagination.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
@@ -29,13 +31,9 @@ function applyFilter(key: string, value: string | null) {
     if (!value) {
         delete params[key];
     }
-    router.get(
-        '/dashboard/featured-history',
-        params as Record<string, string>,
-        {
-            preserveState: true,
-        },
-    );
+    router.get(historyIndex.url(), params as Record<string, string>, {
+        preserveState: true,
+    });
 }
 
 function formatDate(dateStr: string | null): string {
@@ -68,7 +66,7 @@ function slotLabel(slot: string): string {
                     </p>
                 </div>
                 <Link
-                    href="/dashboard/featured-queue"
+                    :href="queueIndex.url()"
                     class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
                 >
                     View Queue

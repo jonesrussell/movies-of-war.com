@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\SelectionMethod;
+use App\Enums\SlotType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,12 +31,28 @@ class FeaturedSlotHistory extends Model
         return [
             'started_at' => 'datetime',
             'ended_at' => 'datetime',
+            'slot' => SlotType::class,
+            'selection_method' => SelectionMethod::class,
         ];
     }
 
     public function movie(): BelongsTo
     {
         return $this->belongsTo(Movie::class);
+    }
+
+    /**
+     * Close this history record by setting ended_at.
+     *
+     * @throws \LogicException if already closed
+     */
+    public function close(): void
+    {
+        if ($this->ended_at !== null) {
+            throw new \LogicException('History record already closed.');
+        }
+
+        $this->update(['ended_at' => now()]);
     }
 
     /**
@@ -50,8 +68,8 @@ class FeaturedSlotHistory extends Model
      * @param  Builder<FeaturedSlotHistory>  $query
      * @return Builder<FeaturedSlotHistory>
      */
-    public function scopeSlot(Builder $query, string $slot): Builder
+    public function scopeSlot(Builder $query, SlotType|string $slot): Builder
     {
-        return $query->where('slot', $slot);
+        return $query->where('slot', $slot instanceof SlotType ? $slot->value : $slot);
     }
 }

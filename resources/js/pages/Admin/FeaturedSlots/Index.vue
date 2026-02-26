@@ -6,6 +6,9 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ChevronDown, ChevronUp } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
+import { index as historyIndex } from '@/actions/App/Http/Controllers/Admin/FeaturedHistoryController';
+import { index as queueIndex } from '@/actions/App/Http/Controllers/Admin/FeaturedQueueController';
+import { index as featuredSlotsIndex } from '@/actions/App/Http/Controllers/Admin/FeaturedSlotController';
 import Pagination from '@/components/Pagination.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
@@ -40,7 +43,7 @@ function applyFilters(
         (k) => updates[k] !== undefined,
     );
     router.get(
-        '/dashboard/featured-slots',
+        featuredSlotsIndex.url(),
         {
             sort: currentSort.value || undefined,
             per_page: perPage.value,
@@ -107,13 +110,13 @@ function getSlotBadge(slot: string): string {
                 </div>
                 <div class="flex gap-3">
                     <Link
-                        href="/dashboard/featured-queue"
+                        :href="queueIndex.url()"
                         class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
                     >
                         View Queue
                     </Link>
                     <Link
-                        href="/dashboard/featured-history"
+                        :href="historyIndex.url()"
                         class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
                     >
                         View History

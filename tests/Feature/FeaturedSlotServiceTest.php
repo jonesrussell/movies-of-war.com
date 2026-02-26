@@ -71,6 +71,12 @@ test('catalog exhaustion resets eligibility', function () {
         ->and($result->first()->id)->toBe($movieA->id);
 });
 
+test('eligible movies returns empty collection when no published movies exist', function () {
+    $result = $this->service->getEligibleMovies();
+
+    expect($result)->toHaveCount(0);
+});
+
 test('fillQueue generates 4 weeks of entries per slot', function () {
     Movie::factory()->published()->count(10)->create(['tmdb_vote_average' => 7.0]);
 
@@ -81,6 +87,14 @@ test('fillQueue generates 4 weeks of entries per slot', function () {
 
     expect($heroCount)->toBe(4)
         ->and($pickCount)->toBe(4);
+});
+
+test('fillQueue returns count of entries added', function () {
+    Movie::factory()->published()->count(10)->create(['tmdb_vote_average' => 7.0]);
+
+    $added = $this->service->fillQueue();
+
+    expect($added)->toBe(8); // 4 per slot x 2 slots
 });
 
 test('fillQueue assigns different movies to hero and pick_of_week for same week', function () {
@@ -105,4 +119,22 @@ test('fillQueue does not duplicate movies already in queue', function () {
     $countAfter = FeaturedSlotQueue::count();
 
     expect($countAfter)->toBe($countBefore);
+});
+
+test('fillQueue with no published movies creates no queue entries', function () {
+    $added = $this->service->fillQueue();
+
+    expect(FeaturedSlotQueue::count())->toBe(0)
+        ->and($added)->toBe(0);
+});
+
+test('fillQueue handles fewer eligible movies than queue depth gracefully', function () {
+    Movie::factory()->published()->count(3)->create(['tmdb_vote_average' => 7.0]);
+
+    $added = $this->service->fillQueue();
+
+    $total = FeaturedSlotQueue::count();
+    expect($total)->toBeLessThanOrEqual(3)
+        ->and($total)->toBeGreaterThan(0)
+        ->and($added)->toBe($total);
 });

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\SelectionMethod;
+use App\Enums\SlotType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +31,8 @@ class FeaturedSlotQueue extends Model
         return [
             'position' => 'integer',
             'scheduled_for' => 'date',
+            'slot' => SlotType::class,
+            'selection_method' => SelectionMethod::class,
         ];
     }
 
@@ -41,9 +45,9 @@ class FeaturedSlotQueue extends Model
      * @param  Builder<FeaturedSlotQueue>  $query
      * @return Builder<FeaturedSlotQueue>
      */
-    public function scopeSlot(Builder $query, string $slot): Builder
+    public function scopeSlot(Builder $query, SlotType|string $slot): Builder
     {
-        return $query->where('slot', $slot);
+        return $query->where('slot', $slot instanceof SlotType ? $slot->value : $slot);
     }
 
     /**

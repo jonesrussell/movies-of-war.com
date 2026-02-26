@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\MovieStatus;
+use App\Enums\SlotType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreQueueEntryRequest;
 use App\Models\FeaturedSlotQueue;
 use App\Models\Movie;
 use App\Services\FeaturedSlotService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,12 +19,12 @@ class FeaturedQueueController extends Controller
 {
     public function index(): Response
     {
-        $heroQueue = FeaturedSlotQueue::slot('hero')
+        $heroQueue = FeaturedSlotQueue::slot(SlotType::Hero)
             ->with('movie')
             ->orderBy('position')
             ->get();
 
-        $pickOfWeekQueue = FeaturedSlotQueue::slot('pick_of_week')
+        $pickOfWeekQueue = FeaturedSlotQueue::slot(SlotType::PickOfWeek)
             ->with('movie')
             ->orderBy('position')
             ->get();
@@ -41,59 +41,32 @@ class FeaturedQueueController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreQueueEntryRequest $request, FeaturedSlotService $service): RedirectResponse
     {
-        $validated = $request->validate([
-            'movie_id' => [
-                'required',
-                Rule::exists('movies', 'id')->where('status', MovieStatus::Published->value),
-            ],
-            'slot' => 'required|in:hero,pick_of_week',
-            'position' => 'required|integer|min:1',
-        ]);
-
-        $slot = $validated['slot'];
+        $validated = $request->validated();
+        $slot = SlotType::from($validated['slot']);
         $position = (int) $validated['position'];
 
-        // Shift existing entries down
-        FeaturedSlotQueue::slot($slot)
-            ->where('position', '>=', $position)
-            ->orderByDesc('position')
-            ->get()
-            ->each(function (FeaturedSlotQueue $entry): void {
-                $entry->update(['position' => $entry->position + 1]);
-            });
+        try {
+            $service->insertAtPosition($slot, (int) $validated['movie_id'], $position);
+        } catch (\Throwable $e) {
+            Log::error('Failed to add entry to featured queue', [
+                'movie_id' => $validated['movie_id'],
+                'slot' => $slot->value,
+                'error' => $e->getMessage(),
+            ]);
 
-        // Calculate scheduled_for based on position
-        $scheduledFor = now()->next('Sunday')->addWeeks($position - 1);
-
-        FeaturedSlotQueue::create([
-            'movie_id' => $validated['movie_id'],
-            'slot' => $slot,
-            'position' => $position,
-            'selection_method' => 'manual',
-            'scheduled_for' => $scheduledFor->toDateString(),
-        ]);
+            return redirect()->route('dashboard.featured-queue')
+                ->with('error', 'Failed to add movie to queue. Please try again.');
+        }
 
         return redirect()->route('dashboard.featured-queue')
             ->with('success', 'Movie added to queue.');
     }
 
-    public function destroy(FeaturedSlotQueue $featuredSlotQueue): RedirectResponse
+    public function destroy(FeaturedSlotQueue $featuredSlotQueue, FeaturedSlotService $service): RedirectResponse
     {
-        $slot = $featuredSlotQueue->slot;
-        $position = $featuredSlotQueue->position;
-
-        $featuredSlotQueue->delete();
-
-        // Reindex positions
-        FeaturedSlotQueue::slot($slot)
-            ->where('position', '>', $position)
-            ->orderBy('position')
-            ->get()
-            ->each(function (FeaturedSlotQueue $entry): void {
-                $entry->update(['position' => $entry->position - 1]);
-            });
+        $service->removeAndReindex($featuredSlotQueue);
 
         return redirect()->route('dashboard.featured-queue')
             ->with('success', 'Entry removed from queue.');
@@ -101,9 +74,21 @@ class FeaturedQueueController extends Controller
 
     public function refill(FeaturedSlotService $service): RedirectResponse
     {
-        $service->fillQueue();
+        try {
+            $added = $service->fillQueue();
 
-        return redirect()->route('dashboard.featured-queue')
-            ->with('success', 'Queue refilled.');
+            if ($added === 0) {
+                return redirect()->route('dashboard.featured-queue')
+                    ->with('warning', 'Queue is already full or no eligible movies found.');
+            }
+
+            return redirect()->route('dashboard.featured-queue')
+                ->with('success', "Queue refilled with {$added} entries.");
+        } catch (\Throwable $e) {
+            Log::error('Failed to refill featured queue', ['error' => $e->getMessage()]);
+
+            return redirect()->route('dashboard.featured-queue')
+                ->with('error', 'Failed to refill queue. Please try again.');
+        }
     }
 }

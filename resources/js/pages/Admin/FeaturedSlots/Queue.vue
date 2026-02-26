@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import type { FeaturedSlotQueue, Movie } from '@/types/models';
+import type { FeaturedSlotQueue, Movie, SlotType } from '@/types/models';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
+import { index as historyIndex } from '@/actions/App/Http/Controllers/Admin/FeaturedHistoryController';
+import {
+    destroy,
+    refill,
+    store,
+} from '@/actions/App/Http/Controllers/Admin/FeaturedQueueController';
+import { index as featuredSlotsIndex } from '@/actions/App/Http/Controllers/Admin/FeaturedSlotController';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
@@ -15,14 +22,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const showAddForm = ref(false);
-const addSlot = ref<'hero' | 'pick_of_week'>('hero');
+const addSlot = ref<SlotType>('hero');
 const addMovieId = ref<number | null>(null);
 const addPosition = ref(1);
 
 function submitAdd() {
     if (!addMovieId.value) return;
     router.post(
-        '/dashboard/featured-queue',
+        store.url(),
         {
             movie_id: addMovieId.value,
             slot: addSlot.value,
@@ -40,11 +47,11 @@ function submitAdd() {
 
 function removeEntry(entry: FeaturedSlotQueue) {
     if (!confirm(`Remove "${entry.movie?.title}" from the queue?`)) return;
-    router.delete(`/dashboard/featured-queue/${entry.id}`);
+    router.delete(destroy.url(entry.id));
 }
 
 function refillQueue() {
-    router.post('/dashboard/featured-queue/refill');
+    router.post(refill.url());
 }
 
 function slotLabel(slot: string): string {
@@ -75,7 +82,7 @@ const queues = {
                 </div>
                 <div class="flex gap-3">
                     <Link
-                        href="/dashboard/featured-slots"
+                        :href="featuredSlotsIndex.url()"
                         class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
                     >
                         Now Showing
@@ -257,7 +264,7 @@ const queues = {
             <!-- Link to History -->
             <div class="mt-12 text-center">
                 <Link
-                    href="/dashboard/featured-history"
+                    :href="historyIndex.url()"
                     class="text-sm text-zinc-400 hover:text-white"
                 >
                     View rotation history &rarr;

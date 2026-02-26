@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SelectionMethod;
+use App\Enums\SlotType;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\FeaturedSlotHistoryResource;
 use App\Models\FeaturedSlotHistory;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,8 +18,17 @@ class FeaturedHistoryController extends Controller
 {
     private const PER_PAGE_OPTIONS = [10, 20, 50, 100];
 
+    private const SORT_OPTIONS = ['started_at_desc', 'started_at_asc', 'ended_at_desc', 'ended_at_asc'];
+
     public function index(Request $request): Response
     {
+        $request->validate([
+            'slot' => ['nullable', Rule::enum(SlotType::class)],
+            'method' => ['nullable', Rule::enum(SelectionMethod::class)],
+            'sort' => ['nullable', Rule::in(self::SORT_OPTIONS)],
+            'per_page' => ['nullable', 'integer', Rule::in(self::PER_PAGE_OPTIONS)],
+        ]);
+
         $query = FeaturedSlotHistory::query()->with('movie');
 
         if ($request->filled('slot')) {
@@ -38,19 +51,7 @@ class FeaturedHistoryController extends Controller
         $paginator = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Admin/FeaturedSlots/History', [
-            'history' => [
-                'data' => $paginator->items(),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'from' => $paginator->firstItem(),
-                    'last_page' => $paginator->lastPage(),
-                    'links' => $paginator->linkCollection()->toArray(),
-                    'path' => $paginator->path(),
-                    'per_page' => $paginator->perPage(),
-                    'to' => $paginator->lastItem(),
-                    'total' => $paginator->total(),
-                ],
-            ],
+            'history' => FeaturedSlotHistoryResource::collection($paginator),
             'queryParams' => $request->only(['sort', 'per_page', 'slot', 'method']),
         ]);
     }

@@ -206,6 +206,30 @@ export interface FeaturedSlot {
     movie?: Movie;
 }
 
+export interface FeaturedSlotQueue {
+    id: number;
+    movie_id: number;
+    slot: 'hero' | 'pick_of_week';
+    position: number;
+    selection_method: 'auto' | 'manual';
+    scheduled_for: string;
+    created_at: string;
+    updated_at: string;
+    movie?: Movie;
+}
+
+export interface FeaturedSlotHistory {
+    id: number;
+    movie_id: number | null;
+    slot: 'hero' | 'pick_of_week';
+    selection_method: 'auto' | 'manual';
+    started_at: string;
+    ended_at: string | null;
+    created_at: string;
+    updated_at: string;
+    movie?: Movie | null;
+}
+
 export interface PaginatedMovies {
     data: Movie[];
     links: PaginationLinks;

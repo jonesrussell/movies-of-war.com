@@ -476,7 +476,7 @@ const jsonLdBreadcrumb = computed(() =>
                                 class="w-full border border-[--intel-border] text-[--intel-text-primary] transition-all duration-200 hover:scale-[1.02] hover:border-[--intel-accent]"
                                 :class="
                                     movie.is_watchlisted
-                                        ? 'hover:shadow-lg hover:shadow-blue-600/10'
+                                        ? 'hover:shadow-[--intel-accent]/10 hover:shadow-lg'
                                         : ''
                                 "
                                 :variant="
@@ -567,7 +567,7 @@ const jsonLdBreadcrumb = computed(() =>
                                 />
                                 <Link
                                     href="#reviews"
-                                    class="font-medium text-blue-500 transition-colors hover:text-blue-400"
+                                    class="font-medium text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                                 >
                                     Your review
                                 </Link>
@@ -588,7 +588,7 @@ const jsonLdBreadcrumb = computed(() =>
                                     v-for="tag in movie.tags"
                                     :key="tag.id"
                                     :href="`/movies?tag=${tag.slug}`"
-                                    class="rounded-full border border-[--intel-border] bg-[--intel-bg-elevated] px-4 py-1.5 font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-body] transition-all duration-200 hover:-translate-y-0.5 hover:border-[--intel-border-bright] hover:text-[--intel-text-primary] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                                    class="rounded-full border border-[--intel-border] bg-[--intel-bg-elevated] px-4 py-1.5 font-[family-name:var(--font-mono-display)] text-xs text-[--intel-text-body] transition-all duration-200 hover:-translate-y-0.5 hover:border-[--intel-border-bright] hover:text-[--intel-text-primary] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                                 >
                                     {{ tag.name }}
                                 </Link>
@@ -656,7 +656,7 @@ const jsonLdBreadcrumb = computed(() =>
                                         />
                                         <div class="min-w-0 text-center">
                                             <span
-                                                class="block truncate font-[family-name:var(--font-mono-display)] text-xs font-medium text-[--intel-text-primary] group-hover:text-blue-400"
+                                                class="block truncate font-[family-name:var(--font-mono-display)] text-xs font-medium text-[--intel-text-primary] group-hover:text-[--intel-accent-hover]"
                                             >
                                                 {{ member.name }}
                                             </span>
@@ -704,7 +704,7 @@ const jsonLdBreadcrumb = computed(() =>
                                             <Link
                                                 v-if="member.slug"
                                                 :href="`/people/${member.slug}`"
-                                                class="hover:text-blue-400"
+                                                class="hover:text-[--intel-accent-hover]"
                                             >
                                                 {{ member.name }}
                                             </Link>
@@ -732,7 +732,7 @@ const jsonLdBreadcrumb = computed(() =>
                                     :href="movie.trailer_url"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold tracking-wide text-white uppercase shadow-lg shadow-blue-600/20 transition-all duration-200 hover:scale-105 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                                    class="inline-flex items-center gap-2 rounded-xl bg-[--intel-accent] px-5 py-3 text-sm font-semibold tracking-wide text-white uppercase shadow-[--intel-accent]/20 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-[--intel-accent-dim] hover:shadow-[--intel-accent]/30 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                                 >
                                     <Play class="size-5" />
                                     WATCH TRAILER
@@ -812,7 +812,7 @@ const jsonLdBreadcrumb = computed(() =>
                     <span>1 review</span>
                     <Link
                         :href="`/movies/${movie.slug}/reviews`"
-                        class="font-medium text-blue-500 hover:underline"
+                        class="font-medium text-[--intel-accent] hover:underline"
                     >
                         Read full review
                     </Link>
@@ -855,7 +855,7 @@ const jsonLdBreadcrumb = computed(() =>
                     <Link
                         v-if="movie.slug"
                         :href="`/movies/${movie.slug}/reviews`"
-                        class="text-sm font-medium text-blue-500 hover:underline"
+                        class="text-sm font-medium text-[--intel-accent] hover:underline"
                     >
                         View all reviews
                     </Link>
@@ -874,7 +874,7 @@ const jsonLdBreadcrumb = computed(() =>
                     >
                         <Link
                             :href="loginUrl"
-                            class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            class="inline-flex items-center justify-center rounded-lg bg-[--intel-accent] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[--intel-accent-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                         >
                             Log in to review
                         </Link>
@@ -883,7 +883,7 @@ const jsonLdBreadcrumb = computed(() =>
                         >
                         <Link
                             :href="register().url"
-                            class="text-sm font-medium text-blue-500 hover:underline"
+                            class="text-sm font-medium text-[--intel-accent] hover:underline"
                         >
                             Sign up
                         </Link>
@@ -920,7 +920,7 @@ const jsonLdBreadcrumb = computed(() =>
                         <Link
                             v-if="movie.slug"
                             :href="`/movies/${movie.slug}/reviews`"
-                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-500 transition-colors hover:text-blue-400"
+                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                         >
                             Read full review
                             <ArrowRight class="size-4" />
@@ -928,7 +928,7 @@ const jsonLdBreadcrumb = computed(() =>
                         <Link
                             v-if="movie.slug && totalReviewCount > 1"
                             :href="`/movies/${movie.slug}/reviews`"
-                            class="text-sm font-medium text-blue-500 hover:underline"
+                            class="text-sm font-medium text-[--intel-accent] hover:underline"
                         >
                             View all reviews
                         </Link>

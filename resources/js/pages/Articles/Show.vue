@@ -101,7 +101,7 @@ const formatDate = (dateStr: string | null): string => {
                         </p>
                         <Link
                             :href="`/movies/${(article.articleable as any).slug}`"
-                            class="text-blue-500 transition-colors hover:text-blue-400"
+                            class="text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                         >
                             {{ (article.articleable as any).title }}
                         </Link>
@@ -123,7 +123,7 @@ const formatDate = (dateStr: string | null): string => {
                 <!-- Article content (trusted CMS content from backend) -->
                 <!-- eslint-disable vue/no-v-html -->
                 <div
-                    class="prose max-w-none prose-invert prose-headings:font-[family-name:var(--font-mono-display)] prose-headings:text-[--intel-text-primary] prose-p:text-[--intel-text-secondary] prose-a:text-blue-500 prose-a:no-underline hover:prose-a:text-blue-400 prose-strong:text-[--intel-text-primary]"
+                    class="prose max-w-none prose-invert prose-headings:font-[family-name:var(--font-mono-display)] prose-headings:text-[--intel-text-primary] prose-p:text-[--intel-text-secondary] prose-a:text-[--intel-accent] prose-a:no-underline hover:prose-a:text-[--intel-accent-hover] prose-strong:text-[--intel-text-primary]"
                     v-html="article.content"
                 />
                 <!-- eslint-enable vue/no-v-html -->
@@ -142,7 +142,7 @@ const formatDate = (dateStr: string | null): string => {
                         :href="article.url"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="inline-flex items-center gap-1 text-sm text-blue-500 transition-colors hover:text-blue-400"
+                        class="inline-flex items-center gap-1 text-sm text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                     >
                         <ExternalLink class="size-4" />
                         Read original article

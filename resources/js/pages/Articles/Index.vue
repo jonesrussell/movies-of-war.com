@@ -89,7 +89,7 @@ const formatDate = (dateStr: string | null): string => {
                     >
                         <Link :href="`/articles/${article.slug}`" class="block">
                             <h2
-                                class="font-[family-name:var(--font-mono-display)] text-lg font-semibold text-[--intel-text-primary] transition-colors group-hover:text-blue-500"
+                                class="font-[family-name:var(--font-mono-display)] text-lg font-semibold text-[--intel-text-primary] transition-colors group-hover:text-[--intel-accent]"
                             >
                                 {{ article.title }}
                             </h2>
@@ -137,7 +137,7 @@ const formatDate = (dateStr: string | null): string => {
                                     article.articleable &&
                                     article.articleable_type?.includes('Movie')
                                 "
-                                class="mt-3 text-xs text-blue-500"
+                                class="mt-3 text-xs text-[--intel-accent]"
                             >
                                 Related to:
                                 {{ (article.articleable as any).title }}
@@ -172,7 +172,7 @@ const formatDate = (dateStr: string | null): string => {
                             class="rounded-md px-3 py-2 text-sm transition-colors"
                             :class="
                                 link.active
-                                    ? 'bg-blue-600 text-white'
+                                    ? 'bg-[--intel-accent] text-white'
                                     : 'text-[--intel-text-muted] hover:bg-[--intel-bg-elevated] hover:text-[--intel-text-primary]'
                             "
                         >

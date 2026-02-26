@@ -76,7 +76,7 @@ function handleMouseLeave() {
             v-for="(star, index) in stars"
             :key="index"
             type="button"
-            class="p-0.5 transition-colors focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-zinc-950 focus:outline-none disabled:pointer-events-none"
+            class="p-0.5 transition-colors focus:ring-2 focus:ring-[--intel-alert]/50 focus:ring-offset-2 focus:ring-offset-[--intel-bg-base] focus:outline-none disabled:pointer-events-none"
             :class="[
                 interactive
                     ? 'rounded hover:scale-110'
@@ -88,13 +88,13 @@ function handleMouseLeave() {
             @mouseenter="handleMouseEnter(index)"
             @mouseleave="handleMouseLeave"
         >
-            <span v-if="star === 'full'" class="text-red-500" aria-hidden="true"
+            <span
+                v-if="star === 'full'"
+                class="text-[--intel-alert]"
+                aria-hidden="true"
                 >★</span
             >
-            <span
-                v-else
-                class="text-zinc-600 dark:text-zinc-700"
-                aria-hidden="true"
+            <span v-else class="text-[--intel-text-faint]" aria-hidden="true"
                 >☆</span
             >
         </button>

@@ -125,7 +125,7 @@ async function toggleWatchlist() {
                 <h3 class="mb-1 font-semibold text-[--intel-text-primary]">
                     <Link
                         :href="`/movies/${movie.slug}`"
-                        class="transition-colors hover:text-blue-400"
+                        class="transition-colors hover:text-[--intel-accent-hover]"
                     >
                         {{ movie.title }}
                     </Link>
@@ -197,7 +197,7 @@ async function toggleWatchlist() {
                     <Loader2 v-if="isToggling" class="size-4 animate-spin" />
                     <BookmarkCheck
                         v-else-if="isCurrentlyWatchlisted"
-                        class="size-4 text-blue-500"
+                        class="size-4 text-[--intel-accent]"
                     />
                     <Bookmark v-else class="size-4" />
                 </Button>

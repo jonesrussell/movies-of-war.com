@@ -112,7 +112,7 @@ const submitLabel = computed(() =>
                 :default-value="existingReview?.title ?? ''"
                 maxlength="255"
                 placeholder="e.g. Midway (1976)"
-                class="bg-zinc-900 text-white dark:bg-zinc-900 dark:text-white"
+                class="bg-[--intel-bg-surface] text-[--intel-text-primary]"
             />
             <InputError :message="errors.title" />
         </div>
@@ -122,14 +122,16 @@ const submitLabel = computed(() =>
                 <Label for="content"
                     >Your review (at least 50 characters)</Label
                 >
-                <div class="flex rounded-lg border border-zinc-800 p-0.5">
+                <div
+                    class="flex rounded-lg border border-[--intel-border] p-0.5"
+                >
                     <button
                         type="button"
                         class="rounded-md px-2 py-1 text-xs font-medium transition-colors"
                         :class="
                             activeTab === 'write'
-                                ? 'bg-zinc-700 text-white'
-                                : 'text-zinc-400 hover:text-zinc-300'
+                                ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                                : 'text-[--intel-text-muted] hover:text-[--intel-text-body]'
                         "
                         @click="activeTab = 'write'"
                     >
@@ -140,8 +142,8 @@ const submitLabel = computed(() =>
                         class="rounded-md px-2 py-1 text-xs font-medium transition-colors"
                         :class="
                             activeTab === 'preview'
-                                ? 'bg-zinc-700 text-white'
-                                : 'text-zinc-400 hover:text-zinc-300'
+                                ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                                : 'text-[--intel-text-muted] hover:text-[--intel-text-body]'
                         "
                         @click="activeTab = 'preview'"
                     >
@@ -149,7 +151,7 @@ const submitLabel = computed(() =>
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-zinc-500">
+            <p class="text-xs text-[--intel-text-faint]">
                 Markdown supported: **bold**, *italic*, [link](url), lists,
                 blockquotes. No raw HTML.
             </p>
@@ -163,16 +165,16 @@ const submitLabel = computed(() =>
                     minlength="50"
                     :default-value="existingReview?.content ?? ''"
                     placeholder="Share your thoughts on this film..."
-                    class="flex min-h-[8rem] w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-red-500 focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white"
+                    class="flex min-h-[8rem] w-full rounded-md border border-[--intel-border] bg-[--intel-bg-surface] px-3 py-2 text-sm text-[--intel-text-primary] placeholder:text-[--intel-text-faint] focus:ring-2 focus:ring-[--intel-alert] focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                 />
             </div>
             <div
                 v-show="activeTab === 'preview'"
-                class="min-h-[8rem] rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2"
+                class="min-h-[8rem] rounded-md border border-[--intel-border] bg-[--intel-bg-surface] px-3 py-2"
             >
                 <div
                     v-if="previewLoading"
-                    class="flex items-center gap-2 text-sm text-zinc-500"
+                    class="flex items-center gap-2 text-sm text-[--intel-text-faint]"
                 >
                     <Spinner class="size-4" />
                     Loading preview…
@@ -182,7 +184,7 @@ const submitLabel = computed(() =>
                     :content-html="previewHtml"
                     size="sm"
                 />
-                <p v-else class="text-sm text-zinc-500">
+                <p v-else class="text-sm text-[--intel-text-faint]">
                     Nothing to preview yet.
                 </p>
             </div>
@@ -196,7 +198,7 @@ const submitLabel = computed(() =>
                 name="has_spoilers"
                 value="1"
                 :checked="existingReview?.has_spoilers ?? false"
-                class="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-red-500 focus:ring-red-500"
+                class="h-4 w-4 rounded border-[--intel-border-bright] bg-[--intel-bg-surface] text-[--intel-alert] focus:ring-[--intel-alert]"
             />
             <Label
                 for="has_spoilers"
@@ -211,7 +213,7 @@ const submitLabel = computed(() =>
             <Button
                 type="submit"
                 :disabled="processing || rating === 0"
-                class="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+                class="bg-[--intel-alert] hover:bg-[--intel-alert-dim]"
             >
                 <Spinner v-if="processing" class="mr-2 size-4" />
                 {{ submitLabel }}

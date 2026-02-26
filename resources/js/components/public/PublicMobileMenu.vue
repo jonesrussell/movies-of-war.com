@@ -53,10 +53,10 @@ function handleLinkClick() {
                     :class="[
                         'block border-b border-[--intel-border] px-4 py-3 text-base font-medium transition-colors',
                         item.isButton
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            ? 'bg-[--intel-accent] text-white hover:bg-[--intel-accent-dim]'
                             : activeClass(
                                   item.href,
-                                  'bg-[--intel-bg-surface] text-blue-500',
+                                  'bg-[--intel-bg-surface] text-[--intel-accent]',
                                   'text-[--intel-text-body] hover:bg-[--intel-bg-surface] hover:text-[--intel-text-primary]',
                               ),
                     ]"

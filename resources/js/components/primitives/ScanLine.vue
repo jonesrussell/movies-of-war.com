@@ -17,7 +17,7 @@ withDefaults(defineProps<Props>(), {
         :class="
             cn(
                 'h-px w-full',
-                'bg-gradient-to-r from-transparent via-blue-500/40 to-transparent',
+                'bg-gradient-to-r from-transparent via-[--intel-accent]/40 to-transparent',
                 animated && 'animate-[scan-glow_3s_ease-in-out_infinite]',
                 $props.class,
             )

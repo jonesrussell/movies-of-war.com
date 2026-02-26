@@ -25,10 +25,10 @@ const posterImage =
     >
         <div class="absolute top-4 right-4 z-10">
             <span
-                class="inline-flex items-center font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-blue-500 uppercase"
+                class="inline-flex items-center font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-[--intel-accent] uppercase"
             >
                 <span
-                    class="mr-3 inline-block h-px w-6 bg-blue-500 align-middle"
+                    class="mr-3 inline-block h-px w-6 bg-[--intel-accent] align-middle"
                 ></span>
                 INCOMING // {{ title.toUpperCase() }}
             </span>
@@ -79,7 +79,7 @@ const posterImage =
                     />
                     <Link
                         :href="`/movies/${movie.slug}#reviews`"
-                        class="font-medium text-blue-500 transition-colors hover:text-blue-400"
+                        class="font-medium text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                     >
                         Your review
                     </Link>
@@ -88,7 +88,7 @@ const posterImage =
                 <div class="flex flex-wrap gap-2">
                     <Link
                         :href="`/movies/${movie.slug}`"
-                        class="inline-flex items-center gap-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                        class="inline-flex items-center gap-1 rounded-md bg-[--intel-accent] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[--intel-accent-dim]"
                     >
                         <Info class="size-4" />
                         Details

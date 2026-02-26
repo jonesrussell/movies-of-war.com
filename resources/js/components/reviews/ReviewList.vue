@@ -52,14 +52,14 @@ function buildReviewsUrl(
             class="flex flex-wrap items-center justify-between gap-4"
         >
             <div class="flex flex-wrap items-center gap-2">
-                <span class="text-sm text-zinc-400">Show:</span>
+                <span class="text-sm text-[--intel-text-muted]">Show:</span>
                 <Link
                     :href="buildReviewsUrl({ show_spoilers: false })"
                     :class="[
                         'rounded px-3 py-1.5 text-sm transition-colors',
                         !queryParams?.show_spoilers
-                            ? 'bg-zinc-700 text-white'
-                            : 'text-zinc-400 hover:text-white',
+                            ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                            : 'text-[--intel-text-muted] hover:text-[--intel-text-primary]',
                     ]"
                 >
                     No spoilers
@@ -69,22 +69,22 @@ function buildReviewsUrl(
                     :class="[
                         'rounded px-3 py-1.5 text-sm transition-colors',
                         queryParams?.show_spoilers
-                            ? 'bg-zinc-700 text-white'
-                            : 'text-zinc-400 hover:text-white',
+                            ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                            : 'text-[--intel-text-muted] hover:text-[--intel-text-primary]',
                     ]"
                 >
                     Include spoilers
                 </Link>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <span class="text-sm text-zinc-400">Sort:</span>
+                <span class="text-sm text-[--intel-text-muted]">Sort:</span>
                 <Link
                     :href="buildReviewsUrl({ sort: 'recent' })"
                     :class="[
                         'rounded px-3 py-1.5 text-sm transition-colors',
                         !queryParams?.sort || queryParams?.sort === 'recent'
-                            ? 'bg-zinc-700 text-white'
-                            : 'text-zinc-400 hover:text-white',
+                            ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                            : 'text-[--intel-text-muted] hover:text-[--intel-text-primary]',
                     ]"
                 >
                     Recent
@@ -94,8 +94,8 @@ function buildReviewsUrl(
                     :class="[
                         'rounded px-3 py-1.5 text-sm transition-colors',
                         queryParams?.sort === 'helpful'
-                            ? 'bg-zinc-700 text-white'
-                            : 'text-zinc-400 hover:text-white',
+                            ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                            : 'text-[--intel-text-muted] hover:text-[--intel-text-primary]',
                     ]"
                 >
                     Helpful
@@ -105,8 +105,8 @@ function buildReviewsUrl(
                     :class="[
                         'rounded px-3 py-1.5 text-sm transition-colors',
                         queryParams?.sort === 'rating_high'
-                            ? 'bg-zinc-700 text-white'
-                            : 'text-zinc-400 hover:text-white',
+                            ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                            : 'text-[--intel-text-muted] hover:text-[--intel-text-primary]',
                     ]"
                 >
                     Highest rated
@@ -116,8 +116,8 @@ function buildReviewsUrl(
                     :class="[
                         'rounded px-3 py-1.5 text-sm transition-colors',
                         queryParams?.sort === 'rating_low'
-                            ? 'bg-zinc-700 text-white'
-                            : 'text-zinc-400 hover:text-white',
+                            ? 'bg-[--intel-bg-elevated] text-[--intel-text-primary]'
+                            : 'text-[--intel-text-muted] hover:text-[--intel-text-primary]',
                     ]"
                 >
                     Lowest rated
@@ -138,7 +138,7 @@ function buildReviewsUrl(
 
         <div
             v-else
-            class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-12 text-center"
+            class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface]/50 p-12 text-center"
         >
             <p class="text-zinc-400">{{ emptyMessage }}</p>
         </div>

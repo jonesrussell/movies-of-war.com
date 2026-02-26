@@ -101,7 +101,7 @@ const jsonLdWebSite = computed(() =>
             <PublicContainer class="relative">
                 <div class="mx-auto max-w-3xl text-center">
                     <p
-                        class="font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-blue-500 uppercase"
+                        class="font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-[--intel-accent] uppercase"
                     >
                         Awaiting Priority Briefing
                     </p>
@@ -121,13 +121,13 @@ const jsonLdWebSite = computed(() =>
                     <div class="mt-8 flex flex-wrap justify-center gap-3">
                         <Link
                             href="/movies"
-                            class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-[--intel-text-primary] transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            class="inline-flex items-center justify-center rounded-xl bg-[--intel-accent] px-5 py-3 text-sm font-semibold text-[--intel-text-primary] transition-colors hover:bg-[--intel-accent-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                         >
                             Browse movies
                         </Link>
                         <Link
                             href="/movies?conflict=WWII"
-                            class="inline-flex items-center justify-center rounded-xl bg-[--intel-bg-surface] px-5 py-3 text-sm font-semibold text-[--intel-text-primary] ring-1 ring-[--intel-border] transition-colors hover:bg-[--intel-bg-elevated] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            class="inline-flex items-center justify-center rounded-xl bg-[--intel-bg-surface] px-5 py-3 text-sm font-semibold text-[--intel-text-primary] ring-1 ring-[--intel-border] transition-colors hover:bg-[--intel-bg-elevated] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                         >
                             Start with WWII
                         </Link>
@@ -146,7 +146,7 @@ const jsonLdWebSite = computed(() =>
                         <template #action>
                             <Link
                                 href="/movies"
-                                class="text-sm font-semibold text-blue-500 transition-colors hover:text-blue-400"
+                                class="text-sm font-semibold text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                             >
                                 View all →
                             </Link>
@@ -173,7 +173,7 @@ const jsonLdWebSite = computed(() =>
                         <template #action>
                             <Link
                                 href="/movies?upcoming=1"
-                                class="text-sm font-semibold text-blue-500 transition-colors hover:text-blue-400"
+                                class="text-sm font-semibold text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                             >
                                 View all →
                             </Link>
@@ -212,7 +212,7 @@ const jsonLdWebSite = computed(() =>
                     </div>
                     <Link
                         href="/movies"
-                        class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-[--intel-text-primary] transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        class="inline-flex items-center justify-center rounded-xl bg-[--intel-accent] px-6 py-3 text-sm font-semibold text-[--intel-text-primary] transition-colors hover:bg-[--intel-accent-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                     >
                         Access Full Database
                     </Link>

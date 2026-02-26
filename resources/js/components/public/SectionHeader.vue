@@ -38,10 +38,10 @@ const headingTag = computed(() => `h${props.level}` as const);
     >
         <p
             v-if="kicker"
-            class="font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-blue-500 uppercase"
+            class="font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-[--intel-accent] uppercase"
         >
             <span
-                class="mr-3 inline-block h-px w-6 bg-blue-500 align-middle"
+                class="mr-3 inline-block h-px w-6 bg-[--intel-accent] align-middle"
             ></span
             >{{ kicker }}
         </p>

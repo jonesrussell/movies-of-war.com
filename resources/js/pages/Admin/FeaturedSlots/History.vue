@@ -3,6 +3,7 @@ import type { FeaturedSlotHistory, PaginationMeta } from '@/types/models';
 
 import { Head, Link, router } from '@inertiajs/vue3';
 
+import Pagination from '@/components/Pagination.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 
 interface Props {
@@ -28,9 +29,13 @@ function applyFilter(key: string, value: string | null) {
     if (!value) {
         delete params[key];
     }
-    router.get('/dashboard/featured-history', params as Record<string, string>, {
-        preserveState: true,
-    });
+    router.get(
+        '/dashboard/featured-history',
+        params as Record<string, string>,
+        {
+            preserveState: true,
+        },
+    );
 }
 
 function formatDate(dateStr: string | null): string {
@@ -78,16 +83,13 @@ function slotLabel(slot: string): string {
                     @change="
                         applyFilter(
                             'slot',
-                            ($event.target as HTMLSelectElement).value ||
-                                null,
+                            ($event.target as HTMLSelectElement).value || null,
                         )
                     "
                 >
                     <option value="">All Slots</option>
                     <option value="hero">Hero</option>
-                    <option value="pick_of_week">
-                        Pick of the Week
-                    </option>
+                    <option value="pick_of_week">Pick of the Week</option>
                 </select>
                 <select
                     :value="queryParams.method ?? ''"
@@ -95,8 +97,7 @@ function slotLabel(slot: string): string {
                     @change="
                         applyFilter(
                             'method',
-                            ($event.target as HTMLSelectElement).value ||
-                                null,
+                            ($event.target as HTMLSelectElement).value || null,
                         )
                     "
                 >
@@ -111,29 +112,19 @@ function slotLabel(slot: string): string {
                 <table class="w-full text-left text-sm">
                     <thead class="border-b border-zinc-800 bg-zinc-900">
                         <tr>
-                            <th
-                                class="px-4 py-3 font-medium text-zinc-400"
-                            >
+                            <th class="px-4 py-3 font-medium text-zinc-400">
                                 Movie
                             </th>
-                            <th
-                                class="px-4 py-3 font-medium text-zinc-400"
-                            >
+                            <th class="px-4 py-3 font-medium text-zinc-400">
                                 Slot
                             </th>
-                            <th
-                                class="px-4 py-3 font-medium text-zinc-400"
-                            >
+                            <th class="px-4 py-3 font-medium text-zinc-400">
                                 Method
                             </th>
-                            <th
-                                class="px-4 py-3 font-medium text-zinc-400"
-                            >
+                            <th class="px-4 py-3 font-medium text-zinc-400">
                                 Started
                             </th>
-                            <th
-                                class="px-4 py-3 font-medium text-zinc-400"
-                            >
+                            <th class="px-4 py-3 font-medium text-zinc-400">
                                 Ended
                             </th>
                         </tr>
@@ -145,9 +136,7 @@ function slotLabel(slot: string): string {
                             class="bg-zinc-950"
                         >
                             <td class="px-4 py-3 text-white">
-                                {{
-                                    entry.movie?.title ?? 'Deleted Movie'
-                                }}
+                                {{ entry.movie?.title ?? 'Deleted Movie' }}
                             </td>
                             <td class="px-4 py-3">
                                 <span
@@ -164,8 +153,7 @@ function slotLabel(slot: string): string {
                             <td class="px-4 py-3">
                                 <span
                                     :class="
-                                        entry.selection_method ===
-                                        'manual'
+                                        entry.selection_method === 'manual'
                                             ? 'text-amber-400'
                                             : 'text-emerald-400'
                                     "
@@ -181,10 +169,7 @@ function slotLabel(slot: string): string {
                                 <template v-if="entry.ended_at">
                                     {{ formatDate(entry.ended_at) }}
                                 </template>
-                                <span
-                                    v-else
-                                    class="text-emerald-400"
-                                >
+                                <span v-else class="text-emerald-400">
                                     Current
                                 </span>
                             </td>
@@ -202,32 +187,7 @@ function slotLabel(slot: string): string {
             </div>
 
             <!-- Pagination -->
-            <div
-                v-if="history.meta.last_page > 1"
-                class="mt-6 flex justify-center gap-1"
-            >
-                <template
-                    v-for="link in history.meta.links"
-                    :key="link.label"
-                >
-                    <Link
-                        v-if="link.url"
-                        :href="link.url"
-                        class="rounded px-3 py-1 text-sm"
-                        :class="
-                            link.active
-                                ? 'bg-red-600 text-white'
-                                : 'text-zinc-400 hover:bg-zinc-800'
-                        "
-                        v-html="link.label"
-                    />
-                    <span
-                        v-else
-                        class="px-3 py-1 text-sm text-zinc-600"
-                        v-html="link.label"
-                    />
-                </template>
-            </div>
+            <Pagination :meta="history.meta" />
         </div>
     </AppSidebarLayout>
 </template>

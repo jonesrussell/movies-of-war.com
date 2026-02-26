@@ -21,17 +21,21 @@ const addPosition = ref(1);
 
 function submitAdd() {
     if (!addMovieId.value) return;
-    router.post('/dashboard/featured-queue', {
-        movie_id: addMovieId.value,
-        slot: addSlot.value,
-        position: addPosition.value,
-    }, {
-        onSuccess: () => {
-            showAddForm.value = false;
-            addMovieId.value = null;
-            addPosition.value = 1;
+    router.post(
+        '/dashboard/featured-queue',
+        {
+            movie_id: addMovieId.value,
+            slot: addSlot.value,
+            position: addPosition.value,
         },
-    });
+        {
+            onSuccess: () => {
+                showAddForm.value = false;
+                addMovieId.value = null;
+                addPosition.value = 1;
+            },
+        },
+    );
 }
 
 function removeEntry(entry: FeaturedSlotQueue) {
@@ -65,8 +69,8 @@ const queues = {
                         Featured Slot Queue
                     </h1>
                     <p class="mt-2 text-zinc-400">
-                        Upcoming featured slot rotations — next change
-                        every Sunday 6 AM UTC
+                        Upcoming featured slot rotations — next change every
+                        Sunday 6 AM UTC
                     </p>
                 </div>
                 <div class="flex gap-3">
@@ -178,10 +182,7 @@ const queues = {
 
             <!-- Queue Columns -->
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <div
-                    v-for="(getQueue, slotType) in queues"
-                    :key="slotType"
-                >
+                <div v-for="(getQueue, slotType) in queues" :key="slotType">
                     <h2 class="mb-4 text-xl font-semibold text-white">
                         {{ slotLabel(slotType) }}
                     </h2>
@@ -189,8 +190,7 @@ const queues = {
                         v-if="getQueue().length === 0"
                         class="rounded-lg border border-zinc-800 bg-zinc-900 p-6 text-center text-zinc-500"
                     >
-                        Queue empty — click "Refill Queue" to
-                        auto-populate.
+                        Queue empty — click "Refill Queue" to auto-populate.
                     </div>
                     <div v-else class="space-y-3">
                         <div
@@ -214,12 +214,8 @@ const queues = {
                                 class="h-12 w-8 shrink-0 rounded bg-zinc-800"
                             />
                             <div class="min-w-0 flex-1">
-                                <p
-                                    class="truncate font-medium text-white"
-                                >
-                                    {{
-                                        entry.movie?.title ?? 'Unknown'
-                                    }}
+                                <p class="truncate font-medium text-white">
+                                    {{ entry.movie?.title ?? 'Unknown' }}
                                 </p>
                                 <p class="text-sm text-zinc-500">
                                     {{ entry.scheduled_for }}

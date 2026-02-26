@@ -47,11 +47,11 @@ function revealSpoilers() {
 
 <template>
     <article
-        class="rounded-lg border p-6 transition-colors dark:border-zinc-800 dark:bg-zinc-900/50"
+        class="rounded-lg border p-6 transition-colors"
         :class="
             isCuratorPick
-                ? 'border-red-500/50 bg-zinc-900/80 ring-2 ring-red-500/30 dark:border-red-500/40'
-                : 'border-zinc-800 bg-zinc-900/50'
+                ? 'border-[--intel-alert]/50 bg-[--intel-bg-surface]/80 ring-2 ring-[--intel-alert]/30'
+                : 'border-[--intel-border] bg-[--intel-bg-surface]/50'
         "
         data-testid="review-card"
         :aria-label="isCuratorPick ? 'Curator\'s pick review' : undefined"
@@ -60,7 +60,7 @@ function revealSpoilers() {
             <div class="flex flex-wrap items-center gap-2">
                 <span
                     v-if="isCuratorPick"
-                    class="rounded bg-red-600/90 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-white uppercase dark:bg-red-500/90"
+                    class="rounded bg-[--intel-alert]/90 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-white uppercase"
                 >
                     Curator's pick
                 </span>
@@ -72,24 +72,30 @@ function revealSpoilers() {
                     Contains spoilers
                 </span>
             </div>
-            <div class="text-sm text-zinc-400">
-                <span v-if="review.user" class="font-medium text-zinc-300">
+            <div class="text-sm text-[--intel-text-muted]">
+                <span
+                    v-if="review.user"
+                    class="font-medium text-[--intel-text-body]"
+                >
                     {{ review.user.name }}
                 </span>
-                <span class="text-zinc-500"> · </span>
+                <span class="text-[--intel-text-faint]"> · </span>
                 <span>{{ review.formatted_date }}</span>
-                <span v-if="review.is_edited" class="text-zinc-500">
+                <span v-if="review.is_edited" class="text-[--intel-text-faint]">
                     (edited)
                 </span>
             </div>
         </header>
 
-        <h3 v-if="review.title" class="mb-2 text-base font-semibold text-white">
+        <h3
+            v-if="review.title"
+            class="mb-2 text-base font-semibold text-[--intel-text-primary]"
+        >
             {{ review.title }}
         </h3>
 
         <div
-            class="relative text-zinc-300"
+            class="relative text-[--intel-text-body]"
             :class="[
                 isSpoilerBlurred &&
                     'blur-md transition-all duration-300 select-none [user-select:none]',
@@ -103,11 +109,11 @@ function revealSpoilers() {
             />
             <div
                 v-if="isSpoilerBlurred"
-                class="absolute inset-0 flex items-center justify-center bg-zinc-900/80"
+                class="absolute inset-0 flex items-center justify-center bg-[--intel-bg-surface]/80"
             >
                 <button
                     type="button"
-                    class="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-700 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                    class="rounded-lg border border-[--intel-border-bright] bg-[--intel-bg-elevated] px-4 py-2 text-sm font-medium text-[--intel-text-primary] transition-colors hover:bg-[--intel-border] focus:ring-2 focus:ring-[--intel-alert] focus:outline-none"
                     @click="revealSpoilers"
                 >
                     Reveal spoilers
@@ -116,12 +122,12 @@ function revealSpoilers() {
         </div>
 
         <footer
-            class="mt-4 flex flex-wrap items-center gap-3 border-t border-zinc-800 pt-3"
+            class="mt-4 flex flex-wrap items-center gap-3 border-t border-[--intel-border] pt-3"
         >
             <button
                 v-if="review.can_edit"
                 type="button"
-                class="text-sm text-zinc-400 hover:text-white focus:ring-2 focus:ring-red-500 focus:outline-none"
+                class="text-sm text-[--intel-text-muted] hover:text-[--intel-text-primary] focus:ring-2 focus:ring-[--intel-alert] focus:outline-none"
                 @click="emit('edit')"
             >
                 Edit
@@ -129,7 +135,7 @@ function revealSpoilers() {
             <button
                 v-if="review.can_delete"
                 type="button"
-                class="text-sm text-zinc-400 hover:text-red-500 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                class="text-sm text-[--intel-text-muted] hover:text-[--intel-alert] focus:ring-2 focus:ring-[--intel-alert] focus:outline-none"
                 @click="emit('delete')"
             >
                 Delete
@@ -137,7 +143,7 @@ function revealSpoilers() {
             <Link
                 v-if="review.id"
                 :href="`/reviews/${review.id}`"
-                class="text-sm text-zinc-400 hover:text-white focus:ring-2 focus:ring-red-500 focus:outline-none"
+                class="text-sm text-[--intel-text-muted] hover:text-[--intel-text-primary] focus:ring-2 focus:ring-[--intel-alert] focus:outline-none"
             >
                 {{ review.comments_count }} comment{{
                     review.comments_count !== 1 ? 's' : ''

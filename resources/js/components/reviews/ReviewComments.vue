@@ -56,8 +56,8 @@ function deleteComment(comment: ReviewComment) {
 </script>
 
 <template>
-    <div class="mt-6 border-t border-zinc-800 pt-6">
-        <h3 class="mb-4 text-sm font-semibold text-zinc-300">
+    <div class="mt-6 border-t border-[--intel-border] pt-6">
+        <h3 class="mb-4 text-sm font-semibold text-[--intel-text-body]">
             {{ review.comments_count }} comment{{
                 review.comments_count !== 1 ? 's' : ''
             }}
@@ -67,7 +67,7 @@ function deleteComment(comment: ReviewComment) {
             <div
                 v-for="comment in comments"
                 :key="comment.id"
-                class="ml-4 border-l-2 border-zinc-800 pl-4"
+                class="ml-4 border-l-2 border-[--intel-border] pl-4"
             >
                 <div v-if="editingCommentId === comment.id" class="space-y-2">
                     <Form
@@ -82,7 +82,7 @@ function deleteComment(comment: ReviewComment) {
                             required
                             minlength="10"
                             :default-value="comment.content"
-                            class="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-red-500 focus:outline-none"
+                            class="w-full rounded-md border border-[--intel-border] bg-[--intel-bg-surface] px-3 py-2 text-sm text-[--intel-text-primary] focus:ring-2 focus:ring-[--intel-alert] focus:outline-none"
                         />
                         <InputError :message="errors.content" />
                         <div class="mt-2 flex gap-2">
@@ -109,12 +109,12 @@ function deleteComment(comment: ReviewComment) {
                     </Form>
                 </div>
                 <div v-else>
-                    <p class="text-sm text-zinc-300">
-                        <span class="font-medium text-zinc-200">
+                    <p class="text-sm text-[--intel-text-body]">
+                        <span class="font-medium text-[--intel-text-primary]">
                             {{ comment.user?.name ?? 'Unknown' }}
                         </span>
-                        <span class="text-zinc-500"> · </span>
-                        <span class="text-zinc-500">
+                        <span class="text-[--intel-text-faint]"> · </span>
+                        <span class="text-[--intel-text-faint]">
                             {{
                                 new Date(
                                     comment.created_at,
@@ -122,7 +122,9 @@ function deleteComment(comment: ReviewComment) {
                             }}
                         </span>
                     </p>
-                    <p class="mt-1 text-sm whitespace-pre-wrap text-zinc-400">
+                    <p
+                        class="mt-1 text-sm whitespace-pre-wrap text-[--intel-text-muted]"
+                    >
                         {{ comment.content }}
                     </p>
                     <div
@@ -132,7 +134,7 @@ function deleteComment(comment: ReviewComment) {
                         <button
                             v-if="comment.can_edit"
                             type="button"
-                            class="text-xs text-zinc-500 hover:text-white"
+                            class="text-xs text-[--intel-text-faint] hover:text-[--intel-text-primary]"
                             @click="startEdit(comment)"
                         >
                             Edit
@@ -140,7 +142,7 @@ function deleteComment(comment: ReviewComment) {
                         <button
                             v-if="comment.can_delete"
                             type="button"
-                            class="text-xs text-zinc-500 hover:text-red-500"
+                            class="text-xs text-[--intel-text-faint] hover:text-[--intel-alert]"
                             @click="deleteComment(comment)"
                         >
                             Delete
@@ -166,7 +168,7 @@ function deleteComment(comment: ReviewComment) {
                 required
                 minlength="10"
                 placeholder="Share your thoughts..."
-                class="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                class="w-full rounded-md border border-[--intel-border] bg-[--intel-bg-surface] px-3 py-2 text-sm text-[--intel-text-primary] placeholder:text-[--intel-text-faint] focus:ring-2 focus:ring-[--intel-alert] focus:outline-none"
             />
             <InputError :message="errors.content" />
             <Button type="submit" :disabled="processing" size="sm">

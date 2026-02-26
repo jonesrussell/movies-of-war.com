@@ -34,7 +34,7 @@ const displayedTags = computed(() => {
             <Link
                 :href="`/movies/${movie.slug}`"
                 :aria-label="`View details for ${movie.title} (${movie.release_year})`"
-                class="relative block overflow-hidden rounded-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                class="relative block overflow-hidden rounded-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
             >
                 <Poster
                     :src="movie.poster_url"
@@ -64,7 +64,7 @@ const displayedTags = computed(() => {
                 >
                     <Link
                         :href="`/movies/${movie.slug}`"
-                        class="transition-colors hover:text-blue-400"
+                        class="transition-colors hover:text-[--intel-accent-hover]"
                     >
                         {{ movie.title }}
                     </Link>
@@ -117,7 +117,7 @@ const displayedTags = computed(() => {
                     />
                     <Link
                         :href="`/movies/${movie.slug}#reviews`"
-                        class="font-medium text-blue-500 transition-colors hover:text-blue-400"
+                        class="font-medium text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                     >
                         Your review
                     </Link>

@@ -442,9 +442,9 @@ function cardEnterStyle(index: number) {
                         type="button"
                         :aria-pressed="selectedConflict === conflict"
                         :class="[
-                            'shrink-0 snap-start rounded-md border px-3 py-1.5 font-[family-name:var(--font-mono-display)] text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600',
+                            'shrink-0 snap-start rounded-md border px-3 py-1.5 font-[family-name:var(--font-mono-display)] text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]',
                             selectedConflict === conflict
-                                ? 'border-blue-600 bg-blue-600 text-white'
+                                ? 'border-[--intel-accent] bg-[--intel-accent] text-white'
                                 : 'border-[--intel-border] bg-transparent text-[--intel-text-body] hover:bg-[--intel-bg-elevated]',
                         ]"
                         @click="
@@ -470,9 +470,9 @@ function cardEnterStyle(index: number) {
                                 selectedYear === String(recentDecadeStart)
                             "
                             :class="[
-                                'shrink-0 snap-start rounded-md border px-3 py-1.5 font-[family-name:var(--font-mono-display)] text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600',
+                                'shrink-0 snap-start rounded-md border px-3 py-1.5 font-[family-name:var(--font-mono-display)] text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]',
                                 selectedYear === String(recentDecadeStart)
-                                    ? 'border-blue-600 bg-blue-600 text-white'
+                                    ? 'border-[--intel-accent] bg-[--intel-accent] text-white'
                                     : 'border-[--intel-border] bg-transparent text-[--intel-text-body] hover:bg-[--intel-bg-elevated]',
                             ]"
                             @click="
@@ -586,7 +586,7 @@ function cardEnterStyle(index: number) {
                                 Filters
                                 <span
                                     v-if="activeChips.length"
-                                    class="rounded-full bg-blue-600 px-2 py-0.5 text-xs text-white"
+                                    class="rounded-full bg-[--intel-accent] px-2 py-0.5 text-xs text-white"
                                 >
                                     {{ activeChips.length }}
                                 </span>
@@ -599,7 +599,7 @@ function cardEnterStyle(index: number) {
                                         Filters
                                         <span
                                             v-if="activeChips.length"
-                                            class="rounded-full bg-blue-600 px-2 py-0.5 text-xs text-white"
+                                            class="rounded-full bg-[--intel-accent] px-2 py-0.5 text-xs text-white"
                                         >
                                             {{ activeChips.length }}
                                         </span>
@@ -709,7 +709,7 @@ function cardEnterStyle(index: number) {
                             <input
                                 v-model="useInfiniteScrollMode"
                                 type="checkbox"
-                                class="size-4 rounded border-[--intel-border] bg-[--intel-bg-surface] text-blue-600 focus:ring-blue-500"
+                                class="size-4 rounded border-[--intel-border] bg-[--intel-bg-surface] text-[--intel-accent] focus:ring-[--intel-accent]"
                             />
                             Infinite scroll
                         </label>
@@ -783,9 +783,9 @@ function cardEnterStyle(index: number) {
                             :key="link.label"
                             :href="link.url || '#'"
                             :class="[
-                                'rounded-md px-4 py-2 font-[family-name:var(--font-mono-display)] text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+                                'rounded-md px-4 py-2 font-[family-name:var(--font-mono-display)] text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]',
                                 link.active
-                                    ? 'bg-blue-600 text-white'
+                                    ? 'bg-[--intel-accent] text-white'
                                     : link.url
                                       ? 'bg-[--intel-bg-base] text-[--intel-text-body] ring-1 ring-[--intel-border] hover:bg-[--intel-bg-surface]'
                                       : 'cursor-not-allowed bg-[--intel-bg-base] text-[--intel-text-faint] ring-1 ring-[--intel-border]',

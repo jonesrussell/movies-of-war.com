@@ -130,21 +130,6 @@
     --ease-smooth-out: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-dramatic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    /* Intelligence palette — Slate Command */
-    --intel-bg-base: #0c1222;
-    --intel-bg-surface: #131c31;
-    --intel-bg-elevated: #1a2540;
-    --intel-border: #1e3050;
-    --intel-border-bright: #2a4060;
-    --intel-accent: #3b82f6;
-    --intel-accent-dim: #2563eb;
-    --intel-accent-glow: rgba(59, 130, 246, 0.15);
-    --intel-alert: #ef4444;
-    --intel-text-primary: #e2e8f0;
-    --intel-text-body: #94a3b8;
-    --intel-text-muted: #64748b;
-    --intel-text-faint: #475569;
-
     /* Container sizes - explicitly set to prevent Tailwind v4 bug where max-w-* uses --spacing-* instead of --container-* */
     /* See: https://github.com/tailwindlabs/tailwindcss/discussions/17777 */
     --container-3xs: 16rem;
@@ -240,7 +225,7 @@
         transition: color 0.15s;
     }
     .film-ref:hover {
-        color: #60a5fa;
+        color: var(--intel-accent-hover);
         text-decoration: underline;
     }
     .film-ref--missing {
@@ -486,7 +471,8 @@
 
     /* Focus ring utility for consistent accessibility */
     .focus-ring {
-        @apply outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1222];
+        @apply outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent] focus-visible:ring-offset-2;
+        --tw-ring-offset-color: var(--intel-bg-base);
     }
 
     /* Override max-width utilities to use container sizes instead of spacing (Tailwind v4 bug workaround) */
@@ -565,6 +551,23 @@
     --sidebar-border: hsl(0 0% 91%);
     --sidebar-ring: hsl(217.2 91.2% 59.8%);
     --sidebar: hsl(0 0% 98%);
+
+    /* Intelligence palette — Light mode */
+    --intel-bg-base: #f1f5f9;
+    --intel-bg-surface: #ffffff;
+    --intel-bg-elevated: #f8fafc;
+    --intel-border: #cbd5e1;
+    --intel-border-bright: #94a3b8;
+    --intel-accent: #2563eb;
+    --intel-accent-dim: #1d4ed8;
+    --intel-accent-hover: #1d4ed8;
+    --intel-accent-glow: rgba(37, 99, 235, 0.08);
+    --intel-alert: #dc2626;
+    --intel-alert-dim: #b91c1c;
+    --intel-text-primary: #0f172a;
+    --intel-text-body: #334155;
+    --intel-text-muted: #475569;
+    --intel-text-faint: #64748b;
 }
 
 .dark {
@@ -601,6 +604,23 @@
     --sidebar-border: #1e3050;
     --sidebar-ring: #3b82f6;
     --sidebar: #0a0f1a;
+
+    /* Intelligence palette — Dark mode (Slate Command) */
+    --intel-bg-base: #0c1222;
+    --intel-bg-surface: #131c31;
+    --intel-bg-elevated: #1a2540;
+    --intel-border: #1e3050;
+    --intel-border-bright: #2a4060;
+    --intel-accent: #3b82f6;
+    --intel-accent-dim: #2563eb;
+    --intel-accent-hover: #60a5fa;
+    --intel-accent-glow: rgba(59, 130, 246, 0.15);
+    --intel-alert: #ef4444;
+    --intel-alert-dim: #dc2626;
+    --intel-text-primary: #e2e8f0;
+    --intel-text-body: #94a3b8;
+    --intel-text-muted: #64748b;
+    --intel-text-faint: #475569;
 }
 
 @layer base {

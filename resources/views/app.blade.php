@@ -34,7 +34,7 @@
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
-                background-color: #f8fafc;
+                background-color: #f1f5f9;
             }
             html.dark {
                 background-color: #0c1222;

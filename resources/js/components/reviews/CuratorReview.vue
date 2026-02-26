@@ -37,7 +37,7 @@ onMounted(() => {
     <div class="space-y-4">
         <div class="flex flex-wrap items-center gap-3">
             <StarRating :rating="review.rating" :max-stars="4" size="lg" />
-            <span class="text-sm font-medium text-zinc-400">
+            <span class="text-sm font-medium text-[--intel-text-muted]">
                 Curator's Review
             </span>
         </div>
@@ -52,7 +52,7 @@ onMounted(() => {
         <!-- eslint-disable vue/no-v-html -->
         <div
             ref="reviewEl"
-            class="review-content prose prose-lg leading-relaxed break-words text-zinc-300 prose-neutral dark:prose-invert prose-headings:text-white prose-p:text-zinc-300 prose-a:text-red-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-hr:border-zinc-700"
+            class="review-content prose prose-lg leading-relaxed break-words text-[--intel-text-body] prose-neutral prose-headings:text-[--intel-text-primary] prose-p:text-[--intel-text-body] prose-a:text-[--intel-alert] prose-a:no-underline hover:prose-a:underline prose-strong:text-[--intel-text-primary] prose-hr:border-[--intel-border-bright]"
             v-html="review.content_html"
         />
         <!-- eslint-enable vue/no-v-html -->

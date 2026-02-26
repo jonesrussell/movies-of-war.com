@@ -6,7 +6,9 @@ import { Home } from 'lucide-vue-next';
 <template>
     <Head title="Page Not Found - Movies of War" />
 
-    <div class="flex min-h-screen items-center justify-center bg-zinc-950 px-4">
+    <div
+        class="flex min-h-screen items-center justify-center bg-[--intel-bg-base] px-4"
+    >
         <div class="text-center">
             <img
                 src="/images/illustrations/404.png"
@@ -14,11 +16,13 @@ import { Home } from 'lucide-vue-next';
                 class="mx-auto mb-8 h-64 w-auto"
             />
 
-            <h1 class="mb-4 text-6xl font-bold text-white">404</h1>
-            <h2 class="mb-2 text-2xl font-semibold text-zinc-300">
+            <h1 class="mb-4 text-6xl font-bold text-[--intel-text-primary]">
+                404
+            </h1>
+            <h2 class="mb-2 text-2xl font-semibold text-[--intel-text-body]">
                 Page Not Found
             </h2>
-            <p class="mb-8 text-zinc-400">
+            <p class="mb-8 text-[--intel-text-muted]">
                 The page you're looking for has gone AWOL.
             </p>
 
@@ -27,7 +31,7 @@ import { Home } from 'lucide-vue-next';
             >
                 <Link
                     href="/"
-                    class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-red-700"
+                    class="inline-flex items-center gap-2 rounded-lg bg-[--intel-alert] px-6 py-3 font-semibold text-white transition-colors hover:bg-[--intel-alert-dim]"
                 >
                     <Home class="size-5" />
                     Return to Base
@@ -35,7 +39,7 @@ import { Home } from 'lucide-vue-next';
 
                 <Link
                     href="/movies"
-                    class="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-6 py-3 font-semibold text-white transition-colors hover:bg-zinc-800"
+                    class="inline-flex items-center gap-2 rounded-lg border border-[--intel-border-bright] bg-[--intel-bg-surface] px-6 py-3 font-semibold text-[--intel-text-primary] transition-colors hover:bg-[--intel-bg-elevated]"
                 >
                     Browse Movies
                 </Link>

@@ -195,7 +195,7 @@ const useResponsiveImages = computed(() => {
     <div
         :class="
             cn(
-                'relative overflow-hidden bg-zinc-900',
+                'relative overflow-hidden bg-[--intel-bg-surface]',
                 aspectClass,
                 $props.class,
             )
@@ -204,7 +204,7 @@ const useResponsiveImages = computed(() => {
         <!-- Skeleton placeholder -->
         <div
             v-if="!isLoaded && !hasError"
-            class="absolute inset-0 animate-pulse bg-zinc-800"
+            class="absolute inset-0 animate-pulse bg-[--intel-bg-elevated]"
         />
 
         <!-- Main image with responsive support -->

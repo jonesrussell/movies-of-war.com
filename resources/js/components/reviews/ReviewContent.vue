@@ -19,7 +19,7 @@ withDefaults(defineProps<Props>(), {
 
 <template>
     <div
-        class="review-content prose prose-lg leading-relaxed break-words text-zinc-300 prose-neutral dark:prose-invert prose-headings:text-white prose-p:text-zinc-300 prose-a:text-red-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-code:rounded prose-code:bg-zinc-800 prose-code:px-1 prose-code:text-zinc-300 prose-code:before:content-none prose-code:after:content-none"
+        class="review-content prose prose-lg leading-relaxed break-words text-[--intel-text-body] prose-neutral prose-headings:text-[--intel-text-primary] prose-p:text-[--intel-text-body] prose-a:text-[--intel-alert] prose-a:no-underline hover:prose-a:underline prose-strong:text-[--intel-text-primary] prose-code:rounded prose-code:bg-[--intel-bg-elevated] prose-code:px-1 prose-code:text-[--intel-text-body] prose-code:before:content-none prose-code:after:content-none"
     >
         <div v-if="collapsed && contentExcerpt" class="whitespace-pre-wrap">
             {{ contentExcerpt }}

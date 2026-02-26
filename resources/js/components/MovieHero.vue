@@ -197,10 +197,10 @@ onMounted(() => {
                 >
                     <div
                         v-if="subtitle"
-                        class="mb-2 font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-blue-500 uppercase"
+                        class="mb-2 font-[family-name:var(--font-mono-display)] text-xs font-semibold tracking-[0.2em] text-[--intel-accent] uppercase"
                     >
                         <span
-                            class="mr-3 inline-block h-px w-6 bg-blue-500 align-middle"
+                            class="mr-3 inline-block h-px w-6 bg-[--intel-accent] align-middle"
                         ></span>
                         {{ subtitle }}
                     </div>
@@ -251,7 +251,7 @@ onMounted(() => {
                             />
                             <Link
                                 :href="`/movies/${movie.slug}/reviews`"
-                                class="font-medium text-blue-500 transition-colors hover:text-blue-400"
+                                class="font-medium text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                             >
                                 Your review
                             </Link>
@@ -273,7 +273,7 @@ onMounted(() => {
                         </p>
                         <Link
                             :href="`/movies/${movie.slug}/reviews`"
-                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-500 transition-colors hover:text-blue-400"
+                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-[--intel-accent] transition-colors hover:text-[--intel-accent-hover]"
                         >
                             Read full review
                             <ArrowRight class="size-4" />
@@ -296,7 +296,7 @@ onMounted(() => {
                     <div class="flex flex-wrap gap-4">
                         <Link
                             :href="`/movies/${movie.slug}`"
-                            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 hover:shadow-blue-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            class="inline-flex items-center gap-2 rounded-xl bg-[--intel-accent] px-6 py-3.5 text-sm font-semibold text-white shadow-[--intel-accent]/20 shadow-lg transition-all hover:bg-[--intel-accent-dim] hover:shadow-[--intel-accent]/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                         >
                             <Info class="size-5" />
                             VIEW DOSSIER
@@ -307,7 +307,7 @@ onMounted(() => {
                             :href="movie.trailer_url"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex items-center gap-2 rounded-xl border border-[--intel-border] bg-[--intel-bg-elevated]/80 px-6 py-3.5 text-sm font-semibold text-[--intel-text-primary] backdrop-blur-sm transition-all hover:border-[--intel-accent] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            class="inline-flex items-center gap-2 rounded-xl border border-[--intel-border] bg-[--intel-bg-elevated]/80 px-6 py-3.5 text-sm font-semibold text-[--intel-text-primary] backdrop-blur-sm transition-all hover:border-[--intel-accent] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]"
                         >
                             <Play class="size-5" />
                             Watch Trailer

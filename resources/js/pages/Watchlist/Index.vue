@@ -33,7 +33,7 @@ defineProps<Props>();
                     } saved`"
                 >
                     <template #action>
-                        <Bookmark class="size-6 text-blue-500" />
+                        <Bookmark class="size-6 text-[--intel-accent]" />
                     </template>
                 </SectionHeader>
 
@@ -74,7 +74,7 @@ defineProps<Props>();
                         <div class="mt-7 flex justify-center">
                             <Button
                                 as-child
-                                class="bg-blue-600 hover:bg-blue-700"
+                                class="bg-[--intel-accent] hover:bg-[--intel-accent-dim]"
                             >
                                 <Link href="/movies">BROWSE DATABASE</Link>
                             </Button>

@@ -149,7 +149,7 @@ const loginUrl = computed(
 
                 <Link
                     :href="`/movies/${movie.slug}`"
-                    class="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                    class="inline-flex items-center gap-2 text-sm text-[--intel-text-muted] transition-colors hover:text-[--intel-text-primary] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-alert]"
                 >
                     <ArrowLeft class="size-4" aria-hidden="true" />
                     Back to {{ movie.title }}
@@ -165,7 +165,7 @@ const loginUrl = computed(
                         <div class="lg:hidden">
                             <Link
                                 :href="`/movies/${movie.slug}`"
-                                class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-alert]"
                             >
                                 <Poster
                                     :src="movie.poster_url"
@@ -175,15 +175,17 @@ const loginUrl = computed(
                                     class="w-full max-w-[200px] rounded-lg"
                                 />
                             </Link>
-                            <p class="mt-2 text-lg font-semibold text-white">
+                            <p
+                                class="mt-2 text-lg font-semibold text-[--intel-text-primary]"
+                            >
                                 <Link
                                     :href="`/movies/${movie.slug}`"
-                                    class="transition-colors hover:text-red-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                    class="transition-colors hover:text-[--intel-alert] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-alert]"
                                 >
                                     {{ movie.title }}
                                 </Link>
                                 <template v-if="movie.release_year">
-                                    <span class="text-zinc-400">
+                                    <span class="text-[--intel-text-muted]">
                                         ({{ movie.release_year }})
                                     </span>
                                 </template>
@@ -193,7 +195,7 @@ const loginUrl = computed(
                                     movie.tmdb_vote_average != null &&
                                     movie.tmdb_vote_count != null
                                 "
-                                class="mt-0.5 text-sm text-zinc-500"
+                                class="mt-0.5 text-sm text-[--intel-text-faint]"
                             >
                                 TMDB:
                                 {{
@@ -215,7 +217,7 @@ const loginUrl = computed(
                             aria-label="Editorial review"
                         >
                             <div
-                                class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                                class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface]/50 p-6"
                             >
                                 <CuratorReviewComponent
                                     :review="curatorReview"
@@ -230,7 +232,9 @@ const loginUrl = computed(
                             role="region"
                             aria-label="Curator's review"
                         >
-                            <h2 class="text-lg font-semibold text-white">
+                            <h2
+                                class="text-lg font-semibold text-[--intel-text-primary]"
+                            >
                                 {{ curator_review.user?.name ?? 'Curator' }}'s
                                 review
                             </h2>
@@ -267,17 +271,17 @@ const loginUrl = computed(
                                 <Button
                                     v-if="!showReviewForm"
                                     variant="outline"
-                                    class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white focus-visible:ring-red-500"
+                                    class="border-[--intel-border-bright] text-[--intel-text-body] hover:bg-[--intel-bg-elevated] hover:text-[--intel-text-primary] focus-visible:ring-[--intel-alert]"
                                     @click="showReviewForm = true"
                                 >
                                     Write a review
                                 </Button>
                                 <div
                                     v-else
-                                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                                    class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface]/50 p-6"
                                 >
                                     <h2
-                                        class="mb-4 text-lg font-semibold text-white"
+                                        class="mb-4 text-lg font-semibold text-[--intel-text-primary]"
                                     >
                                         Write a review
                                     </h2>
@@ -298,7 +302,7 @@ const loginUrl = computed(
                         <div class="hidden lg:block">
                             <Link
                                 :href="`/movies/${movie.slug}`"
-                                class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-alert]"
                             >
                                 <Poster
                                     :src="movie.poster_url"
@@ -316,22 +320,26 @@ const loginUrl = computed(
                 <!-- Guest empty state: no reviews at all -->
                 <div
                     v-if="hasNoReviews && !auth.user"
-                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 text-center"
+                    class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface]/50 p-6 text-center"
                 >
-                    <p class="mb-4 text-zinc-300">Be the first to review</p>
+                    <p class="mb-4 text-[--intel-text-body]">
+                        Be the first to review
+                    </p>
                     <div
                         class="flex flex-wrap items-center justify-center gap-3"
                     >
                         <Link
                             :href="loginUrl"
-                            class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="inline-flex items-center justify-center rounded-lg bg-[--intel-alert] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[--intel-alert-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-alert]"
                         >
                             Log in to review
                         </Link>
-                        <span class="text-sm text-zinc-500">or</span>
+                        <span class="text-sm text-[--intel-text-faint]"
+                            >or</span
+                        >
                         <Link
                             :href="register().url"
-                            class="text-sm font-medium text-red-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="text-sm font-medium text-[--intel-alert] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-alert]"
                         >
                             Sign up
                         </Link>
@@ -341,9 +349,9 @@ const loginUrl = computed(
                 <!-- Only curator, no user reviews: single CTA block (no "More reviews" section) -->
                 <div
                     v-else-if="onlyCuratorNoUserReviews"
-                    class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6 text-center"
+                    class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface]/50 p-6 text-center"
                 >
-                    <p class="mb-4 text-zinc-300">
+                    <p class="mb-4 text-[--intel-text-body]">
                         No user reviews yet. Be the first to share your
                         thoughts!
                     </p>
@@ -353,16 +361,18 @@ const loginUrl = computed(
                     >
                         <Button
                             v-if="!showReviewForm"
-                            class="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500"
+                            class="bg-[--intel-alert] text-white hover:bg-[--intel-alert-dim] focus-visible:ring-[--intel-alert]"
                             @click="showReviewForm = true"
                         >
                             Write a review
                         </Button>
                         <div
                             v-else
-                            class="w-full rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 text-left"
+                            class="w-full rounded-lg border border-[--intel-border] bg-[--intel-bg-base]/60 p-4 text-left"
                         >
-                            <h2 class="mb-4 text-lg font-semibold text-white">
+                            <h2
+                                class="mb-4 text-lg font-semibold text-[--intel-text-primary]"
+                            >
                                 Write a review
                             </h2>
                             <ReviewForm
@@ -377,14 +387,16 @@ const loginUrl = computed(
                     >
                         <Link
                             :href="loginUrl"
-                            class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="inline-flex items-center justify-center rounded-lg bg-[--intel-alert] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[--intel-alert-dim] focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-alert]"
                         >
                             Log in to review
                         </Link>
-                        <span class="text-sm text-zinc-500">or</span>
+                        <span class="text-sm text-[--intel-text-faint]"
+                            >or</span
+                        >
                         <Link
                             :href="register().url"
-                            class="text-sm font-medium text-red-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            class="text-sm font-medium text-[--intel-alert] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-alert]"
                         >
                             Sign up
                         </Link>
@@ -414,16 +426,18 @@ const loginUrl = computed(
                     <Button
                         v-if="!showReviewForm"
                         variant="outline"
-                        class="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white focus-visible:ring-red-500"
+                        class="border-[--intel-border-bright] text-[--intel-text-body] hover:bg-[--intel-bg-elevated] hover:text-[--intel-text-primary] focus-visible:ring-[--intel-alert]"
                         @click="showReviewForm = true"
                     >
                         Write a review
                     </Button>
                     <div
                         v-else
-                        class="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6"
+                        class="rounded-lg border border-[--intel-border] bg-[--intel-bg-surface]/50 p-6"
                     >
-                        <h2 class="mb-4 text-lg font-semibold text-white">
+                        <h2
+                            class="mb-4 text-lg font-semibold text-[--intel-text-primary]"
+                        >
                             Write a review
                         </h2>
                         <ReviewForm :movie="movie" :existing-review="null" />

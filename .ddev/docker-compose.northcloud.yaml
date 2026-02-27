@@ -1,0 +1,4 @@
+services:
+  web:
+    volumes:
+      - /home/fsd42/dev/northcloud-laravel:/home/fsd42/dev/northcloud-laravel

@@ -10,6 +10,18 @@
                 "boost:mcp"
             ],
             "cwd": "/home/jones/dev/movies-of-war.com"
+        },
+        "northcloud-production": {
+            "command": "wsl.exe",
+            "args": [
+                "ddev",
+                "exec",
+                "php",
+                "artisan",
+                "mcp:start",
+                "northcloud-production"
+            ],
+            "cwd": "/home/jones/dev/movies-of-war.com"
         }
     }
 }

@@ -23,6 +23,7 @@ interface Props {
     pickOfWeekUserReview?: UserReviewSummary | null;
     latestMovies: Movie[];
     upcomingMovies: Movie[];
+    totalPublishedCount: number;
 }
 
 defineProps<Props>();
@@ -202,7 +203,7 @@ const jsonLdWebSite = computed(() =>
                         <p
                             class="font-[family-name:var(--font-mono-display)] text-2xl font-bold text-[--intel-text-primary]"
                         >
-                            {{ latestMovies.length + upcomingMovies.length }}+
+                            {{ totalPublishedCount }}+
                         </p>
                         <p
                             class="font-[family-name:var(--font-mono-display)] text-xs tracking-wider text-[--intel-text-muted] uppercase"

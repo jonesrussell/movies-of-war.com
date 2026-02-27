@@ -128,5 +128,6 @@ Route::get('/', function () {
         'pickOfWeekUserReview' => $pickOfWeekUserReview,
         'latestMovies' => $latestPayload,
         'upcomingMovies' => $upcomingPayload,
+        'totalPublishedCount' => Movie::query()->published()->count(),
     ]);
 })->name('home');

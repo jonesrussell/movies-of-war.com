@@ -149,6 +149,19 @@ test('home page uses DB review for pick of week when no markdown file exists', f
     expect($props['pickOfWeekReview']['content_excerpt'] ?? '')->toContain('Database-only');
 });
 
+test('home page includes total published count', function () {
+    Movie::factory()->published()->count(5)->create(['is_upcoming' => false]);
+    Movie::factory()->create(['status' => 'draft']);
+
+    $response = $this->get(route('home'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Welcome')
+        ->where('totalPublishedCount', 5)
+    );
+});
+
 test('guest users never receive user_review on home page', function () {
     $movie = Movie::factory()->published()->create(['slug' => 'latest-one', 'is_upcoming' => false]);
     FeaturedSlot::factory()->for($movie)->create(['slot' => 'pick_of_week']);

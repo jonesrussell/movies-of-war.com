@@ -9,6 +9,10 @@ WorkingDirectory=/home/deployer/movies-of-war.com/current
 ExecStart=/usr/bin/php artisan horizon
 Restart=always
 RestartSec=3
+TimeoutStopSec=90
+KillMode=mixed
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=default.target

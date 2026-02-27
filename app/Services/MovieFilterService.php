@@ -24,7 +24,7 @@ class MovieFilterService
     /**
      * Get all filter options with caching.
      *
-     * @return array{countries: Collection, conflicts: Collection, years: Collection, tags: Collection}
+     * @return array{countries: Collection, conflicts: Collection, years: Collection, tags: Collection, eraTags: Collection}
      */
     public function getFilterOptions(): array
     {
@@ -33,6 +33,7 @@ class MovieFilterService
             'conflicts' => $this->getConflicts(),
             'years' => $this->getYears(),
             'tags' => $this->getTags(),
+            'eraTags' => $this->getEraTags(),
         ];
     }
 
@@ -47,6 +48,7 @@ class MovieFilterService
             self::CACHE_PREFIX.':countries',
             self::CACHE_TTL,
             fn () => Movie::query()
+                ->published()
                 ->distinct()
                 ->pluck('country')
                 ->filter()
@@ -66,6 +68,7 @@ class MovieFilterService
             self::CACHE_PREFIX.':conflicts',
             self::CACHE_TTL,
             fn () => Movie::query()
+                ->published()
                 ->distinct()
                 ->pluck('conflict')
                 ->filter()
@@ -85,6 +88,7 @@ class MovieFilterService
             self::CACHE_PREFIX.':years',
             self::CACHE_TTL,
             fn () => Movie::query()
+                ->published()
                 ->distinct()
                 ->pluck('release_year')
                 ->filter()
@@ -109,6 +113,23 @@ class MovieFilterService
     }
 
     /**
+     * Get era tags that have at least one published movie.
+     *
+     * @return Collection<int, Tag>
+     */
+    public function getEraTags(): Collection
+    {
+        return Cache::remember(
+            self::CACHE_PREFIX.':era_tags',
+            self::CACHE_TTL,
+            fn () => Tag::eras()
+                ->whereHas('movies', fn ($q) => $q->published())
+                ->orderBy('name')
+                ->get()
+        );
+    }
+
+    /**
      * Clear all filter caches.
      */
     public function clearCache(): void
@@ -117,6 +138,7 @@ class MovieFilterService
         Cache::forget(self::CACHE_PREFIX.':conflicts');
         Cache::forget(self::CACHE_PREFIX.':years');
         Cache::forget(self::CACHE_PREFIX.':tags');
+        Cache::forget(self::CACHE_PREFIX.':era_tags');
     }
 
     /**

@@ -113,6 +113,7 @@ class MovieController extends Controller
                 'conflicts' => $filterOptions['conflicts'],
                 'years' => $filterOptions['years'],
                 'tags' => TagResource::collection($filterOptions['tags'])->withoutWrapping(),
+                'eraTags' => TagResource::collection($filterOptions['eraTags'])->resolve(request()),
             ],
             'queryParams' => $request->only(['search', 'year', 'country', 'conflict', 'tag', 'sort']),
         ]);

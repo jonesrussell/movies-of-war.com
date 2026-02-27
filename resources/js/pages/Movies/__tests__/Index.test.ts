@@ -103,6 +103,10 @@ describe('Movies/Index', () => {
     const defaultFilters = {
         conflicts: ['WWI', 'WWII', 'Vietnam'],
         countries: ['USA', 'UK', 'Germany'],
+        eraTags: [
+            createMockTag({ id: 10, name: 'WWII', slug: 'wwii' }),
+            createMockTag({ id: 11, name: 'Vietnam War', slug: 'vietnam-war' }),
+        ],
         tags: [
             createMockTag({ id: 1, name: 'Action', slug: 'action' }),
             createMockTag({ id: 2, name: 'Drama', slug: 'drama' }),

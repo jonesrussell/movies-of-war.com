@@ -71,6 +71,7 @@ interface Props {
     filters: {
         conflicts: string[];
         countries: string[];
+        eraTags: Tag[] | { data?: Tag[] };
         tags: Tag[] | { data?: Tag[] };
         years: number[];
     };
@@ -80,6 +81,9 @@ interface Props {
 
 const props = defineProps<Props>();
 const filterTags = computed(() => normalizeFilterTags(props.filters.tags));
+const filterEraTags = computed(() =>
+    normalizeFilterTags(props.filters.eraTags),
+);
 const page = usePage();
 const appUrl = computed(() => (page.props.appUrl as string) ?? '');
 const canonicalUrl = computed(() =>
@@ -425,9 +429,7 @@ function cardEnterStyle(index: number) {
 
                 <!-- Quick filter pills -->
                 <div
-                    v-if="
-                        filters.conflicts.length > 0 || filters.years.length > 0
-                    "
+                    v-if="filterEraTags.length > 0 || filters.years.length > 0"
                     aria-label="Quick filters"
                     class="scrollbar-none flex snap-x snap-mandatory items-center gap-2 overflow-x-auto pb-1 whitespace-nowrap"
                 >
@@ -437,22 +439,22 @@ function cardEnterStyle(index: number) {
                         Quick filters
                     </span>
                     <button
-                        v-for="conflict in filters.conflicts.slice(0, 5)"
-                        :key="conflict"
+                        v-for="eraTag in filterEraTags"
+                        :key="eraTag.slug"
                         type="button"
-                        :aria-pressed="selectedConflict === conflict"
+                        :aria-pressed="selectedTag === eraTag.slug"
                         :class="[
                             'shrink-0 snap-start rounded-md border px-3 py-1.5 font-[family-name:var(--font-mono-display)] text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[--intel-accent]',
-                            selectedConflict === conflict
+                            selectedTag === eraTag.slug
                                 ? 'border-[--intel-accent] bg-[--intel-accent] text-white'
                                 : 'border-[--intel-border] bg-transparent text-[--intel-text-body] hover:bg-[--intel-bg-elevated]',
                         ]"
                         @click="
-                            selectedConflict =
-                                selectedConflict === conflict ? '' : conflict
+                            selectedTag =
+                                selectedTag === eraTag.slug ? '' : eraTag.slug
                         "
                     >
-                        {{ conflict }}
+                        {{ eraTag.name }}
                     </button>
                     <template
                         v-if="

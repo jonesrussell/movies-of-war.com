@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a2247d05448f5836eb353b5f4addd2a",
+    "content-hash": "d99130f19923406444d6417dd7fbc71c",
     "packages": [
         {
             "name": "atymic/twitter",
@@ -1587,11 +1587,17 @@
         },
         {
             "name": "jonesrussell/northcloud-laravel",
-            "version": "0.7.1",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jonesrussell/northcloud-laravel.git",
+                "reference": "88476d2a1fdaf35d60746b7d9359f66343196bfd"
+            },
             "dist": {
-                "type": "path",
-                "url": "/home/fsd42/dev/northcloud-laravel",
-                "reference": "eed6484020ad835f477a9dca3fdaeed070dbc205"
+                "type": "zip",
+                "url": "https://api.github.com/repos/jonesrussell/northcloud-laravel/zipball/88476d2a1fdaf35d60746b7d9359f66343196bfd",
+                "reference": "88476d2a1fdaf35d60746b7d9359f66343196bfd",
+                "shasum": ""
             },
             "require": {
                 "ext-json": "*",
@@ -1601,7 +1607,7 @@
                 "illuminate/database": "^12.0",
                 "illuminate/events": "^12.0",
                 "illuminate/support": "^12.0",
-                "laravel/mcp": "^0.1 || ^0.5",
+                "laravel/mcp": "^0.5",
                 "php": "^8.4",
                 "phpseclib/phpseclib": "~3.0",
                 "sendgrid/sendgrid": "^8.0"
@@ -1613,15 +1619,16 @@
                 "pestphp/pest": "^4.0",
                 "pestphp/pest-plugin-laravel": "^4.0"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "JonesRussell\\NorthCloud\\NorthCloudServiceProvider"
-                    ],
                     "aliases": {
                         "NorthCloud": "JonesRussell\\NorthCloud\\Facades\\NorthCloud"
-                    }
+                    },
+                    "providers": [
+                        "JonesRussell\\NorthCloud\\NorthCloudServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -1630,18 +1637,16 @@
                     "JonesRussell\\NorthCloud\\Database\\Factories\\": "database/factories/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "JonesRussell\\NorthCloud\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "description": "Shared article ingestion pipeline for North Cloud-connected Laravel sites",
-            "transport-options": {
-                "relative": false
-            }
+            "support": {
+                "issues": "https://github.com/jonesrussell/northcloud-laravel/issues",
+                "source": "https://github.com/jonesrussell/northcloud-laravel/tree/main"
+            },
+            "time": "2026-02-27T04:33:15+00:00"
         },
         {
             "name": "jonesrussell/x-suite-laravel",

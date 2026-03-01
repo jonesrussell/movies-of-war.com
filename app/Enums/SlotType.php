@@ -16,4 +16,12 @@ enum SlotType: string
             self::PickOfWeek => 'Pick of the Week',
         };
     }
+
+    public function strategy(): SlotStrategy
+    {
+        return match ($this) {
+            self::Hero => SlotStrategy::Upcoming,
+            self::PickOfWeek => SlotStrategy::HighestRated,
+        };
+    }
 }

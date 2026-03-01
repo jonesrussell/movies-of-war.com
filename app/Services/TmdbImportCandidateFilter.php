@@ -16,10 +16,10 @@ class TmdbImportCandidateFilter
      */
     private const WAR_GENRE_ID = 10752;
 
-    public function filter(Collection $candidates): Collection
+    public function filter(Collection $candidates, bool $upcoming = false): Collection
     {
-        $minVoteCount = config('tmdb.import.min_vote_count');
-        $minVoteAverage = config('tmdb.import.min_vote_average');
+        $minVoteCount = $upcoming ? null : config('tmdb.import.min_vote_count');
+        $minVoteAverage = $upcoming ? null : config('tmdb.import.min_vote_average');
         $relevanceKeywords = config('tmdb.import.relevance_keywords', []);
         $relevanceMinScore = config('tmdb.import.relevance_min_score');
         $relevanceTopPercent = config('tmdb.import.relevance_top_percent');

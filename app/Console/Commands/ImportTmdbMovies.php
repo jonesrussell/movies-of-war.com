@@ -137,7 +137,7 @@ class ImportTmdbMovies extends Command
                 usleep(250000);
             }
 
-            $candidates = $this->filter->filter($allResults)->values();
+            $candidates = $this->filter->filter($allResults, $upcoming)->values();
             $ids = $candidates;
 
             if (! $force) {
@@ -197,8 +197,8 @@ class ImportTmdbMovies extends Command
         }
 
         if ($type === 'genre' || $type === 'keywords') {
-            $minVoteCount = config('tmdb.import.min_vote_count');
-            $minVoteAverage = config('tmdb.import.min_vote_average');
+            $minVoteCount = $upcoming ? null : config('tmdb.import.min_vote_count');
+            $minVoteAverage = $upcoming ? null : config('tmdb.import.min_vote_average');
             $genreIds = null;
             $keywordIds = null;
 
@@ -308,7 +308,7 @@ class ImportTmdbMovies extends Command
             usleep(250000);
         }
 
-        $filtered = $this->filter->filter($allResults);
+        $filtered = $this->filter->filter($allResults, $upcoming);
 
         return $filtered->take($limit)->values();
     }

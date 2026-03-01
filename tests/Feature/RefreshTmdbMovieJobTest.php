@@ -90,6 +90,50 @@ test('RefreshTmdbMovieJob does not overwrite slug poster_path or poster_url', fu
         ->and($movie->poster_url)->toBe('https://example.com/poster.jpg');
 });
 
+test('RefreshTmdbMovieJob preserves release_year when TMDB returns null release_date', function () {
+    $movie = Movie::factory()->create([
+        'tmdb_id' => 35,
+        'release_year' => 2026,
+        'release_date' => '2026-01-01',
+        'tmdb_last_synced_at' => null,
+    ]);
+
+    $dtoData = [
+        'id' => 35,
+        'title' => 'Some Post-Production Film',
+        'overview' => 'A film still in production.',
+        'release_date' => '',
+        'genres' => [],
+        'videos' => ['results' => []],
+        'keywords' => ['keywords' => []],
+        'credits' => [
+            'crew' => [
+                ['job' => 'Director', 'name' => 'Shane Stanley'],
+                ['job' => 'Writer', 'name' => 'Lee Wilson'],
+            ],
+        ],
+        'status' => 'Post Production',
+    ];
+    $dto = TmdbMovieData::fromApiResponse($dtoData);
+
+    $this->mock(TMDBService::class, function ($mock) use ($dto): void {
+        $mock->shouldReceive('getMovieDetailsAsDto')
+            ->once()
+            ->with(35)
+            ->andReturn($dto);
+    });
+
+    $job = new RefreshTmdbMovieJob($movie);
+    $job->handle(app(TMDBService::class), app(PersonSyncService::class));
+
+    $movie->refresh();
+    expect($movie->release_year)->toBe(2026)
+        ->and($movie->release_date->toDateString())->toBe('2026-01-01')
+        ->and($movie->director)->toBe('Shane Stanley')
+        ->and($movie->production_status)->toBe('Post Production')
+        ->and($movie->tmdb_last_synced_at)->not->toBeNull();
+});
+
 test('RefreshTmdbMovieJob does nothing when TMDB returns null', function () {
     Log::shouldReceive('warning')->once();
 

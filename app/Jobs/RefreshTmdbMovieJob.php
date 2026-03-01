@@ -46,6 +46,12 @@ class RefreshTmdbMovieJob implements ShouldQueue
         unset($attrs['slug'], $attrs['poster_path'], $attrs['poster_url'], $attrs['cast'], $attrs['crew']);
         $attrs['tmdb_last_synced_at'] = now();
 
+        // Don't overwrite existing release_year/release_date with null
+        // (TMDB may lack dates for films still in production)
+        if ($attrs['release_year'] === null) {
+            unset($attrs['release_year'], $attrs['release_date']);
+        }
+
         $this->movie->fill($attrs);
         $this->movie->save();
 

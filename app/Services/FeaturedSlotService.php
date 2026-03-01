@@ -23,8 +23,8 @@ class FeaturedSlotService
     private const SLOTS = [SlotType::PickOfWeek, SlotType::Hero];
 
     /**
-     * Get eligible movies ranked by rating desc, created_at desc.
-     * If all published movies have been featured, reset eligibility (catalog exhaustion).
+     * Get eligible movies using the PickOfWeek strategy (highest-rated).
+     * Kept for backward compatibility; prefer getEligibleMoviesForSlot().
      *
      * @return Collection<int, Movie>
      */
@@ -185,8 +185,8 @@ class FeaturedSlotService
     {
         $upcomingQuery = clone $query;
         $upcoming = $upcomingQuery
-            ->where('is_upcoming', true)
-            ->orderByRaw('release_date IS NULL, release_date ASC')
+            ->upcoming()
+            ->orderByRaw('CASE WHEN release_date IS NULL THEN 1 ELSE 0 END, release_date ASC')
             ->orderByDesc('tmdb_vote_average')
             ->limit(20)
             ->get();

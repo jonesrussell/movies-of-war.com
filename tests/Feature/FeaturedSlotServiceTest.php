@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Enums\SlotType;
 use App\Models\FeaturedSlotHistory;
 use App\Models\FeaturedSlotQueue;
 use App\Models\Movie;
@@ -137,4 +140,148 @@ test('fillQueue handles fewer eligible movies than queue depth gracefully', func
     expect($total)->toBeLessThanOrEqual(3)
         ->and($total)->toBeGreaterThan(0)
         ->and($added)->toBe($total);
+});
+
+// =========================================================================
+// Slot Strategy Tests
+// =========================================================================
+
+test('hero slot selects upcoming movie over higher-rated classic', function () {
+    Movie::factory()->published()->create([
+        'tmdb_vote_average' => 9.5,
+        'is_upcoming' => false,
+    ]);
+    $upcoming = Movie::factory()->published()->upcoming()->create([
+        'tmdb_vote_average' => 6.0,
+    ]);
+
+    $result = $this->service->getEligibleMoviesForSlot(SlotType::Hero);
+
+    expect($result->first()->id)->toBe($upcoming->id);
+});
+
+test('pick of week slot selects highest-rated regardless of upcoming status', function () {
+    $classic = Movie::factory()->published()->create([
+        'tmdb_vote_average' => 9.5,
+        'is_upcoming' => false,
+    ]);
+    Movie::factory()->published()->upcoming()->create([
+        'tmdb_vote_average' => 6.0,
+    ]);
+
+    $result = $this->service->getEligibleMoviesForSlot(SlotType::PickOfWeek);
+
+    expect($result->first()->id)->toBe($classic->id);
+});
+
+test('hero slot falls back to highest-rated when no upcoming movies exist', function () {
+    $highRated = Movie::factory()->published()->create([
+        'tmdb_vote_average' => 9.0,
+        'is_upcoming' => false,
+    ]);
+    Movie::factory()->published()->create([
+        'tmdb_vote_average' => 6.0,
+        'is_upcoming' => false,
+    ]);
+
+    $result = $this->service->getEligibleMoviesForSlot(SlotType::Hero);
+
+    expect($result->first()->id)->toBe($highRated->id);
+});
+
+test('upcoming strategy orders by soonest release date first', function () {
+    $later = Movie::factory()->published()->create([
+        'is_upcoming' => true,
+        'release_date' => now()->addMonths(6),
+        'tmdb_vote_average' => 8.0,
+    ]);
+    $sooner = Movie::factory()->published()->create([
+        'is_upcoming' => true,
+        'release_date' => now()->addMonth(),
+        'tmdb_vote_average' => 5.0,
+    ]);
+
+    $result = $this->service->getEligibleMoviesForSlot(SlotType::Hero);
+
+    expect($result->first()->id)->toBe($sooner->id)
+        ->and($result->values()[1]->id)->toBe($later->id);
+});
+
+test('fillQueue uses different strategies per slot', function () {
+    // Create enough non-upcoming movies for PickOfWeek to consume without taking the upcoming one
+    Movie::factory()->published()->count(8)->create([
+        'tmdb_vote_average' => 8.0,
+        'is_upcoming' => false,
+    ]);
+    $upcoming = Movie::factory()->published()->upcoming()->create([
+        'tmdb_vote_average' => 5.0,
+        'release_date' => now()->addMonth(),
+    ]);
+
+    $this->service->fillQueue();
+
+    $heroMovie = FeaturedSlotQueue::slot(SlotType::Hero)
+        ->orderBy('position')
+        ->first();
+    $pickMovie = FeaturedSlotQueue::slot(SlotType::PickOfWeek)
+        ->orderBy('position')
+        ->first();
+
+    // Hero should pick the upcoming movie (upcoming strategy)
+    expect($heroMovie->movie_id)->toBe($upcoming->id);
+    // PickOfWeek should pick a higher-rated non-upcoming movie (highest-rated strategy)
+    expect($pickMovie->movie_id)->not->toBe($upcoming->id);
+});
+
+test('upcoming strategy sorts null release dates after known dates', function () {
+    $nullDate = Movie::factory()->published()->create([
+        'is_upcoming' => true,
+        'release_date' => null,
+        'tmdb_vote_average' => 9.0,
+    ]);
+    $knownDate = Movie::factory()->published()->create([
+        'is_upcoming' => true,
+        'release_date' => now()->addMonths(6),
+        'tmdb_vote_average' => 5.0,
+    ]);
+
+    $result = $this->service->getEligibleMoviesForSlot(SlotType::Hero);
+
+    expect($result->first()->id)->toBe($knownDate->id)
+        ->and($result->values()[1]->id)->toBe($nullDate->id);
+});
+
+test('getEligibleMovies delegates to PickOfWeek strategy', function () {
+    Movie::factory()->published()->upcoming()->create([
+        'tmdb_vote_average' => 5.0,
+        'release_date' => now()->addMonth(),
+    ]);
+    Movie::factory()->published()->create([
+        'tmdb_vote_average' => 9.5,
+        'is_upcoming' => false,
+    ]);
+
+    $legacy = $this->service->getEligibleMovies();
+    $explicit = $this->service->getEligibleMoviesForSlot(SlotType::PickOfWeek);
+
+    expect($legacy->pluck('id')->toArray())->toBe($explicit->pluck('id')->toArray());
+});
+
+test('catalog exhaustion resets eligibility for upcoming strategy', function () {
+    $upcoming = Movie::factory()->published()->upcoming()->create([
+        'tmdb_vote_average' => 7.0,
+        'release_date' => now()->addMonth(),
+    ]);
+    $classic = Movie::factory()->published()->create([
+        'tmdb_vote_average' => 9.0,
+        'is_upcoming' => false,
+    ]);
+
+    FeaturedSlotHistory::factory()->create(['movie_id' => $upcoming->id]);
+    FeaturedSlotHistory::factory()->create(['movie_id' => $classic->id]);
+
+    $result = $this->service->getEligibleMoviesForSlot(SlotType::Hero);
+
+    // After exhaustion reset, upcoming movies should still be prioritized
+    expect($result->first()->id)->toBe($upcoming->id);
 });

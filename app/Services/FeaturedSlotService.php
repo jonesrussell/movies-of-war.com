@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\SelectionMethod;
+use App\Enums\SlotStrategy;
 use App\Enums\SlotType;
 use App\Models\FeaturedSlotHistory;
 use App\Models\FeaturedSlotQueue;
 use App\Models\Movie;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -21,37 +23,29 @@ class FeaturedSlotService
     private const SLOTS = [SlotType::PickOfWeek, SlotType::Hero];
 
     /**
-     * Get eligible movies ranked by rating desc, created_at desc.
-     * If all published movies have been featured, reset eligibility (catalog exhaustion).
+     * Get eligible movies using the PickOfWeek strategy (highest-rated).
+     * Kept for backward compatibility; prefer getEligibleMoviesForSlot().
      *
      * @return Collection<int, Movie>
      */
     public function getEligibleMovies(): Collection
     {
-        $publishedCount = Movie::query()->published()->count();
-        $featuredMovieIds = FeaturedSlotHistory::query()
-            ->distinct()
-            ->pluck('movie_id')
-            ->filter()
-            ->toArray();
+        return $this->getEligibleMoviesForSlot(SlotType::PickOfWeek);
+    }
 
-        $exhausted = $publishedCount > 0 && count($featuredMovieIds) >= $publishedCount;
+    /**
+     * Get eligible movies for a specific slot, applying that slot's strategy.
+     *
+     * @return Collection<int, Movie>
+     */
+    public function getEligibleMoviesForSlot(SlotType $slot): Collection
+    {
+        $query = $this->baseEligibleQuery();
 
-        $queuedMovieIds = FeaturedSlotQueue::query()->pluck('movie_id')->toArray();
-
-        $query = Movie::query()
-            ->published()
-            ->whereNotIn('id', $queuedMovieIds);
-
-        if (! $exhausted) {
-            $query->whereNotIn('id', $featuredMovieIds);
-        }
-
-        return $query
-            ->orderByDesc('tmdb_vote_average')
-            ->orderByDesc('created_at')
-            ->limit(20)
-            ->get();
+        return match ($slot->strategy()) {
+            SlotStrategy::Upcoming => $this->applyUpcomingStrategy($query),
+            SlotStrategy::HighestRated => $this->applyHighestRatedStrategy($query),
+        };
     }
 
     /**
@@ -153,6 +147,73 @@ class FeaturedSlotService
     }
 
     /**
+     * Base query for eligible movies: published, not queued, with catalog exhaustion handling.
+     *
+     * @return Builder<Movie>
+     */
+    private function baseEligibleQuery(): Builder
+    {
+        $publishedCount = Movie::query()->published()->count();
+        $featuredMovieIds = FeaturedSlotHistory::query()
+            ->distinct()
+            ->pluck('movie_id')
+            ->filter()
+            ->toArray();
+
+        $exhausted = $publishedCount > 0 && count($featuredMovieIds) >= $publishedCount;
+
+        $queuedMovieIds = FeaturedSlotQueue::query()->pluck('movie_id')->toArray();
+
+        $query = Movie::query()
+            ->published()
+            ->whereNotIn('id', $queuedMovieIds);
+
+        if (! $exhausted) {
+            $query->whereNotIn('id', $featuredMovieIds);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Upcoming strategy: upcoming movies by soonest release date, falls back to highest-rated.
+     *
+     * @param  Builder<Movie>  $query
+     * @return Collection<int, Movie>
+     */
+    private function applyUpcomingStrategy(Builder $query): Collection
+    {
+        $upcomingQuery = clone $query;
+        $upcoming = $upcomingQuery
+            ->upcoming()
+            ->orderByRaw('CASE WHEN release_date IS NULL THEN 1 ELSE 0 END, release_date ASC')
+            ->orderByDesc('tmdb_vote_average')
+            ->limit(20)
+            ->get();
+
+        if ($upcoming->isNotEmpty()) {
+            return $upcoming;
+        }
+
+        return $this->applyHighestRatedStrategy($query);
+    }
+
+    /**
+     * Highest-rated strategy: order by TMDB vote average descending.
+     *
+     * @param  Builder<Movie>  $query
+     * @return Collection<int, Movie>
+     */
+    private function applyHighestRatedStrategy(Builder $query): Collection
+    {
+        return $query
+            ->orderByDesc('tmdb_vote_average')
+            ->orderByDesc('created_at')
+            ->limit(20)
+            ->get();
+    }
+
+    /**
      * Pick the next eligible movie for a slot on a given date and insert it.
      */
     private function assignMovieToSlot(SlotType $slot, Carbon $scheduledFor): bool
@@ -162,7 +223,7 @@ class FeaturedSlotService
             ->where('slot', '!=', $slot->value)
             ->value('movie_id');
 
-        $eligible = $this->getEligibleMovies();
+        $eligible = $this->getEligibleMoviesForSlot($slot);
 
         if ($otherSlotMovieId) {
             $eligible = $eligible->where('id', '!=', $otherSlotMovieId);

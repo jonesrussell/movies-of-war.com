@@ -36,6 +36,13 @@ class WarArticle extends BaseArticle
         'articleable_id',
     ];
 
+    public function movies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Movie::class, 'article_movie', 'article_id', 'movie_id')
+            ->withTimestamps()
+            ->withPivot('confidence');
+    }
+
     public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         $tagModel = config('northcloud.models.tag');

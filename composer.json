@@ -12,7 +12,7 @@
         "php": "^8.2",
         "guzzlehttp/guzzle": "^7.10",
         "inertiajs/inertia-laravel": "^2.0",
-        "jonesrussell/northcloud-laravel": "dev-main",
+        "jonesrussell/northcloud-laravel": "^0.10",
         "jonesrussell/x-suite-laravel": "^0.1",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",

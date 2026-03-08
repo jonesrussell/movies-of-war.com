@@ -10,32 +10,29 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Publish scheduled X posts every minute
-Schedule::call(function (): void {
-    XPost::query()
-        ->readyToPublish()
-        ->each(function (XPost $xPost): void {
-            PublishXPost::dispatch($xPost);
-        });
-})->everyMinute()->name('publish-scheduled-x-posts')->withoutOverlapping();
-
-// Sync X analytics every 15 minutes (respect rate limits)
-Schedule::command('x-suite:sync-analytics --limit=50')
-    ->everyFifteenMinutes()
-    ->name('sync-x-analytics')
-    ->withoutOverlapping();
-
-// Monitor trends every 30 minutes
-Schedule::command('x-suite:monitor-trends')
-    ->everyThirtyMinutes()
-    ->name('monitor-x-trends')
-    ->withoutOverlapping();
-
-// Process auto-replies every 10 minutes
-Schedule::command('x-suite:process-auto-replies --limit=10')
-    ->everyTenMinutes()
-    ->name('process-x-auto-replies')
-    ->withoutOverlapping();
+// X (Twitter) scheduled tasks disabled — API tier does not support these endpoints (402)
+// Schedule::call(function (): void {
+//     XPost::query()
+//         ->readyToPublish()
+//         ->each(function (XPost $xPost): void {
+//             PublishXPost::dispatch($xPost);
+//         });
+// })->everyMinute()->name('publish-scheduled-x-posts')->withoutOverlapping();
+//
+// Schedule::command('x-suite:sync-analytics --limit=50')
+//     ->everyFifteenMinutes()
+//     ->name('sync-x-analytics')
+//     ->withoutOverlapping();
+//
+// Schedule::command('x-suite:monitor-trends')
+//     ->everyThirtyMinutes()
+//     ->name('monitor-x-trends')
+//     ->withoutOverlapping();
+//
+// Schedule::command('x-suite:process-auto-replies --limit=10')
+//     ->everyTenMinutes()
+//     ->name('process-x-auto-replies')
+//     ->withoutOverlapping();
 
 // Graduate upcoming movies to released when release date passes (daily at 2 AM)
 Schedule::command('movies:graduate-upcoming')
@@ -43,17 +40,15 @@ Schedule::command('movies:graduate-upcoming')
     ->name('graduate-upcoming-movies')
     ->withoutOverlapping();
 
-// Discover content daily at 2 AM
-Schedule::command('x-suite:discover-content --min-likes=10 --max-results=50')
-    ->dailyAt('02:00')
-    ->name('discover-x-content')
-    ->withoutOverlapping();
-
-// Generate "War Movie of the Day" post daily at 8 AM
-Schedule::command('x:generate-content')
-    ->dailyAt('08:00')
-    ->name('generate-war-movie-post')
-    ->withoutOverlapping();
+// Schedule::command('x-suite:discover-content --min-likes=10 --max-results=50')
+//     ->dailyAt('02:00')
+//     ->name('discover-x-content')
+//     ->withoutOverlapping();
+//
+// Schedule::command('x:generate-content')
+//     ->dailyAt('08:00')
+//     ->name('generate-war-movie-post')
+//     ->withoutOverlapping();
 
 // Import new upcoming war films weekly
 Schedule::command('tmdb:import --upcoming --limit=10')
